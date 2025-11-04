@@ -4,13 +4,20 @@
       <div class="col-12 p-1" v-if="!nextStep">
         <div class="box p-2">
           <div class="row add-box">
-            <img :src="require('@/assets/add-box.avif')">
+            <svg class="mt-4 mb-2" xmlns="http://www.w3.org/2000/svg" width="300" height="200" viewBox="0 0 124 124" fill="none">
+              <rect width="124" height="124" rx="24" fill="#ABEBC6" />
+              <path
+                d="M19.375 36.7818V100.625C19.375 102.834 21.1659 104.625 23.375 104.625H87.2181C90.7818 104.625 92.5664 100.316 90.0466 97.7966L26.2034 33.9534C23.6836 31.4336 19.375 33.2182 19.375 36.7818Z"
+                fill="white" />
+              <circle cx="63.2109" cy="37.5391" r="18.1641" fill="black" />
+              <rect opacity="0.4" x="81.1328" y="80.7198" width="17.5687" height="17.3876" rx="4"
+                transform="rotate(-45 81.1328 80.7198)" fill="#FDBA74" />
+            </svg>
             <h2 class="pt-2">همین حالا وارد فاکس باکس شو</h2>
           </div>
           <div class="form-group">
             <label class="mb-2">شماره موبایل</label>
-            <input v-model="phone" type="number" class="form-control"
-                   placeholder="شماره موبایل">
+            <input v-model="phone" type="number" class="form-control" placeholder="شماره موبایل">
             <small class="form-text text-muted"></small>
           </div>
           <button class="btn btn-dark" @click="login()">
@@ -26,8 +33,7 @@
           </div>
           <div class="form-group">
             <label class="mb-2">کد تایید</label>
-            <input v-model="code" type="number" class="form-control"
-                   placeholder="کد تایید">
+            <input v-model="code" type="number" class="form-control" placeholder="کد تایید">
             <small class="form-text text-muted"></small>
           </div>
           <button class="btn btn-dark" @click="verify()">
@@ -40,7 +46,7 @@
 </template>
 
 <script>
-import {get, post} from '@/api';
+import { get, post } from '@/api';
 import { setCookie, getCookie } from '@/cookie';
 
 export default {
@@ -64,33 +70,33 @@ export default {
     verify() {
       if (this.code.length < 3) return;
       this.$emit("loading-started", "true");
-      post('/auth/verify', {phone: this.phone, code: this.code})
-          .then(response => {
-            // Handle the response data
-            if (response.success) {
-              setCookie("app-token", response.token, 7);
-              setCookie("app-channel", response.channel, 7);
-              window.location.assign("/");
-            }
-          })
-          .catch(error => {
-            // Handle the error
-            console.error(error);
-          });
+      post('/auth/verify', { phone: this.phone, code: this.code })
+        .then(response => {
+          // Handle the response data
+          if (response.success) {
+            setCookie("app-token", response.token, 7);
+            setCookie("app-channel", response.channel, 7);
+            window.location.assign("/");
+          }
+        })
+        .catch(error => {
+          // Handle the error
+          console.error(error);
+        });
     },
     login() {
       // Make a POST request
-      post('/auth/entry', {phone: this.phone})
-          .then(response => {
-            // Handle the response data
-            if (response.success) {
-              this.nextStep = true;
-            }
-          })
-          .catch(error => {
-            // Handle the error
-            console.error(error);
-          });
+      post('/auth/entry', { phone: this.phone })
+        .then(response => {
+          // Handle the response data
+          if (response.success) {
+            this.nextStep = true;
+          }
+        })
+        .catch(error => {
+          // Handle the error
+          console.error(error);
+        });
     }
   }
 }
@@ -116,12 +122,12 @@ export default {
 }
 
 .inner-box {
-  background: #ffffff;
+  background: #000;
   margin-bottom: 10px;
 }
 
 .box {
-  background: #ffffff;
+  background: #000;
   margin-bottom: 10px;
   border-radius: 1rem;
   border: 1px solid #555;
@@ -145,10 +151,12 @@ export default {
 
 .box h2 {
   font-size: 1rem;
+  color: #ffffff;
 }
 
-.box p {
-  font-size: 0.6rem;
+.box label {
+  color: #ffffff;
+  font-size: 0.8rem;
 }
 
 .box:hover {
@@ -181,10 +189,12 @@ export default {
   font-size: 1rem;
   text-wrap: normal;
   word-break: break-all;
+  color: #ffffff;
 }
 
 button {
   margin-top: 20px;
+  background-color: #222;
   float: left;
 }
 

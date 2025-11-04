@@ -107,7 +107,7 @@ export default {
 .reply {
   border-radius: 0.5rem;
   z-index: 1200;
-  background-color: #ffffff;
+  background-color: #000;
   position: fixed;
   padding: 10px;
   bottom: 0;
@@ -115,6 +115,8 @@ export default {
   width: 100%;
 }
 .reply textarea {
-  border: 1px solid #e1e1e1;
+  border: 1px solid #58D68D;
+  background: #000;
+  color: #ffffff;
 }
 </style>
