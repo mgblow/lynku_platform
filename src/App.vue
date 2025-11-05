@@ -17,6 +17,7 @@ export default {
 </script>
 <style>
 .og-coordinates {
+
   display: none !important;
 }
 

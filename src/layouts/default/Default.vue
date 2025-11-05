@@ -1,5 +1,5 @@
 <template>
-  <div class="row default-page-wrapper">
+  <div class="col default-page-wrapper">
     <slot/>
     <default-nav/>
   </div>
@@ -35,8 +35,7 @@ body {
 }
 
 .default-page-wrapper {
-  padding: 25px;
-  margin: 0;
+  margin: 10px auto;
 }
 
 a{

@@ -1,6 +1,4 @@
-import Contracts from '../views/Contracts.vue'
 import {createRouter, createWebHashHistory} from 'vue-router'
-import Contract from "../views/Contract.vue";
 import Box from "../views/Box.vue"
 import Profile from "../views/Profile.vue";
 import AddBox from "../views/AddBox.vue";
@@ -8,6 +6,8 @@ import Login from "../views/Login.vue";
 import Others from "../views/Others.vue";
 import Mail from "../views/Mail.vue";
 import Chat from "../views/Chat.vue";
+import Feed from '../views/Feed.vue';
+import Tweet from '../views/Tweet.vue';
 
 const history = createWebHashHistory()
 const routes = [
@@ -44,7 +44,7 @@ const routes = [
         }
     },
     {
-        path: '/profile/:id',
+        path: '/profile',
         name: 'Profile',
         component: Profile,
         meta: {
@@ -53,14 +53,14 @@ const routes = [
     },
     {
         path: '/',
-        name: 'Contracts',
-        component: Contracts,
+        name: 'Feed',
+        component: Feed,
         meta: {
             layout: 'default'
         }
     },
     {
-        path: '/box/add',
+        path: '/tweet',
         name: 'AddBox',
         component: AddBox,
         meta: {
@@ -68,9 +68,9 @@ const routes = [
         }
     },
     {
-        path: '/box/:id',
-        name: 'Contract',
-        component: Contract,
+        path: '/post/:id',
+        name: 'Tweet',
+        component: Tweet,
         meta: {
             layout: 'default'
         }

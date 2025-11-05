@@ -1,362 +1,678 @@
 <template>
-  <div style="direction: ltr !important;padding: 10px">
-    <div class="row top-header">
-      <ul class="main-categories" v-show="mainCategoriesSlidedDown">
-        <li>گربه</li>
-        <li>پرندگان</li>
-        <li>چهارپا</li>
-        <li>خزندگان</li>
-        <li>احبار</li>
-      </ul>
-      <div class="menu-arrow-icon" @click="() => { mainCategoriesSlidedDown = !mainCategoriesSlidedDown }">
-        <svg v-if="!mainCategoriesSlidedDown" xmlns="http://www.w3.org/2000/svg" width="20" height="20"
-          fill="currentColor" class="bi bi-chevron-compact-down" viewBox="0 0 16 16">
-          <path fill-rule="evenodd"
-            d="M1.553 6.776a.5.5 0 0 1 .67-.223L8 9.44l5.776-2.888a.5.5 0 1 1 .448.894l-6 3a.5.5 0 0 1-.448 0l-6-3a.5.5 0 0 1-.223-.67z" />
-        </svg>
-        <svg v-if="mainCategoriesSlidedDown" xmlns="http://www.w3.org/2000/svg" width="20" height="20"
-          fill="currentColor" class="bi bi-chevron-compact-up" viewBox="0 0 16 16">
-          <path fill-rule="evenodd"
-            d="M7.776 5.553a.5.5 0 0 1 .448 0l6 3a.5.5 0 1 1-.448.894L8 6.56 2.224 9.447a.5.5 0 1 1-.448-.894l6-3z" />
-        </svg>
-      </div>
-    </div>
-
-    <div class="navigation-menu" v-if="showOptions" style="direction: rtl;">
-      <ul>
-        <li>
-          <a @click="() => { mainCategoriesSlidedDown = true; showOptions = false }">
-            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-file-text"
-              viewBox="0 0 16 16">
-              <path
-                d="M5 4a.5.5 0 0 0 0 1h6a.5.5 0 0 0 0-1H5zm-.5 2.5A.5.5 0 0 1 5 6h6a.5.5 0 0 1 0 1H5a.5.5 0 0 1-.5-.5zM5 8a.5.5 0 0 0 0 1h6a.5.5 0 0 0 0-1H5zm0 2a.5.5 0 0 0 0 1h3a.5.5 0 0 0 0-1H5z" />
-              <path
-                d="M2 2a2 2 0 0 1 2-2h8a2 2 0 0 1 2 2v12a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V2zm10-1H4a1 1 0 0 0-1 1v12a1 1 0 0 0 1 1h8a1 1 0 0 0 1-1V2a1 1 0 0 0-1-1z" />
-            </svg>
-            &nbsp
-            گروه ها
-          </a>
-        </li>
-        <li>
-          <a href="#">
-            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-file-text"
-              viewBox="0 0 16 16">
-              <path
-                d="M5 4a.5.5 0 0 0 0 1h6a.5.5 0 0 0 0-1H5zm-.5 2.5A.5.5 0 0 1 5 6h6a.5.5 0 0 1 0 1H5a.5.5 0 0 1-.5-.5zM5 8a.5.5 0 0 0 0 1h6a.5.5 0 0 0 0-1H5zm0 2a.5.5 0 0 0 0 1h3a.5.5 0 0 0 0-1H5z" />
-              <path
-                d="M2 2a2 2 0 0 1 2-2h8a2 2 0 0 1 2 2v12a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V2zm10-1H4a1 1 0 0 0-1 1v12a1 1 0 0 0 1 1h8a1 1 0 0 0 1-1V2a1 1 0 0 0-1-1z" />
-            </svg>
-            &nbsp
-            پیمان نامه
-          </a>
-        </li>
-        <li v-if="user != null">
-          <router-link to="/mail">
-            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-cash-coin"
-              viewBox="0 0 16 16">
-              <path fill-rule="evenodd" d="M11 15a4 4 0 1 0 0-8 4 4 0 0 0 0 8zm5-4a5 5 0 1 1-10 0 5 5 0 0 1 10 0z" />
-              <path
-                d="M9.438 11.944c.047.596.518 1.06 1.363 1.116v.44h.375v-.443c.875-.061 1.386-.529 1.386-1.207 0-.618-.39-.936-1.09-1.1l-.296-.07v-1.2c.376.043.614.248.671.532h.658c-.047-.575-.54-1.024-1.329-1.073V8.5h-.375v.45c-.747.073-1.255.522-1.255 1.158 0 .562.378.92 1.007 1.066l.248.061v1.272c-.384-.058-.639-.27-.696-.563h-.668zm1.36-1.354c-.369-.085-.569-.26-.569-.522 0-.294.216-.514.572-.578v1.1h-.003zm.432.746c.449.104.655.272.655.569 0 .339-.257.571-.709.614v-1.195l.054.012z" />
-              <path
-                d="M1 0a1 1 0 0 0-1 1v8a1 1 0 0 0 1 1h4.083c.058-.344.145-.678.258-1H3a2 2 0 0 0-2-2V3a2 2 0 0 0 2-2h10a2 2 0 0 0 2 2v3.528c.38.34.717.728 1 1.154V1a1 1 0 0 0-1-1H1z" />
-              <path d="M9.998 5.083 10 5a2 2 0 1 0-3.132 1.65 5.982 5.982 0 0 1 3.13-1.567z" />
-            </svg>
-            &nbsp
-            چت
-          </router-link>
-        </li>
-        <li><a href="#">
-            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor"
-              class="bi bi-person-circle" viewBox="0 0 16 16">
-              <path d="M11 6a3 3 0 1 1-6 0 3 3 0 0 1 6 0z" />
-              <path fill-rule="evenodd"
-                d="M0 8a8 8 0 1 1 16 0A8 8 0 0 1 0 8zm8-7a7 7 0 0 0-5.468 11.37C3.242 11.226 4.805 10 8 10s4.757 1.225 5.468 2.37A7 7 0 0 0 8 1z" />
-            </svg>
-            &nbsp
-            دیگران
-          </a>
-        </li>
-        <li>
-          <router-link to="/map">
-            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-map"
-              viewBox="0 0 16 16">
-              <path fill-rule="evenodd"
-                d="M15.817.113A.5.5 0 0 1 16 .5v13.934a.5.5 0 0 1-.683.464l-4.81-1.924-4.994 1.998a.5.5 0 0 1-.372 0L.183 13.887A.5.5 0 0 1 0 13.5V.566a.5.5 0 0 1 .683-.464l4.81 1.924L10.487.028a.5.5 0 0 1 .372 0l4.958 1.982zM10.5 1.271v11.837l4 1.6V2.871l-4-1.6zm-1 11.837V1.271l-4 1.6v11.837l4-1.6zm-5 1.6V2.871l-4-1.6v11.837l4 1.6z" />
-            </svg>
-            &nbsp;
-            نقشه
-          </router-link>
-        </li>
-
-        <li v-if="user != null">
-          <router-link to="/profile/@mojtaba">
-            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor"
-              class="bi bi-person-circle" viewBox="0 0 16 16">
-              <path d="M11 6a3 3 0 1 1-6 0 3 3 0 0 1 6 0z" />
-              <path fill-rule="evenodd"
-                d="M0 8a8 8 0 1 1 16 0A8 8 0 0 1 0 8zm8-7a7 7 0 0 0-5.468 11.37C3.242 11.226 4.805 10 8 10s4.757 1.225 5.468 2.37A7 7 0 0 0 8 1z" />
-            </svg>&nbsp;
-            <span>mojtaba</span>
-          </router-link>
-          <router-link to="/login">
-            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor"
-              class="bi bi-person-circle" viewBox="0 0 16 16">
-              <path d="M11 6a3 3 0 1 1-6 0 3 3 0 0 1 6 0z" />
-              <path fill-rule="evenodd"
-                d="M0 8a8 8 0 1 1 16 0A8 8 0 0 1 0 8zm8-7a7 7 0 0 0-5.468 11.37C3.242 11.226 4.805 10 8 10s4.757 1.225 5.468 2.37A7 7 0 0 0 8 1z" />
-            </svg>&nbsp;
-            <span>ورود</span>
-          </router-link>
-        </li>
-        <li v-if="user == null">
-          <router-link to="/login">
-            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor"
-              class="bi bi-person-circle" viewBox="0 0 16 16">
-              <path d="M11 6a3 3 0 1 1-6 0 3 3 0 0 1 6 0z" />
-              <path fill-rule="evenodd"
-                d="M0 8a8 8 0 1 1 16 0A8 8 0 0 1 0 8zm8-7a7 7 0 0 0-5.468 11.37C3.242 11.226 4.805 10 8 10s4.757 1.225 5.468 2.37A7 7 0 0 0 8 1z" />
-            </svg>&nbsp;
-            <span>ورود</span>
-          </router-link>
-        </li>
-        <li v-if="user != null"><a @click="logout()">
-            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-power"
-              viewBox="0 0 16 16">
-              <path d="M7.5 1v7h1V1h-1z" />
-              <path
-                d="M3 8.812a4.999 4.999 0 0 1 2.578-4.375l-.485-.874A6 6 0 1 0 11 3.616l-.501.865A5 5 0 1 1 3 8.812z" />
-            </svg>
-            &nbsp
-            خروج
-          </a>
-        </li>
-      </ul>
-    </div>
-    <nav class="navbar navbar-expand-md navbar-light fixed-bottom">
-      <div class="col col-12 p-1">
-        <div class="input-group mb-2" style="width: 100% !important;">
-          <input v-if="showSearch" type="text" class="form-control search-home" placeholder="جست و جو برای ..."
-            style="direction: rtl;">
-          <button @click="search()" class="btn btn-dark nav-menu" style="background: #000;">
-            <svg xmlns="http://www.w3.org/2000/svg" width="25" height="25" fill="currentColor"
-              class="bi bi-search-heart" viewBox="0 0 16 16">
-              <path d="M6.5 4.482c1.664-1.673 5.825 1.254 0 5.018-5.825-3.764-1.664-6.69 0-5.018Z" />
-              <path
-                d="M13 6.5a6.471 6.471 0 0 1-1.258 3.844c.04.03.078.062.115.098l3.85 3.85a1 1 0 0 1-1.414 1.415l-3.85-3.85a1.007 1.007 0 0 1-.1-.115h.002A6.5 6.5 0 1 1 13 6.5ZM6.5 12a5.5 5.5 0 1 0 0-11 5.5 5.5 0 0 0 0 11Z" />
-            </svg>
-          </button>
-          <button class="btn btn-dark nav-menu" @click="addBox()" style="background: #000;">
-            <svg xmlns="http://www.w3.org/2000/svg" width="25" height="25" fill="currentColor" class="bi bi-patch-plus"
-              viewBox="0 0 16 16">
-              <path fill-rule="evenodd"
-                d="M8 5.5a.5.5 0 0 1 .5.5v1.5H10a.5.5 0 0 1 0 1H8.5V10a.5.5 0 0 1-1 0V8.5H6a.5.5 0 0 1 0-1h1.5V6a.5.5 0 0 1 .5-.5z" />
-              <path
-                d="m10.273 2.513-.921-.944.715-.698.622.637.89-.011a2.89 2.89 0 0 1 2.924 2.924l-.01.89.636.622a2.89 2.89 0 0 1 0 4.134l-.637.622.011.89a2.89 2.89 0 0 1-2.924 2.924l-.89-.01-.622.636a2.89 2.89 0 0 1-4.134 0l-.622-.637-.89.011a2.89 2.89 0 0 1-2.924-2.924l.01-.89-.636-.622a2.89 2.89 0 0 1 0-4.134l.637-.622-.011-.89a2.89 2.89 0 0 1 2.924-2.924l.89.01.622-.636a2.89 2.89 0 0 1 4.134 0l-.715.698a1.89 1.89 0 0 0-2.704 0l-.92.944-1.32-.016a1.89 1.89 0 0 0-1.911 1.912l.016 1.318-.944.921a1.89 1.89 0 0 0 0 2.704l.944.92-.016 1.32a1.89 1.89 0 0 0 1.912 1.911l1.318-.016.921.944a1.89 1.89 0 0 0 2.704 0l.92-.944 1.32.016a1.89 1.89 0 0 0 1.911-1.912l-.016-1.318.944-.921a1.89 1.89 0 0 0 0-2.704l-.944-.92.016-1.32a1.89 1.89 0 0 0-1.912-1.911l-1.318.016z" />
-            </svg>
-          </button>
-          <button class="btn btn-dark nav-menu" @click="toggleOptions()" style="background: #000;">
-            <svg xmlns="http://www.w3.org/2000/svg" width="25" height="25" fill="currentColor" class="bi bi-list"
-              viewBox="0 0 16 16">
-              <path fill-rule="evenodd"
-                d="M2.5 12a.5.5 0 0 1 .5-.5h10a.5.5 0 0 1 0 1H3a.5.5 0 0 1-.5-.5zm0-4a.5.5 0 0 1 .5-.5h10a.5.5 0 0 1 0 1H3a.5.5 0 0 1-.5-.5zm0-4a.5.5 0 0 1 .5-.5h10a.5.5 0 0 1 0 1H3a.5.5 0 0 1-.5-.5z" />
-            </svg>
-          </button>
+  <div class="metaverse-nav">
+    <!-- Holographic Top Bar -->
+    <div class="hologram-header">
+      <div class="hologram-effect"></div>
+      <div class="nav-brand">
+        <div class="logo-hologram">
+          <div class="hologram-circle"></div>
         </div>
       </div>
-    </nav>
+
+      <div class="universal-search">
+        <div class="search-orb" @click="toggleSearch">
+          <svg viewBox="0 0 24 24" fill="currentColor">
+            <path
+              d="M15.5 14h-.79l-.28-.27C15.41 12.59 16 11.11 16 9.5 16 5.91 13.09 3 9.5 3S3 5.91 3 9.5 5.91 16 9.5 16c1.61 0 3.09-.59 4.23-1.57l.27.28v.79l5 4.99L20.49 19l-4.99-5zm-6 0C7.01 14 5 11.99 5 9.5S7.01 5 9.5 5 14 7.01 14 9.5 11.99 14 9.5 14z" />
+          </svg>
+        </div>
+        <div class="search-field" v-if="showSearch">
+          <input type="text" placeholder="جستجو در متاورس..." v-model="searchQuery" @keyup.enter="performSearch">
+          <div class="search-aura"></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Floating Navigation Orb -->
+    <div class="nav-orb-container">
+      <div class="nav-orb" :class="{ 'active': orbActive }" @click="toggleOrb">
+        <div class="orb-core"></div>
+        <div class="orb-rings">
+          <div class="ring ring-1"></div>
+          <div class="ring ring-2"></div>
+          <div class="ring ring-3"></div>
+        </div>
+      </div>
+
+      <!-- Orb Menu Items -->
+      <div class="orb-menu" v-if="orbActive">
+        <!-- Home Portal -->
+        <div class="orb-item home-portal" @click="navigateTo('/')">
+          <div class="portal-glow"></div>
+          <svg viewBox="0 0 24 24" fill="currentColor">
+            <path d="M10 20v-6h4v6h5v-8h3L12 3 2 12h3v8z" />
+          </svg>
+          <span class="tooltip">پورتال اصلی</span>
+        </div>
+
+        <!-- Universe -->
+        <div class="orb-item new-tweet" @click="navigateTo('/tweet')">
+          <div class="tweet-glow"></div>
+          <svg viewBox="0 0 24 24" fill="currentColor">
+            <path
+              d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm1 11h3v-2h-3V8h-2v3H8v2h3v3h2v-3z" />
+          </svg>
+          <span class="tooltip">توییت جدید</span>
+        </div>
+
+
+        <!-- Social Hub -->
+        <div class="orb-item social-hub" @click="navigateTo('/mail')">
+          <div class="hub-glow"></div>
+          <svg viewBox="0 0 24 24" fill="currentColor">
+            <path
+              d="M16 11c1.66 0 2.99-1.34 2.99-3S17.66 5 16 5c-1.66 0-3 1.34-3 3s1.34 3 3 3zm-8 0c1.66 0 2.99-1.34 2.99-3S9.66 5 8 5C6.34 5 5 6.34 5 8s1.34 3 3 3zm0 2c-2.33 0-7 1.17-7 3.5V19h14v-2.5c0-2.33-4.67-3.5-7-3.5zm8 0c-.29 0-.62.02-.97.05 1.16.84 1.97 1.97 1.97 3.45V19h6v-2.5c0-2.33-4.67-3.5-7-3.5z" />
+          </svg>
+          <span class="tooltip">هاب اجتماعی</span>
+        </div>
+
+        <!-- AR World -->
+        <div class="orb-item ar-world" @click="navigateTo('/map')">
+          <div class="ar-glow"></div>
+          <svg viewBox="0 0 24 24" fill="currentColor">
+            <path
+              d="M12 2a10 10 0 1 0 0 20 10 10 0 0 0 0-20zm8 10c0 1.3-.31 2.52-.85 3.6H16.9a15.92 15.92 0 0 0 0-7.2h2.25c.54 1.08.85 2.3.85 3.6zM12 4c1.4 0 2.7.37 3.84 1.02h-2.22A15.99 15.99 0 0 0 9.1 7.2H7.15A7.98 7.98 0 0 1 12 4zm-7.15 9.6H7.1a15.92 15.92 0 0 0 0-7.2H4.85A7.93 7.93 0 0 0 4 12c0 1.3.31 2.52.85 3.6zm2.3 2.4h1.95a15.99 15.99 0 0 0 4.52 2.18v2.22A7.98 7.98 0 0 1 7.15 16zm6.85 4.4v-2.22a15.99 15.99 0 0 0 4.52-2.18h1.95A7.98 7.98 0 0 1 14 20.4z" />
+          </svg>
+          <span class="tooltip">دنیای AR</span>
+        </div>
+
+
+        <!-- Marketplace -->
+        <div class="orb-item marketplace" @click="navigateTo('/market')">
+          <div class="market-glow"></div>
+          <svg viewBox="0 0 24 24" fill="currentColor">
+            <path
+              d="M7 18c-1.1 0-1.99.9-1.99 2S5.9 22 7 22s2-.9 2-2-.9-2-2-2zM1 2v2h2l3.6 7.59-1.35 2.45c-.16.28-.25.61-.25.96 0 1.1.9 2 2 2h12v-2H7.42c-.14 0-.25-.11-.25-.25l.03-.12.9-1.63h7.45c.75 0 1.41-.41 1.75-1.03l3.58-6.49c.08-.14.12-.31.12-.48 0-.55-.45-1-1-1H5.21l-.94-2H1zm16 16c-1.1 0-1.99.9-1.99 2s.89 2 1.99 2 2-.9 2-2-.9-2-2-2z" />
+          </svg>
+          <span class="tooltip">بازار متاورس</span>
+        </div>
+
+        <!-- Profile Portal -->
+        <div class="orb-item profile-portal" @click="navigateTo('/profile')">
+          <div class="profile-glow"></div>
+          <svg viewBox="0 0 24 24" fill="currentColor">
+            <path
+              d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm0 3c1.66 0 3 1.34 3 3s-1.34 3-3 3-3-1.34-3-3 1.34-3 3-3zm0 14.2c-2.5 0-4.71-1.28-6-3.22.03-1.99 4-3.08 6-3.08 1.99 0 5.97 1.09 6 3.08-1.29 1.94-3.5 3.22-6 3.22z" />
+          </svg>
+          <span class="tooltip">پورتال شخصی</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- Digital Universe Map -->
+    <div class="universe-map" v-if="showUniverseMap">
+      <div class="map-grid">
+        <div class="galaxy" v-for="galaxy in galaxies" :key="galaxy.id" :class="galaxy.type"
+          @click="enterGalaxy(galaxy)">
+          <div class="galaxy-core"></div>
+          <div class="galaxy-stars"></div>
+          <span class="galaxy-name">{{ galaxy.name }}</span>
+        </div>
+      </div>
+    </div>
   </div>
 </template>
 
 <script>
-import { deleteCookie, getCookie } from '@/cookie';
-
 export default {
+  name: 'MetaverseNavigation',
   data() {
     return {
-      loading: false,
-      user: null,
-      navs: ["خانه", "گربه", "اسکاتیش"],
-      navbarExpanded: false,
-      showOptions: false,
+      orbActive: false,
       showSearch: false,
-      mainCategoriesSlidedDown: false
+      searchQuery: '',
+      showUniverseMap: false,
+      unreadNotifications: 3,
+      unreadMessages: 5,
+      galaxies: [
+        { id: 1, name: 'جهت گربه‌ها', type: 'feline', active: true },
+        { id: 2, name: 'قلمرو سگ‌ها', type: 'canine', active: true },
+        { id: 3, name: 'آسمان پرندگان', type: 'avian', active: false },
+        { id: 4, name: 'اقیانوس آبزیان', type: 'aquatic', active: false },
+        { id: 5, name: 'جنگل خزندگان', type: 'reptile', active: true }
+      ]
     }
-  },
-  beforeMount() {
-    this.user = getCookie('app-token');
   },
   methods: {
-    toggleOptions() {
-      this.showOptions = !this.showOptions;
+    toggleOrb() {
+      this.orbActive = !this.orbActive;
     },
-    logout() {
-      deleteCookie('app-token');
-      deleteCookie('app-channel');
-      window.location.assign("/");
-    },
-    addBox() {
-      this.$router.push('/box/add');
-    },
-    search() {
-      this.showSearch = !this.showSearch;
-      this.$router.push('/');
-    }
 
+    toggleSearch() {
+      this.showSearch = !this.showSearch;
+      if (this.showSearch) {
+        setTimeout(() => {
+          document.querySelector('.search-field input')?.focus();
+        }, 100);
+      }
+    },
+
+    performSearch() {
+      if (this.searchQuery.trim()) {
+        console.log('Searching for:', this.searchQuery);
+        // Implement search logic
+      }
+    },
+
+    navigateTo(route) {
+      this.orbActive = false;
+      this.$router.push(route);
+    },
+
+    createPost() {
+      this.$router.push('/create');
+    },
+
+    toggleNotifications() {
+      // Toggle notifications panel
+      console.log('Toggle notifications');
+    },
+
+    toggleMessages() {
+      // Toggle messages panel
+      console.log('Toggle messages');
+    },
+
+    enterGalaxy(galaxy) {
+      if (galaxy.active) {
+        this.$router.push(`/galaxy/${galaxy.type}`);
+      }
+    },
+
+    toggleUniverseMap() {
+      this.showUniverseMap = !this.showUniverseMap;
+    }
   }
 }
 </script>
+
 <style scoped>
-.top-header {
-  background: #000;
-  box-shadow: 0 0 1px #fff;
-  border-bottom-left-radius: 2rem;
-  border-bottom-right-radius: 2rem;
+.metaverse-nav {
   position: fixed;
   top: 0;
-  margin: 0;
   left: 0;
-  width: 100%;
-  z-index: 9999;
-  text-align: center;
-  padding: 0;
-  padding-top: 5px;
-  text-align: center;
+  right: 0;
+  z-index: 10000;
+  pointer-events: none;
 }
 
-.top-header ul {
-  animation: slideUp 0.2s ease-out;
-  padding-bottom: 0;
+/* Holographic Header */
+.hologram-header {
+  background: rgba(0, 0, 0, 0.9);
+  backdrop-filter: blur(20px);
+  border-bottom: 1px solid rgba(29, 155, 240, 0.3);
+  padding: 12px 20px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  position: relative;
+  pointer-events: all;
 }
 
-.top-header ul li {
-  padding: 5px;
-  border-bottom: 1px solid #303952;
-  list-style: none;
-  color: #fff;
+.hologram-effect {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 2px;
+  background: linear-gradient(90deg,
+      transparent,
+      #1d9bf0,
+      #00ba7c,
+      #f91880,
+      transparent);
+  animation: hologramScan 3s linear infinite;
 }
 
-.top-header ul li:active {
-  background: #2E86C1;
-}
-
-.breadcrumb-follow {
-  border-bottom: 1px dashed #2E86C1;
-}
-
-.top-header .breadcrumb-follow h1 {
-  font-size: 14px;
-  display: inline-block;
-  padding-bottom: 10px;
-}
-
-.navbar {
-  padding-bottom: 0 !important;
-  border-radius: 1rem;
-  margin: 10px;
-  width: fit-content;
-}
-
-.search-home,
-.nav-menu {
-  border-radius: 1rem;
-}
-
-.nav-menu {
-  line-height: 0rem;
-}
-
-.menu-arrow-icon {
-  cursor: pointer;
-  display: inline-block;
-}
-
-
-.navigation-menu {
-  background: #000;
-  opacity: 1;
-  position: fixed;
-  bottom: 70px;
-  right: 10px;
-  box-shadow: 0 0 5px #444;
-  border-radius: 20px;
-  width: max-content;
-  padding: 10px;
-  animation: slideUp 0.2s ease-out;
-}
-
-
-@keyframes slideUp {
-  from {
-    transform: scaleY(0.2);
-    transition: transform 0.5s ease-in-out;
+@keyframes hologramScan {
+  0% {
+    transform: translateX(-100%);
   }
 
-  to {
-    transform: scaleY(1.2);
-    transition: transform 0.2s ease-in-out;
+  100% {
+    transform: translateX(100%);
   }
 }
 
-/* Firefox < 16 */
-@-moz-keyframes fadein {
-  from {
-    width: 0;
-    opacity: 0;
-  }
-
-  to {
-    width: max-content;
-    opacity: 1;
-  }
-}
-
-/* Safari, Chrome and Opera > 12.1 */
-@-webkit-keyframes fadein {
-  from {
-    width: 0;
-    opacity: 0;
-  }
-
-  to {
-    width: max-content;
-    opacity: 1;
-  }
-}
-
-/* Internet Explorer */
-@-ms-keyframes fadein {
-  from {
-    width: 0;
-    opacity: 0;
-  }
-
-  to {
-    width: max-content;
-    opacity: 1;
-  }
-}
-
-.navigation-menu ul {
-  padding: 0;
-  margin: 0;
-  width: max-content;
-}
-
-.navigation-menu li {
-  list-style: none;
-  background: #222;
-  padding: 5px 10px;
-  border-radius: 0.5rem;
-  margin-bottom: 5px;
-}
-
-.navigation-menu li:active {
-  background: #222222;
-}
-
-
-.navigation-menu li a {
+.logo-hologram {
+  display: flex;
+  align-items: center;
+  gap: 10px;
   color: #ffffff;
-  text-decoration: none;
+  font-weight: 700;
+  font-size: 18px;
+}
+
+.hologram-circle {
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  background: conic-gradient(from 0deg, #1d9bf0, #00ba7c, #f91880, #1d9bf0);
+  animation: rotate 4s linear infinite;
+  position: relative;
+}
+
+.hologram-circle::before {
+  content: '';
+  position: absolute;
+  inset: 2px;
+  background: #000;
+  border-radius: 50%;
+}
+
+@keyframes rotate {
+  from {
+    transform: rotate(0deg);
+  }
+
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+.universal-search {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.search-orb {
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  background: rgba(29, 155, 240, 0.2);
+  border: 1px solid rgba(29, 155, 240, 0.5);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  pointer-events: all;
+}
+
+.search-orb:hover {
+  background: rgba(29, 155, 240, 0.4);
+  transform: scale(1.1);
+}
+
+.search-orb svg {
+  width: 20px;
+  height: 20px;
+  color: #1d9bf0;
+}
+
+.search-field {
+  position: relative;
+  pointer-events: all;
+}
+
+.search-field input {
+  background: rgba(255, 255, 255, 0.1);
+  border: 1px solid rgba(29, 155, 240, 0.5);
+  border-radius: 20px;
+  padding: 8px 16px;
+  color: #ffffff;
+  font-size: 14px;
+  width: 250px;
+  backdrop-filter: blur(10px);
+}
+
+.search-field input::placeholder {
+  color: rgba(255, 255, 255, 0.6);
+}
+
+.search-aura {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  border-radius: 20px;
+  background: linear-gradient(45deg, transparent, rgba(29, 155, 240, 0.2), transparent);
+  animation: auraPulse 2s ease-in-out infinite;
+  pointer-events: none;
+}
+
+@keyframes auraPulse {
+
+  0%,
+  100% {
+    opacity: 0.5;
+  }
+
+  50% {
+    opacity: 1;
+  }
+}
+
+/* Navigation Orb */
+.nav-orb-container {
+  position: fixed;
+  bottom: 30px;
+  left: 30%;
+  transform: translateX(-50%);
+  z-index: 10001;
+  pointer-events: all;
+}
+
+.nav-orb {
+  width: 65px;
+  height: 65px;
+  border-radius: 50%;
+  background: radial-gradient(circle at 30% 30%, #000, #444);
+  border: 2px solid rgba(29, 155, 240, 0.8);
+  cursor: pointer;
+  position: relative;
+  transition: all 0.5s cubic-bezier(0.68, -0.55, 0.265, 1.55);
+  box-shadow:
+    0 0 20px rgba(29, 155, 240, 0.5),
+    inset 0 0 20px rgba(255, 255, 255, 0.1);
+  transform: translateX(-50%) scale(1);
+  /* keep horizontally centered */
+}
+
+
+.nav-orb:hover {
+  transform: scale(1.1) translateX(-50%);
+  box-shadow:
+    0 0 30px rgba(29, 155, 240, 0.8),
+    inset 0 0 30px rgba(255, 255, 255, 0.2);
+}
+
+.nav-orb.active {
+  transform: scale(1.2) translateX(-50%);
+  background: radial-gradient(circle at 30% 30%, #00ba7c, #000);
+  border-color: rgba(0, 186, 124, 0.8);
+}
+
+.orb-core {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  width: 20px;
+  height: 20px;
+  background: #ffffff;
+  border-radius: 50%;
+  animation: corePulse 2s ease-in-out infinite;
+}
+
+@keyframes corePulse {
+
+  0%,
+  100% {
+    transform: translate(-50%, -50%) scale(1);
+  }
+
+  50% {
+    transform: translate(-50%, -50%) scale(1.2);
+  }
+}
+
+.orb-rings {
+  position: relative;
+  transform: translate(50%, 50%);
+}
+
+.ring {
+  position: absolute;
+  border: 1px solid rgba(29, 155, 240, 0.6);
+  border-radius: 50%;
+  animation: ringExpand 3s linear infinite;
+}
+
+.ring-1 {
+  width: 60px;
+  height: 60px;
+  animation-delay: 0s;
+}
+
+.ring-2 {
+  width: 80px;
+  height: 80px;
+  animation-delay: 1s;
+}
+
+.ring-3 {
+  width: 100px;
+  height: 100px;
+  animation-delay: 2s;
+}
+
+@keyframes ringExpand {
+  0% {
+    transform: translate(-50%, -50%) scale(0.8);
+    opacity: 1;
+  }
+
+  100% {
+    transform: translate(-50%, -50%) scale(1.5);
+    opacity: 0;
+  }
+}
+
+/* Orb Menu */
+.orb-menu {
+  position: absolute;
+  bottom: 90px;
+  left: 50%;
+  transform: translateX(-50%);
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 20px;
+  padding: 30px;
+  background: rgba(0, 0, 0, 0.95);
+  backdrop-filter: blur(20px);
+  border: 1px solid rgba(29, 155, 240, 0.3);
+  border-radius: 24px;
+  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.5);
+}
+
+.orb-item {
+  width: 80px;
+  height: 80px;
+  border-radius: 20px;
+  background: rgba(255, 255, 255, 0.1);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  position: relative;
+  transition: all 0.3s ease;
+  border: 1px solid transparent;
+}
+
+.orb-item:hover {
+  transform: translateY(-5px) scale(1.1);
+  background: rgba(255, 255, 255, 0.15);
+  border-color: rgba(29, 155, 240, 0.5);
+}
+
+.orb-item svg {
+  width: 24px;
+  height: 24px;
+  color: #ffffff;
+  margin-bottom: 8px;
+}
+
+.orb-item .tooltip {
+  position: absolute;
+  bottom: -30px;
+  background: rgba(0, 0, 0, 0.8);
+  color: #ffffff;
+  padding: 4px 8px;
+  border-radius: 6px;
+  font-size: 12px;
+  white-space: nowrap;
+  opacity: 0;
+  transition: opacity 0.3s ease;
+}
+
+.orb-item:hover .tooltip {
+  opacity: 1;
+}
+
+/* Quick Actions */
+.quick-actions {
+  position: fixed;
+  bottom: 20px;
+  left: 50%;
+  transform: translateX(-50%);
+  display: flex;
+  gap: 15px;
+  pointer-events: all;
+}
+
+.action-pill {
+  background: rgba(255, 255, 255, 0.1);
+  backdrop-filter: blur(20px);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  border-radius: 25px;
+  padding: 12px 20px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  position: relative;
+  color: #ffffff;
+  font-size: 14px;
+  font-weight: 500;
+}
+
+.action-pill:hover {
+  background: rgba(29, 155, 240, 0.2);
+  transform: translateY(-2px);
+  border-color: rgba(29, 155, 240, 0.5);
+}
+
+.action-glow {
+  position: absolute;
+  inset: 0;
+  border-radius: 25px;
+  background: linear-gradient(45deg, transparent, rgba(29, 155, 240, 0.1), transparent);
+  animation: glowPulse 2s ease-in-out infinite;
+  pointer-events: none;
+}
+
+.notification-badge,
+.message-badge {
+  position: absolute;
+  top: -5px;
+  right: -5px;
+  background: #f91880;
+  color: #ffffff;
+  border-radius: 50%;
+  width: 18px;
+  height: 18px;
+  font-size: 10px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: 700;
+}
+
+/* Universe Map */
+.universe-map {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: radial-gradient(ellipse at center, #0a0a2a 0%, #000000 70%);
+  z-index: 9999;
+  pointer-events: all;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.map-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 40px;
+  padding: 40px;
+}
+
+.galaxy {
+  width: 120px;
+  height: 120px;
+  border-radius: 50%;
+  position: relative;
+  cursor: pointer;
+  transition: all 0.4s ease;
+}
+
+.galaxy:hover {
+  transform: scale(1.2);
+}
+
+.galaxy-core {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  background: conic-gradient(from 0deg, #1d9bf0, #00ba7c, #f91880, #1d9bf0);
+  animation: rotate 8s linear infinite;
+}
+
+.galaxy-stars {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  border-radius: 50%;
+  background: radial-gradient(circle at 30% 30%, transparent 50%, rgba(255, 255, 255, 0.8) 50%);
+  animation: twinkle 3s ease-in-out infinite;
+}
+
+.galaxy-name {
+  position: absolute;
+  bottom: -30px;
+  left: 50%;
+  transform: translateX(-50%);
+  color: #ffffff;
+  font-size: 12px;
+  white-space: nowrap;
+}
+
+@keyframes twinkle {
+
+  0%,
+  100% {
+    opacity: 0.3;
+  }
+
+  50% {
+    opacity: 1;
+  }
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+  .orb-menu {
+    grid-template-columns: repeat(2, 1fr);
+    gap: 15px;
+    padding: 20px;
+  }
+
+  .quick-actions {
+    flex-direction: column;
+    bottom: 180px;
+  }
+
+  .search-field input {
+    width: 200px;
+  }
+
+  .map-grid {
+    grid-template-columns: repeat(2, 1fr);
+    gap: 20px;
+  }
 }
 </style>
