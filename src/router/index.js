@@ -1,4 +1,4 @@
-import {createRouter, createWebHashHistory} from 'vue-router'
+import { createRouter, createWebHashHistory } from 'vue-router'
 import Box from "../views/Box.vue"
 import Profile from "../views/Profile.vue";
 import AddBox from "../views/AddBox.vue";
@@ -8,6 +8,7 @@ import Mail from "../views/Mail.vue";
 import Chat from "../views/Chat.vue";
 import Feed from '../views/Feed.vue';
 import Tweet from '../views/Tweet.vue';
+import AvatarGenerator from '../views/AvatarGenerator.vue';
 
 const history = createWebHashHistory()
 const routes = [
@@ -15,6 +16,14 @@ const routes = [
         path: '/mail',
         name: 'Mail',
         component: Mail,
+        meta: {
+            layout: 'default'
+        }
+    },
+    {
+        path: '/avatar',
+        name: 'AvatarGenerator',
+        component: AvatarGenerator,
         meta: {
             layout: 'default'
         }
@@ -101,4 +110,4 @@ const router = createRouter({
     routes
 })
 
-export {router}
+export { router }

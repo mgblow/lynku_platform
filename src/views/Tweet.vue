@@ -1,5 +1,5 @@
 <template>
-  <div class="container page" style="padding:0;margin-top: 30px;margin-bottom: 50px;">
+  <div class="container page" style="padding:0;margin-top: 60px;margin-bottom: 50px;">
     <div class="tweet-card">
       <!-- Main Tweet -->
       <div class="tweet-main">
@@ -283,9 +283,11 @@ export default {
 
 .tweet-options {
   margin-right: auto;
+  text-align: center;
 }
 
 .option-btn {
+  display: inline-block;
   background: transparent;
   border: none;
   color: #71767b;
@@ -337,6 +339,7 @@ export default {
   background: transparent;
   border: none;
   padding: 8px;
+  margin: 12px;
   border-radius: 20px;
   cursor: pointer;
   transition: all 0.2s ease;

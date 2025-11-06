@@ -5,8 +5,10 @@
       <div class="hologram-effect"></div>
       <div class="nav-brand">
         <div class="logo-hologram">
-          <div class="hologram-circle"></div>
+          <div class="hologram-circle" @click="toggleNotifications">
+          </div>
         </div>
+        <span class="brand-text">lynku</span>
       </div>
 
       <div class="universal-search">
@@ -36,77 +38,90 @@
 
       <!-- Orb Menu Items -->
       <div class="orb-menu" v-if="orbActive">
-        <!-- Home Portal -->
-        <div class="orb-item home-portal" @click="navigateTo('/')">
-          <div class="portal-glow"></div>
-          <svg viewBox="0 0 24 24" fill="currentColor">
-            <path d="M10 20v-6h4v6h5v-8h3L12 3 2 12h3v8z" />
-          </svg>
-          <span class="tooltip">پورتال اصلی</span>
-        </div>
-
-        <!-- Universe -->
-        <div class="orb-item new-tweet" @click="navigateTo('/tweet')">
-          <div class="tweet-glow"></div>
-          <svg viewBox="0 0 24 24" fill="currentColor">
-            <path
-              d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm1 11h3v-2h-3V8h-2v3H8v2h3v3h2v-3z" />
-          </svg>
-          <span class="tooltip">توییت جدید</span>
-        </div>
-
-
-        <!-- Social Hub -->
-        <div class="orb-item social-hub" @click="navigateTo('/mail')">
-          <div class="hub-glow"></div>
-          <svg viewBox="0 0 24 24" fill="currentColor">
-            <path
-              d="M16 11c1.66 0 2.99-1.34 2.99-3S17.66 5 16 5c-1.66 0-3 1.34-3 3s1.34 3 3 3zm-8 0c1.66 0 2.99-1.34 2.99-3S9.66 5 8 5C6.34 5 5 6.34 5 8s1.34 3 3 3zm0 2c-2.33 0-7 1.17-7 3.5V19h14v-2.5c0-2.33-4.67-3.5-7-3.5zm8 0c-.29 0-.62.02-.97.05 1.16.84 1.97 1.97 1.97 3.45V19h6v-2.5c0-2.33-4.67-3.5-7-3.5z" />
-          </svg>
-          <span class="tooltip">هاب اجتماعی</span>
-        </div>
-
-        <!-- AR World -->
-        <div class="orb-item ar-world" @click="navigateTo('/map')">
-          <div class="ar-glow"></div>
-          <svg viewBox="0 0 24 24" fill="currentColor">
-            <path
-              d="M12 2a10 10 0 1 0 0 20 10 10 0 0 0 0-20zm8 10c0 1.3-.31 2.52-.85 3.6H16.9a15.92 15.92 0 0 0 0-7.2h2.25c.54 1.08.85 2.3.85 3.6zM12 4c1.4 0 2.7.37 3.84 1.02h-2.22A15.99 15.99 0 0 0 9.1 7.2H7.15A7.98 7.98 0 0 1 12 4zm-7.15 9.6H7.1a15.92 15.92 0 0 0 0-7.2H4.85A7.93 7.93 0 0 0 4 12c0 1.3.31 2.52.85 3.6zm2.3 2.4h1.95a15.99 15.99 0 0 0 4.52 2.18v2.22A7.98 7.98 0 0 1 7.15 16zm6.85 4.4v-2.22a15.99 15.99 0 0 0 4.52-2.18h1.95A7.98 7.98 0 0 1 14 20.4z" />
-          </svg>
-          <span class="tooltip">دنیای AR</span>
-        </div>
-
-
-        <!-- Marketplace -->
-        <div class="orb-item marketplace" @click="navigateTo('/market')">
-          <div class="market-glow"></div>
-          <svg viewBox="0 0 24 24" fill="currentColor">
-            <path
-              d="M7 18c-1.1 0-1.99.9-1.99 2S5.9 22 7 22s2-.9 2-2-.9-2-2-2zM1 2v2h2l3.6 7.59-1.35 2.45c-.16.28-.25.61-.25.96 0 1.1.9 2 2 2h12v-2H7.42c-.14 0-.25-.11-.25-.25l.03-.12.9-1.63h7.45c.75 0 1.41-.41 1.75-1.03l3.58-6.49c.08-.14.12-.31.12-.48 0-.55-.45-1-1-1H5.21l-.94-2H1zm16 16c-1.1 0-1.99.9-1.99 2s.89 2 1.99 2 2-.9 2-2-.9-2-2-2z" />
-          </svg>
-          <span class="tooltip">بازار متاورس</span>
-        </div>
-
-        <!-- Profile Portal -->
-        <div class="orb-item profile-portal" @click="navigateTo('/profile')">
-          <div class="profile-glow"></div>
-          <svg viewBox="0 0 24 24" fill="currentColor">
-            <path
-              d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm0 3c1.66 0 3 1.34 3 3s-1.34 3-3 3-3-1.34-3-3 1.34-3 3-3zm0 14.2c-2.5 0-4.71-1.28-6-3.22.03-1.99 4-3.08 6-3.08 1.99 0 5.97 1.09 6 3.08-1.29 1.94-3.5 3.22-6 3.22z" />
-          </svg>
-          <span class="tooltip">پورتال شخصی</span>
+        <div class="ios-grid-item" v-for="action in quickActions" :key="action.id" @click="performAction(action)">
+          <div class="ios-icon-bg" :style="{ background: action.gradient }">
+            <svg viewBox="0 0 24 24" fill="currentColor" @click="navigateTo(action.link)">
+              <path :d="action.icon" />
+            </svg>
+          </div>
+          <span class="ios-grid-label">{{ action.name }}</span>
         </div>
       </div>
     </div>
 
     <!-- Digital Universe Map -->
     <div class="universe-map" v-if="showUniverseMap">
-      <div class="map-grid">
-        <div class="galaxy" v-for="galaxy in galaxies" :key="galaxy.id" :class="galaxy.type"
-          @click="enterGalaxy(galaxy)">
-          <div class="galaxy-core"></div>
-          <div class="galaxy-stars"></div>
-          <span class="galaxy-name">{{ galaxy.name }}</span>
+      <div class="ios-glass-panel">
+        <div class="panel-header">
+          <h2 class="panel-title">نقشه جهان دیجیتال</h2>
+          <button class="ios-close-btn" @click="toggleUniverseMap">
+            <svg viewBox="0 0 24 24" fill="currentColor">
+              <path
+                d="M19 6.41L17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z" />
+            </svg>
+          </button>
+        </div>
+        <div class="map-grid">
+          <div class="galaxy" v-for="galaxy in galaxies" :key="galaxy.id" :class="galaxy.type"
+            @click="enterGalaxy(galaxy)">
+            <div class="galaxy-core"></div>
+            <div class="galaxy-stars"></div>
+            <span class="galaxy-name">{{ galaxy.name }}</span>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- iOS Style Quick Actions Panel -->
+    <div class="ios-panel" v-if="showQuickActions">
+      <div class="ios-glass-panel">
+        <div class="panel-header">
+          <h2 class="panel-title">اقدامات سریع</h2>
+          <button class="ios-close-btn" @click="toggleQuickActions">
+            <svg viewBox="0 0 24 24" fill="currentColor">
+              <path
+                d="M19 6.41L17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z" />
+            </svg>
+          </button>
+        </div>
+        <div class="ios-grid">
+          <div class="ios-grid-item" v-for="action in quickActions" :key="action.id" @click="performAction(action)">
+            <div class="ios-icon-bg" :style="{ background: action.gradient }">
+              <svg viewBox="0 0 24 24" fill="currentColor">
+                <path :d="action.icon" />
+              </svg>
+            </div>
+            <span class="ios-grid-label">{{ action.name }}</span>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- iOS Style Notifications Panel -->
+    <div class="ios-panel" v-if="showNotifications">
+      <div class="ios-glass-panel">
+        <div class="panel-header">
+          <h2 class="panel-title">اعلان‌ها</h2>
+          <button class="ios-close-btn" @click="toggleNotifications">
+            <svg viewBox="0 0 24 24" fill="currentColor">
+              <path
+                d="M19 6.41L17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z" />
+            </svg>
+          </button>
+        </div>
+        <div class="ios-list">
+          <div class="ios-list-item" v-for="notification in notifications" :key="notification.id">
+            <div class="notification-avatar" :style="{ background: notification.color }">
+              <svg viewBox="0 0 24 24" fill="currentColor">
+                <path :d="notification.icon" />
+              </svg>
+            </div>
+            <div class="notification-content">
+              <h3>{{ notification.title }}</h3>
+              <p>{{ notification.message }}</p>
+              <span class="notification-time">{{ notification.time }}</span>
+            </div>
+          </div>
         </div>
       </div>
     </div>
@@ -122,6 +137,8 @@ export default {
       showSearch: false,
       searchQuery: '',
       showUniverseMap: false,
+      showQuickActions: false,
+      showNotifications: false,
       unreadNotifications: 3,
       unreadMessages: 5,
       galaxies: [
@@ -130,6 +147,70 @@ export default {
         { id: 3, name: 'آسمان پرندگان', type: 'avian', active: false },
         { id: 4, name: 'اقیانوس آبزیان', type: 'aquatic', active: false },
         { id: 5, name: 'جنگل خزندگان', type: 'reptile', active: true }
+      ],
+      quickActions: [
+        {
+          id: 1,
+          name: 'خانه',
+          icon: 'M10 20v-6h4v6h5v-8h3L12 3 2 12h3v8z',
+          gradient: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
+          link: '/'
+        },
+        {
+          id: 2,
+          name: 'پست جدید',
+          icon: 'M19 13H5v-2h14v2zm-7-8a1 1 0 0 1 1 1v3h3a1 1 0 0 1 0 2h-3v3a1 1 0 0 1-2 0v-3H8a1 1 0 0 1 0-2h3V6a1 1 0 0 1 1-1z',
+          gradient: 'linear-gradient(135deg, #ff9a9e 0%, #fecfef 100%)',
+          link: '/tweet'
+        },
+        {
+          id: 3,
+          name: 'پیام‌ها',
+          icon: 'M20 2H4a2 2 0 0 0-2 2v16l4-4h14a2 2 0 0 0 2-2V4a2 2 0 0 0-2-2z',
+          gradient: 'linear-gradient(135deg, #43e97b 0%, #38f9d7 100%)',
+          link: '/mail'
+        },
+        {
+          id: 7,
+          name: 'نقشه جهان',
+          icon: 'M12 2a10 10 0 1 0 0 20 10 10 0 0 0 0-20zm7.73 6h-3.58a6.5 6.5 0 0 0-4.15-3.32A8 8 0 0 1 19.73 8zM4.27 8a8 8 0 0 1 7.73-5.32A6.5 6.5 0 0 0 7.85 8H4.27zm0 8h3.58a6.5 6.5 0 0 0 4.15 3.32A8 8 0 0 1 4.27 16zm15.46 0a8 8 0 0 1-7.73 5.32A6.5 6.5 0 0 0 16.15 16h3.58zm-5.08-2h-5.3A4.5 4.5 0 0 1 8 12c0-.71.16-1.37.44-2h7.12c.28.63.44 1.29.44 2 0 1.39-.56 2.64-1.35 3.6z',
+          gradient: 'linear-gradient(135deg, #00c6ff 0%, #0072ff 100%)',
+          link: '/map'
+        },
+        {
+          id: 4,
+          name: 'اعلان‌ها',
+          icon: 'M10 21h4a2 2 0 0 1-4 0zm6-6v-5a6 6 0 1 0-12 0v5l-2 2v1h16v-1l-2-2z',
+          gradient: 'linear-gradient(135deg, #fddb92 0%, #d1fdff 100%)',
+          link: '/notifications'
+        },
+        {
+          id: 5,
+          name: 'تولید آواتار',
+          icon: 'M12 2a10 10 0 0 0-3.16 19.48c.5.09.68-.22.68-.48v-1.68c-2.78.6-3.37-1.34-3.37-1.34-.46-1.15-1.11-1.46-1.11-1.46-.91-.62.07-.61.07-.61 1 .07 1.52 1.04 1.52 1.04.9 1.52 2.35 1.08 2.92.83.09-.65.35-1.09.63-1.34-2.22-.26-4.55-1.12-4.55-4.98 0-1.1.39-2 .1-2.7 0 0 .84-.27 2.75 1.02A9.5 9.5 0 0 1 12 6.8c.85 0 1.7.11 2.5.32 1.9-1.3 2.75-1.02 2.75-1.02.29.7.1 1.6.1 2.7 0 3.88-2.34 4.72-4.57 4.98.36.31.67.92.67 1.85v2.74c0 .26.18.57.68.48A10 10 0 0 0 12 2z',
+          gradient: 'linear-gradient(135deg, #a1c4fd 0%, #c2e9fb 100%)',
+          link: '/avatar'
+        },
+        {
+          id: 6,
+          name: 'تنظیمات',
+          icon: 'M19.14 12.94c.04-.3.06-.61.06-.94 0-.32-.02-.64-.07-.94l2.03-1.58c.18-.14.23-.41.12-.61l-1.92-3.32c-.12-.22-.37-.29-.59-.22l-2.39.96c-.5-.38-1.03-.7-1.62-.94l-.36-2.54c-.04-.24-.24-.41-.48-.41h-3.84c-.24 0-.43.17-.47.41l-.36 2.54c-.59.24-1.13.57-1.62.94l-2.39-.96c-.22-.08-.47 0-.59.22L2.74 8.87c-.12.21-.08.47.12.61l2.03 1.58c-.05.3-.09.63-.09.94s.02.64.07.94l-2.03 1.58c-.18.14-.23.41-.12.61l1.92 3.32c.12.22.37.29.59.22l2.39-.96c.5.38 1.03.7 1.62.94l.36 2.54c.05.24.24.41.48.41h3.84c.24 0 .44-.17.47-.41l.36-2.54c.59-.24 1.13-.56 1.62-.94l2.39.96c.22.08.47 0 .59-.22l1.92-3.32c.12-.22.07-.47-.12-.61l-2.01-1.58zM12 15.6c-1.98 0-3.6-1.62-3.6-3.6s1.62-3.6 3.6-3.6 3.6 1.62 3.6 3.6-1.62 3.6-3.6 3.6z',
+          gradient: 'linear-gradient(135deg, #f093fb 0%, #f5576c 100%)',
+          link: '/settings'
+        },
+        {
+          id: 7,
+          name: 'خروج',
+          icon: 'M16 13v-2H7V8l-5 4 5 4v-3z M20 3h-8v2h8v14h-8v2h8a2 2 0 0 0 2-2V5a2 2 0 0 0-2-2z',
+          gradient: 'linear-gradient(135deg, #fa709a 0%, #fee140 100%)',
+          link: '/logout'
+        }
+      ]
+      ,
+      notifications: [
+        { id: 1, title: 'پیام جدید', message: 'شما یک پیام جدید دارید', time: '5 دقیقه پیش', icon: 'M20 2H4c-1.1 0-1.99.9-1.99 2L2 22l4-4h14c1.1 0 2-.9 2-2V4c0-1.1-.9-2-2-2zm-2 12H6v-2h12v2zm0-3H6V9h12v2zm0-3H6V6h12v2z', color: '#1d9bf0' },
+        { id: 2, title: 'دعوت به جهان', message: 'شما به جهان جدید دعوت شده‌اید', time: '1 ساعت پیش', icon: 'M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-2 15l-5-5 1.41-1.41L10 14.17l7.59-7.59L19 8l-9 9z', color: '#00ba7c' },
+        { id: 3, title: 'به‌روزرسانی', message: 'نسخه جدید متاورس در دسترس است', time: '2 ساعت پیش', icon: 'M13 3c-4.97 0-9 4.03-9 9H1l3.89 3.89.07.14L9 12H6c0-3.87 3.13-7 7-7s7 3.13 7 7-3.13 7-7 7c-1.93 0-3.68-.79-4.94-2.06l-1.42 1.42C8.27 19.99 10.51 21 13 21c4.97 0 9-4.03 9-9s-4.03-9-9-9zm-1 5v5l4.28 2.54.72-1.21-3.5-2.08V8H12z', color: '#f91880' }
       ]
     }
   },
@@ -164,8 +245,10 @@ export default {
     },
 
     toggleNotifications() {
-      // Toggle notifications panel
-      console.log('Toggle notifications');
+      this.showNotifications = !this.showNotifications;
+      if (this.showNotifications) {
+        this.unreadNotifications = 0;
+      }
     },
 
     toggleMessages() {
@@ -181,6 +264,16 @@ export default {
 
     toggleUniverseMap() {
       this.showUniverseMap = !this.showUniverseMap;
+    },
+
+    toggleQuickActions() {
+      this.showQuickActions = !this.showQuickActions;
+    },
+
+    performAction(action) {
+      console.log('Performing action:', action.name);
+      this.showQuickActions = false;
+      // Implement action logic
     }
   }
 }
@@ -234,13 +327,30 @@ export default {
   }
 }
 
+.nav-brand {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
 .logo-hologram {
   display: flex;
   align-items: center;
   gap: 10px;
+}
+
+.brand-text {
   color: #ffffff;
   font-weight: 700;
-  font-size: 18px;
+  font-size: 28px;
+  font-family: "Honk", system-ui;
+  font-optical-sizing: auto;
+  font-weight: 400;
+  font-style: normal;
+  font-variation-settings:
+    "MORF" 15,
+    "SHLN" 50;
+    color: #000;
 }
 
 .hologram-circle {
@@ -353,6 +463,7 @@ export default {
   transform: translateX(-50%);
   z-index: 10001;
   pointer-events: all;
+  opacity: 0.8;
 }
 
 .nav-orb {
@@ -368,9 +479,7 @@ export default {
     0 0 20px rgba(29, 155, 240, 0.5),
     inset 0 0 20px rgba(255, 255, 255, 0.1);
   transform: translateX(-50%) scale(1);
-  /* keep horizontally centered */
 }
-
 
 .nav-orb:hover {
   transform: scale(1.1) translateX(-50%);
@@ -395,6 +504,7 @@ export default {
   background: #ffffff;
   border-radius: 50%;
   animation: corePulse 2s ease-in-out infinite;
+  
 }
 
 @keyframes corePulse {
@@ -462,7 +572,7 @@ export default {
   gap: 20px;
   padding: 30px;
   background: rgba(0, 0, 0, 0.95);
-  backdrop-filter: blur(20px);
+  backdrop-filter: blur(100px);
   border: 1px solid rgba(29, 155, 240, 0.3);
   border-radius: 24px;
   box-shadow: 0 20px 60px rgba(0, 0, 0, 0.5);
@@ -489,11 +599,23 @@ export default {
   border-color: rgba(29, 155, 240, 0.5);
 }
 
-.orb-item svg {
-  width: 24px;
-  height: 24px;
-  color: #ffffff;
+.ios-icon-wrapper {
+  width: 40px;
+  height: 40px;
+  border-radius: 12px;
+  background: rgba(255, 255, 255, 0.1);
+  display: flex;
+  align-items: center;
+  justify-content: center;
   margin-bottom: 8px;
+  backdrop-filter: blur(10px);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+}
+
+.orb-item svg {
+  width: 20px;
+  height: 20px;
+  color: #ffffff;
 }
 
 .orb-item .tooltip {
@@ -511,6 +633,203 @@ export default {
 
 .orb-item:hover .tooltip {
   opacity: 1;
+}
+
+/* iOS Style Panels */
+.ios-panel {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(0, 0, 0, 0.7);
+  z-index: 10002;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  pointer-events: all;
+  animation: panelFadeIn 0.3s ease-out;
+}
+
+@keyframes panelFadeIn {
+  from {
+    opacity: 0;
+  }
+
+  to {
+    opacity: 1;
+  }
+}
+
+.ios-glass-panel {
+  background: rgba(255, 255, 255, 0.1);
+  backdrop-filter: blur(40px);
+  border-radius: 24px;
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  box-shadow: 0 25px 50px rgba(0, 0, 0, 0.3);
+  max-width: 90%;
+  max-height: 80%;
+  overflow: hidden;
+  animation: panelSlideUp 0.4s cubic-bezier(0.23, 1, 0.32, 1);
+}
+
+@keyframes panelSlideUp {
+  from {
+    transform: translateY(50px);
+    opacity: 0;
+  }
+
+  to {
+    transform: translateY(0);
+    opacity: 1;
+  }
+}
+
+.panel-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 20px 24px;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.panel-title {
+  color: #ffffff;
+  font-size: 20px;
+  font-weight: 600;
+  margin: 0;
+}
+
+.ios-close-btn {
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.1);
+  border: none;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.ios-close-btn:hover {
+  background: rgba(255, 255, 255, 0.2);
+  transform: scale(1.1);
+}
+
+.ios-close-btn svg {
+  width: 20px;
+  height: 20px;
+  color: #ffffff;
+}
+
+/* iOS Grid for Quick Actions */
+.ios-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 20px;
+  padding: 24px;
+}
+
+.ios-grid-item {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  padding: 16px 8px;
+  border-radius: 16px;
+}
+
+.ios-grid-item:hover {
+  background: rgba(255, 255, 255, 0.1);
+  transform: translateY(-5px);
+}
+
+.ios-icon-bg {
+  width: 60px;
+  height: 60px;
+  border-radius: 18px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-bottom: 12px;
+}
+
+.ios-icon-bg svg {
+  width: 28px;
+  height: 28px;
+  color: #ffffff;
+}
+
+.ios-grid-label {
+  color: #ffffff;
+  font-size: 14px;
+  font-weight: 500;
+  text-align: center;
+}
+
+/* iOS List for Notifications */
+.ios-list {
+  padding: 0;
+  max-height: 400px;
+  overflow-y: auto;
+}
+
+.ios-list-item {
+  display: flex;
+  padding: 16px 24px;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+  transition: all 0.2s ease;
+  cursor: pointer;
+}
+
+.ios-list-item:hover {
+  background: rgba(255, 255, 255, 0.05);
+}
+
+.ios-list-item:last-child {
+  border-bottom: none;
+}
+
+.notification-avatar {
+  width: 44px;
+  height: 44px;
+  border-radius: 12px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-left: 16px;
+  flex-shrink: 0;
+}
+
+.notification-avatar svg {
+  width: 20px;
+  height: 20px;
+  color: #ffffff;
+}
+
+.notification-content {
+  flex: 1;
+}
+
+.notification-content h3 {
+  color: #ffffff;
+  font-size: 16px;
+  font-weight: 600;
+  margin: 0 0 4px 0;
+}
+
+.notification-content p {
+  color: rgba(255, 255, 255, 0.7);
+  font-size: 14px;
+  margin: 0 0 8px 0;
+}
+
+.notification-time {
+  color: rgba(255, 255, 255, 0.5);
+  font-size: 12px;
 }
 
 /* Quick Actions */
@@ -556,8 +875,7 @@ export default {
   pointer-events: none;
 }
 
-.notification-badge,
-.message-badge {
+.notification-badge {
   position: absolute;
   top: -5px;
   right: -5px;
@@ -673,6 +991,15 @@ export default {
   .map-grid {
     grid-template-columns: repeat(2, 1fr);
     gap: 20px;
+  }
+
+  .ios-grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+
+  .ios-glass-panel {
+    max-width: 95%;
+    max-height: 85%;
   }
 }
 </style>

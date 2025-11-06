@@ -1,35 +1,61 @@
 <template>
   <div class="col default-page-wrapper">
-    <slot/>
-    <default-nav/>
+    <slot />
+    <default-nav />
+
+    <!-- Snackbar -->
+    <transition name="slide-up">
+      <div v-if="showSnackbar" class="snackbar">
+        {{ snackbarMessage }}
+      </div>
+    </transition>
   </div>
 </template>
 
 <script>
+import { inject, ref, onMounted } from 'vue'
 import DefaultNav from './DefaultNav.vue'
 
 export default {
-  components: {
-    DefaultNav
+  name: 'LayoutDefault',
+  components: { DefaultNav },
+  setup() {
+    const mqtt = inject('mqtt') // Inject global MQTT client
+    const showSnackbar = ref(false)
+    const snackbarMessage = ref('')
+
+    onMounted(() => {
+      if (mqtt) {
+        mqtt.subscribe('notification', (payload) => {
+          snackbarMessage.value = payload
+          showSnackbar.value = true
+
+          // Hide snackbar after 3 seconds
+          setTimeout(() => (showSnackbar.value = false), 3000)
+        })
+      }
+    })
+
+    return { showSnackbar, snackbarMessage }
   }
 }
 </script>
 
 <style>
-  @import url('https://fonts.googleapis.com/css2?family=Almarai:wght@700&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Almarai:wght@700&display=swap');
 </style>
 
 <style lang="scss">
-
 html {
   padding: 0;
   margin: 0;
   direction: rtl;
 }
 
-*{
+* {
   font-family: 'Almarai', sans-serif;
 }
+
 body {
   background: #000000;
 }
@@ -38,7 +64,7 @@ body {
   margin: 10px auto;
 }
 
-a{
+a {
   color: #cf6a87;
 }
 
@@ -46,10 +72,9 @@ a{
   animation: slideUp 0.2s ease-out;
 }
 
-button:active{
+button:active {
   box-shadow: 0 0 4px #555555;
 }
-
 
 @keyframes slideUp {
   from {
@@ -63,25 +88,40 @@ button:active{
   }
 }
 
-.loading-spinner {
-  width: 50px;
-  height: 50px;
-  animation: spin 2s infinite;
-  box-sizing: border-box; /* Ensure border does not affect overall size */
+/* Snackbar */
+.snackbar {
+  position: fixed;
+  bottom: 20px;
+  right: 20px;
+  background: linear-gradient(135deg, #43e97b 0%, #38f9d7 100%);
+  color: #000;
+  padding: 14px 20px;
+  border-radius: 10px;
+  font-size: 15px;
+  box-shadow: 0 0 10px rgba(0, 0, 0, 0.4);
+  z-index: 9999;
+  animation: fadeIn 0.3s ease;
 }
 
-@keyframes spin {
-  0% {
-    transform: rotate(0deg) scale(0.8);
-    border-width: 15px;
-  }
-  50% {
-    border-width: 50px;
-  }
-  100% {
-    transform: rotate(360deg) scale(0.8);
-    border-width: 15px;
-  }
+/* Animation for showing/hiding */
+.slide-up-enter-active,
+.slide-up-leave-active {
+  transition: all 0.3s ease;
+}
+.slide-up-enter-from,
+.slide-up-leave-to {
+  transform: translateY(40px);
+  opacity: 0;
 }
 
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
 </style>
