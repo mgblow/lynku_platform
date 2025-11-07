@@ -198,24 +198,7 @@ export default {
           lat: 35.3892
         }
       ],
-      avatarSVG: `
-        <svg width="80" height="80" viewBox="0 0 40 40" xmlns="http://www.w3.org/2000/svg">
-          <ellipse cx="20" cy="25" rx="15" ry="10" fill="#87CEEB" stroke="#4682B4" stroke-width="2"/>
-          <circle cx="20" cy="20" r="12" fill="#FFB6C1"/>
-          <path d="M12 10 L20 5 L28 10 Z" fill="#FFB6C1" stroke="#FF69B4" stroke-width="1"/>
-          <path d="M28 10 L36 5 L32 10 Z" fill="#FFB6C1" stroke="#FF69B4" stroke-width="1"/>
-          <circle cx="16" cy="18" r="3" fill="#000"/>
-          <circle cx="24" cy="18" r="3" fill="#000"/>
-          <path d="M20 22 L18 25 L22 25 Z" fill="#FF69B4"/>
-          <path d="M18 28 Q20 30 22 28" stroke="#000" stroke-width="1.5" fill="none"/>
-          <path d="M8 20 L14 20" stroke="#000" stroke-width="1"/>
-          <path d="M8 22 L14 23" stroke="#000" stroke-width="1"/>
-          <path d="M8 24 L14 26" stroke="#000" stroke-width="1"/>
-          <path d="M32 20 L26 20" stroke="#000" stroke-width="1"/>
-          <path d="M32 22 L26 23" stroke="#000" stroke-width="1"/>
-          <path d="M32 24 L26 26" stroke="#000" stroke-width="1"/>
-        </svg>
-      `
+      avatarSVG: null
     };
   },
   mounted() {
@@ -235,7 +218,7 @@ export default {
         await nextTick();
 
         // Convert SVG to data URL
-        const avatarDataURL = `data:image/svg+xml;base64,${btoa(this.avatarSVG)}`;
+    
 
         // Create avatar layer
         this.avatarLayer = new Vector("avatars", {
@@ -244,13 +227,13 @@ export default {
           async: false
         });
 
-        // Add avatars to the layer
         this.avatars.forEach(avatar => {
+          const avatarDataURL = `data:image/svg+xml;base64,${this.generateRandomAvatarURL()}`;
           const entity = new Entity({
             name: `avatar-${avatar.id}`,
             lonlat: new LonLat(avatar.lon, avatar.lat),
             billboard: {
-              src: avatarDataURL,
+              src: this.generateRandomAvatarURL(),
               size: [40, 40],
               offset: [0, 20],
             },
@@ -261,6 +244,7 @@ export default {
 
           this.avatarLayer.add(entity);
         });
+
 
         // Base OSM Layer
         const osm = new XYZ("OpenStreetMap", {
@@ -298,6 +282,60 @@ export default {
         console.error("Error initializing globe:", error);
       }
     },
+
+    generateRandomAvatarURL() {
+      const options = {
+        topType: [
+          "ShortHairShortFlat", "LongHairCurly", "NoHair", "Hat", "Eyepatch"
+        ],
+        accessoriesType: [
+          "Blank", "Kurt", "Round", "Prescription02"
+        ],
+        hairColor: [
+          "BrownDark", "Blonde", "Black", "Red"
+        ],
+        facialHairType: [
+          "Blank", "BeardLight", "BeardMedium"
+        ],
+        facialHairColor: [
+          "Red", "Brown", "Black"
+        ],
+        clotheType: [
+          "BlazerSweater", "Hoodie", "ShirtCrewNeck"
+        ],
+        eyeType: [
+          "Happy", "Wink", "WinkWacky", "Squint"
+        ],
+        eyebrowType: [
+          "Default", "UpDown", "Angry"
+        ],
+        mouthType: [
+          "Smile", "Serious", "Vomit", "Twinkle"
+        ],
+        skinColor: [
+          "Light", "Pale", "Brown", "DarkBrown"
+        ]
+      };
+
+      const pick = (arr) => arr[Math.floor(Math.random() * arr.length)];
+
+      const query = new URLSearchParams({
+        avatarStyle: "Circle",
+        topType: pick(options.topType),
+        accessoriesType: pick(options.accessoriesType),
+        hairColor: pick(options.hairColor),
+        facialHairType: pick(options.facialHairType),
+        facialHairColor: pick(options.facialHairColor),
+        clotheType: pick(options.clotheType),
+        eyeType: pick(options.eyeType),
+        eyebrowType: pick(options.eyebrowType),
+        mouthType: pick(options.mouthType),
+        skinColor: pick(options.skinColor),
+      });
+
+      return `http://10.20.151.166:5000/avatars?${query.toString()}`;
+    },
+
 
     setupClickEvents() {
       // Handle click events on avatars
