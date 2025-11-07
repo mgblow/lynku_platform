@@ -5,8 +5,7 @@
       <div class="tweet-header">
         <div class="user-avatar">
           <div class="avatar-placeholder">
-            <img
-              style="width: 100%;"
+            <img style="width: 100%;"
               src='https://avataaars.io/?avatarStyle=Circle&topType=LongHairStraight&accessoriesType=Blank&hairColor=SilverGray&facialHairType=BeardMajestic&facialHairColor=Auburn&clotheType=BlazerSweater&eyeType=Close&eyebrowType=Default&mouthType=ScreamOpen&skinColor=Black' />
           </div>
         </div>
@@ -20,6 +19,7 @@
       <div class="tweet-textarea">
         <textarea v-model="tweetText" class="tweet-input" placeholder="چه خبر؟..." maxlength="280"
           @input="updateCharacterCount"></textarea>
+        <input type="file" ref="fileInput" style="display: none" accept="image/*" @change="handleImageUpload" />
         <div class="textarea-actions">
           <span class="character-count" :class="{ 'warning': characterCount > 250, 'danger': characterCount > 270 }">
             {{ characterCount }}/280
@@ -30,6 +30,14 @@
       <!-- Tweet Actions -->
       <div class="tweet-actions">
         <div class="action-buttons">
+          <!-- Add Picture -->
+          <button class="action-btn" @click="triggerImageUpload">
+            <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" fill="currentColor" viewBox="0 0 16 16">
+              <path d="M6.002 5.5a1.5 1.5 0 1 1-3 0 1.5 1.5 0 0 1 3 0z" />
+              <path
+                d="M2.002 1a2 2 0 0 0-2 2v10a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V3a2 2 0 0 0-2-2h-12zm12 1a1 1 0 0 1 1 1v6.5l-3.777-1.947a.5.5 0 0 0-.577.093l-3.71 3.71-2.66-1.772a.5.5 0 0 0-.63.062L1.002 12V3a1 1 0 0 1 1-1h12z" />
+            </svg>
+          </button>
           <!-- Emoji Picker Trigger -->
           <button class="action-btn" @click="toggleEmojiPicker">
             <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" fill="currentColor" viewBox="0 0 16 16">
@@ -83,12 +91,15 @@
       </div>
     </div>
     <!-- Preview -->
-    <div v-if="tweetText" class="tweet-preview">
+    <div v-if="tweetText || imagePreview" class="tweet-preview">
       <div class="preview-header">
         <h4>پیش نمایش توییت</h4>
       </div>
       <div class="preview-content">
         <div class="preview-text">{{ tweetText }}</div>
+        <div v-if="imagePreview" class="preview-image-container">
+          <img :src="imagePreview" alt="Preview" class="preview-image" />
+        </div>
         <div v-if="location" class="preview-location">
           <small>📍 {{ location }}</small>
         </div>
@@ -110,6 +121,7 @@ export default {
       showEmojiPicker: false,
       isLoading: false,
       characterCount: 0,
+      imagePreview: null,
       popularEmojis: [
         '😊', '😂', '❤️', '🔥', '👍', '👏', '🎉', '🙏',
         '😍', '😎', '🤔', '😢', '🙌', '💯', '✨', '🌟'
@@ -127,6 +139,34 @@ export default {
     this.scrollToTop();
   },
   methods: {
+    handleImageUpload(event) {
+      const file = event.target.files[0];
+      if (file) {
+        // Check file size (4MB limit)
+        if (file.size > 4 * 1024 * 1024) {
+          this.showError('حجم فایل باید کمتر از ۴ مگابایت باشد');
+          return;
+        }
+
+        // Check file type
+        if (!file.type.match('image.*')) {
+          this.showError('لطفاً فقط فایل تصویر انتخاب کنید');
+          return;
+        }
+
+        this.selectedImage = file;
+
+        // Create preview
+        const reader = new FileReader();
+        reader.onload = (e) => {
+          this.imagePreview = e.target.result;
+        };
+        reader.readAsDataURL(file);
+      }
+    },
+    triggerImageUpload() {
+      this.$refs.fileInput.click();
+    },
     updateCharacterCount() {
       this.characterCount = this.tweetText.length;
     },
@@ -546,5 +586,11 @@ export default {
 
 .tweet-input::-webkit-scrollbar-thumb:hover {
   background: #555;
+}
+
+.preview-image{
+  width: 100%;
+  border-radius: 15px;
+  box-shadow: 0 0 5px #eee;
 }
 </style>
