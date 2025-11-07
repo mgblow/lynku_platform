@@ -12,8 +12,8 @@ app.use(createPinia())
 app.use(router)
 
 // connect MQTT globally
-const mqttClient = useMqtt()
-app.provide('mqtt', mqttClient)
+// const mqttClient = useMqtt()
+// app.provide('mqtt', mqttClient)
 
 app.mount('#app')
 export const eventBus = app;

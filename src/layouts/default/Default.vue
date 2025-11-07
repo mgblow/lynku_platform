@@ -1,5 +1,13 @@
 <template>
-  <div class="col default-page-wrapper">
+  <!-- Splash Screen -->
+  <SplashScreen 
+    v-if="showSplash" 
+    @login="handleLogin" 
+    @register="handleRegister" 
+  />
+  
+  <!-- Main App -->
+  <div v-else class="col default-page-wrapper">
     <slot />
     <default-nav />
 
@@ -15,28 +23,63 @@
 <script>
 import { inject, ref, onMounted } from 'vue'
 import DefaultNav from './DefaultNav.vue'
+import SplashScreen from './SplashScreen.vue'
 
 export default {
   name: 'LayoutDefault',
-  components: { DefaultNav },
+  components: { DefaultNav, SplashScreen },
   setup() {
-    const mqtt = inject('mqtt') // Inject global MQTT client
+    const mqtt = inject('mqtt')
     const showSnackbar = ref(false)
     const snackbarMessage = ref('')
+    const showSplash = ref(true)
+
+    const checkAuthStatus = () => {
+      const token = getCookie('app-token')
+      if (token) {
+        showSplash.value = false
+      }
+    }
+
+    const handleLogin = () => {
+      console.log('Navigate to login')
+      showSplash.value = false
+      // Add your login navigation logic here
+    }
+
+    const handleRegister = () => {
+      console.log('Navigate to register')
+      showSplash.value = false
+      // Add your register navigation logic here
+    }
+
+    const getCookie = (name) => {
+      const value = `; ${document.cookie}`
+      const parts = value.split(`; ${name}=`)
+      if (parts.length === 2) return parts.pop().split(';').shift()
+      return null
+    }
 
     onMounted(() => {
+      checkAuthStatus()
+      setInterval(() => showSplash.value = false, 4000);
       if (mqtt) {
         mqtt.subscribe('notification', (payload) => {
           snackbarMessage.value = payload
           showSnackbar.value = true
 
-          // Hide snackbar after 3 seconds
           setTimeout(() => (showSnackbar.value = false), 3000)
         })
       }
     })
 
-    return { showSnackbar, snackbarMessage }
+    return { 
+      showSnackbar, 
+      snackbarMessage, 
+      showSplash,
+      handleLogin,
+      handleRegister
+    }
   }
 }
 </script>
