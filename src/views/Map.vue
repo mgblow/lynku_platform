@@ -1,12 +1,12 @@
 <template>
   <div id="earth-container">
     <div id="earth"></div>
-    
+
     <!-- Bottom Info Panel -->
     <transition name="slide-up">
       <div v-if="selectedAvatar" class="avatar-info-panel">
         <button class="close-btn" @click="closePanel">✕</button>
-        
+
         <div class="avatar-header">
           <div class="avatar-image">
             <div class="svg-avatar" v-html="avatarSVG"></div>
@@ -48,28 +48,28 @@
               <div class="stat-item">
                 <label>Power</label>
                 <div class="stat-bar">
-                  <div class="stat-fill" :style="{width: selectedAvatar.stats.power + '%'}"></div>
+                  <div class="stat-fill" :style="{ width: selectedAvatar.stats.power + '%' }"></div>
                   <span class="stat-value">{{ selectedAvatar.stats.power }}</span>
                 </div>
               </div>
               <div class="stat-item">
                 <label>Speed</label>
                 <div class="stat-bar">
-                  <div class="stat-fill" :style="{width: selectedAvatar.stats.speed + '%'}"></div>
+                  <div class="stat-fill" :style="{ width: selectedAvatar.stats.speed + '%' }"></div>
                   <span class="stat-value">{{ selectedAvatar.stats.speed }}</span>
                 </div>
               </div>
               <div class="stat-item">
                 <label>Magic</label>
                 <div class="stat-bar">
-                  <div class="stat-fill" :style="{width: selectedAvatar.stats.magic + '%'}"></div>
+                  <div class="stat-fill" :style="{ width: selectedAvatar.stats.magic + '%' }"></div>
                   <span class="stat-value">{{ selectedAvatar.stats.magic }}</span>
                 </div>
               </div>
               <div class="stat-item">
                 <label>Intelligence</label>
                 <div class="stat-bar">
-                  <div class="stat-fill" :style="{width: selectedAvatar.stats.intelligence + '%'}"></div>
+                  <div class="stat-fill" :style="{ width: selectedAvatar.stats.intelligence + '%' }"></div>
                   <span class="stat-value">{{ selectedAvatar.stats.intelligence }}</span>
                 </div>
               </div>
@@ -94,13 +94,13 @@
 <script>
 import { nextTick } from "vue";
 import "@openglobus/og/css/og.css";
-import { 
-  Globe, 
-  XYZ, 
-  LonLat, 
-  Entity, 
-  Vector, 
-  math 
+import {
+  Globe,
+  XYZ,
+  LonLat,
+  Entity,
+  Vector,
+  math
 } from "@openglobus/og";
 
 export default {
@@ -253,7 +253,6 @@ export default {
               src: avatarDataURL,
               size: [40, 40],
               offset: [0, 20],
-              rotation: math.RADIANS * (Math.random() * 360)
             },
             properties: {
               avatarData: avatar // Store the complete avatar data
@@ -267,7 +266,7 @@ export default {
         const osm = new XYZ("OpenStreetMap", {
           isBaseLayer: true,
           url: "//{s}.tile.openstreetmap.org/{z}/{x}/{y}.png",
-          attribution: "Cloudy Cat Avatars On Earth",
+          attribution: "Lynku Avatars On Earth",
         });
 
         // Create Globe
@@ -287,32 +286,8 @@ export default {
         // Handle avatar clicks
         this.setupClickEvents();
 
-        // Rotate avatars around the center
-        this.rotateAvatars = () => {
-          let angle = 0.02 * math.RADIANS;
-          
-          this.avatarLayer.each(entity => {
-            if (!entity) return;
-            
-            const c = entity.getLonLat();
-            const rotatedLon = Math.cos(angle) * (c.lon - this.center.lon) - Math.sin(angle) * (c.lat - this.center.lat) + this.center.lon;
-            const rotatedLat = Math.sin(angle) * (c.lon - this.center.lon) + Math.cos(angle) * (c.lat - this.center.lat) + this.center.lat;
-            
-            entity.setLonLat(new LonLat(rotatedLon, rotatedLat));
-            
-            // Update bobbing animation
-            const time = Date.now() * 0.001;
-            const bobOffset = Math.sin(time + c.lon * 100) * 2;
-            
-            // Update billboard offset
-            if (entity.billboard) {
-              entity.billboard.offset = [0, 20 + bobOffset];
-            }
-          });
-        };
-
         // Add draw event listener for rotation
-        this.globe.planet.events.on("draw", this.rotateAvatars);
+        // this.globe.planet.events.on("draw", this.rotateAvatars);
 
         // Handle resize events
         window.addEventListener("resize", this.handleResize);
@@ -350,7 +325,7 @@ export default {
 
     setInitialView() {
       if (!this.globe) return;
-      
+
       setTimeout(() => {
         try {
           this.globe.planet.viewExtent([
@@ -367,11 +342,11 @@ export default {
 
     flyToAvatar() {
       if (!this.selectedAvatar || !this.globe) return;
-      
+
       try {
         const lon = this.selectedAvatar.lon;
         const lat = this.selectedAvatar.lat;
-        
+
         this.globe.planet.viewExtent([
           lon - 0.5,
           lat - 0.5,
@@ -399,7 +374,7 @@ export default {
 <style scoped>
 #earth-container {
   width: 100vw;
-  height: 50vh;
+  height: 90vh;
   overflow: hidden;
   background: none;
   position: relative;
@@ -522,11 +497,30 @@ export default {
   font-weight: 600;
 }
 
-.status.exploring { background: #e3f2fd; color: #1976d2; }
-.status.resting { background: #f3e5f5; color: #7b1fa2; }
-.status.training { background: #e8f5e8; color: #388e3c; }
-.status.playing { background: #fff3e0; color: #f57c00; }
-.status.meditating { background: #fce4ec; color: #c2185b; }
+.status.exploring {
+  background: #e3f2fd;
+  color: #1976d2;
+}
+
+.status.resting {
+  background: #f3e5f5;
+  color: #7b1fa2;
+}
+
+.status.training {
+  background: #e8f5e8;
+  color: #388e3c;
+}
+
+.status.playing {
+  background: #fff3e0;
+  color: #f57c00;
+}
+
+.status.meditating {
+  background: #fce4ec;
+  color: #c2185b;
+}
 
 .specialties {
   display: flex;
@@ -652,27 +646,27 @@ export default {
     padding: 15px;
     max-height: 60vh;
   }
-  
+
   .profile-grid {
     grid-template-columns: 1fr;
     gap: 15px;
   }
-  
+
   .avatar-header {
     flex-direction: column;
     text-align: center;
     padding-right: 0;
   }
-  
+
   .avatar-image {
     margin-left: 0;
     margin-bottom: 10px;
   }
-  
+
   .panel-actions {
     flex-direction: column;
   }
-  
+
   .btn {
     width: 100%;
   }
