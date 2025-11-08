@@ -37,11 +37,6 @@
         <!-- Tweet Content -->
         <div class="tweet-content" @click="viewPost(post)">
           <p class="tweet-text">{{ post.content }}</p>
-          
-          <!-- Media if exists -->
-          <div v-if="post.media" class="tweet-media">
-            <img :src="post.media" :alt="post.content">
-          </div>
         </div>
 
         <!-- Tweet Actions -->

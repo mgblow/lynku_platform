@@ -1,7 +1,8 @@
+import { emitter } from './../utils/event-bus';
 import { createRouter, createWebHashHistory } from 'vue-router'
 import Box from "../views/Box.vue"
 import Profile from "../views/Profile.vue";
-import AddBox from "../views/AddBox.vue";
+import Publish from "../views/Publish.vue";
 import Login from "../views/Login.vue";
 import Others from "../views/Others.vue";
 import Mail from "../views/Mail.vue";
@@ -69,9 +70,9 @@ const routes = [
         }
     },
     {
-        path: '/tweet',
-        name: 'AddBox',
-        component: AddBox,
+        path: '/publish',
+        name: 'Publish',
+        component: Publish,
         meta: {
             layout: 'default'
         }
@@ -102,7 +103,36 @@ const routes = [
         meta: {
             layout: 'default'
         }
-    }
+    },
+    {
+        path: '/logout',
+        name: 'Logout',
+        // No component needed as we're just redirecting after logic
+        beforeEnter: (to, from, next) => {
+            console.log('Logging out...');
+            // 1. Clear Local Storage
+            localStorage.clear();
+            // 2. Clear Session Storage
+            sessionStorage.clear();
+            // 3. Clear Cookies (You may need a utility function for all cookies)
+            // Example of clearing a single cookie named 'auth_token':
+            // document.cookie = "auth_token=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;";
+
+            // To clear all path-dependent cookies, you might need a more comprehensive solution 
+            // or iterate over known cookie names. For a basic setup, you can clear all:
+            document.cookie.split(";").forEach((c) => {
+                document.cookie = c.replace(/^ +/, "").replace(/=.*/, `=;expires=${new Date().toUTCString()};path=/`);
+            });
+            emitter.emit('refresh-navigation-state');
+            // 4. Navigate to the root (Feed)
+            next({ name: 'Feed', replace: true });
+        },
+        meta: {
+            layout: 'default'
+        }
+    },
+
+
 ]
 const router = createRouter({
     linkActiveClass: 'active',

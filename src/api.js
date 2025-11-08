@@ -1,24 +1,32 @@
 import axios from 'axios';
 
 const api = axios.create({
-    baseURL: process.env.VUE_APP_API_URL,
-    // You can also add other default configurations for your requests here
+  baseURL: process.env.VUE_APP_API_URL,
+  // You can also add other default configurations for your requests here
 });
 
-export const get = (url, params) => {
-    return api.get(url, { params })
-        .then(response => response.data)
-        .catch(error => {
-            throw error;
-        });
+/**
+ * GET request
+ * @param {string} url - endpoint
+ * @param {object} params - query parameters
+ * @param {object} headers - optional headers
+ */
+export const get = (url, params = {}, headers = {}) => {
+  return api.get(url, { params, headers })
+    .then(response => response.data)
+    .catch(error => { throw error; });
 };
 
-export const post = (url, data) => {
-    return api.post(url, data)
-        .then(response => response.data)
-        .catch(error => {
-            throw error;
-        });
+/**
+ * POST request
+ * @param {string} url - endpoint
+ * @param {object} data - request body
+ * @param {object} headers - optional headers
+ */
+export const post = (url, data = {}, headers = {}) => {
+  return api.post(url, data, { headers })
+    .then(response => response.data)
+    .catch(error => { throw error; });
 };
 
 export default api;

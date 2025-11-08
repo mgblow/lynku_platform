@@ -1,44 +1,49 @@
 <template>
-  <div class="container page" style="padding:0;margin-top: 30px;margin-bottom: 50px;">
-    <div class="row">
-      <div class="col-12 p-1" v-if="!nextStep">
-        <div class="box p-2">
-          <div class="row add-box">
-            <svg class="mt-4 mb-2" xmlns="http://www.w3.org/2000/svg" width="300" height="200" viewBox="0 0 124 124" fill="none">
-              <rect width="124" height="124" rx="24" fill="#ABEBC6" />
-              <path
-                d="M19.375 36.7818V100.625C19.375 102.834 21.1659 104.625 23.375 104.625H87.2181C90.7818 104.625 92.5664 100.316 90.0466 97.7966L26.2034 33.9534C23.6836 31.4336 19.375 33.2182 19.375 36.7818Z"
-                fill="white" />
-              <circle cx="63.2109" cy="37.5391" r="18.1641" fill="black" />
-              <rect opacity="0.4" x="81.1328" y="80.7198" width="17.5687" height="17.3876" rx="4"
-                transform="rotate(-45 81.1328 80.7198)" fill="#FDBA74" />
-            </svg>
-            <h2 class="pt-2">همین حالا وارد فاکس باکس شو</h2>
-          </div>
-          <div class="form-group">
-            <label class="mb-2">شماره موبایل</label>
-            <input v-model="phone" type="number" class="form-control" placeholder="شماره موبایل">
-            <small class="form-text text-muted"></small>
-          </div>
-          <button class="btn btn-dark" @click="login()">
-            ارسال کد تایید
-          </button>
+  <div class="login-terminal-page">
+    <div class="terminal-container">
+      <div class="terminal-glass-panel">
+        <div class="terminal-header">
+          <span class="brand-text">lynku</span>
         </div>
-      </div>
-      <div class="col-12 p-1" v-if="nextStep">
-        <div class="box p-2">
-          <div class="row add-box">
-            <img :src="require('@/assets/add-box.avif')">
-            <h2 class="pt-2">وارد کردن کد تایید</h2>
+
+        <div class="terminal-content">
+          <div class="access-request" v-if="!nextStep">
+            <h2 class="terminal-title">ورود به دنیای lynku</h2>
+
+            <div class="input-field-group">
+              <label for="phone-input" class="input-label">شماره موبایل</label>
+              <input id="phone-input" v-model="phone" type="text" class="terminal-input" placeholder="09xx xxx xxxx"
+                @keyup.enter="login()" maxlength="11">
+              <div class="input-glow-bar"></div>
+            </div>
+
+            <button class="terminal-btn btn-primary-glow" @click="login()" :disabled="!isPhoneValid">
+              <span class="btn-text">ارسال کد تایید</span>
+              <div class="btn-glow"></div>
+            </button>
           </div>
-          <div class="form-group">
-            <label class="mb-2">کد تایید</label>
-            <input v-model="code" type="number" class="form-control" placeholder="کد تایید">
-            <small class="form-text text-muted"></small>
+
+          <div class="verification-entry" v-if="nextStep">
+            <h2 class="terminal-title">وارد کردن کد تایید</h2>
+
+            <p class="verification-info">کد تایید به شماره {{ phone }} ارسال شد.</p>
+
+            <div class="input-field-group">
+              <label for="code-input" class="input-label">کد تایید | Verification Code</label>
+              <input id="code-input" v-model="code" type="text" class="terminal-input code-input" placeholder="____"
+                @keyup.enter="verify()" maxlength="6">
+              <div class="input-glow-bar"></div>
+            </div>
+
+            <button class="terminal-btn btn-success-glow" @click="verify()" :disabled="!isCodeValid">
+              <span class="btn-text">احراز هویت و ورود</span>
+              <div class="btn-glow"></div>
+            </button>
+            <button class="terminal-btn btn-secondary-text mt-3" @click="nextStep = false">
+              <span class="btn-text">تغییر شماره موبایل</span>
+            </button>
           </div>
-          <button class="btn btn-dark" @click="verify()">
-            احراز هویت
-          </button>
+
         </div>
       </div>
     </div>
@@ -46,13 +51,13 @@
 </template>
 
 <script>
-import { get, post } from '@/api';
-import { setCookie, getCookie } from '@/cookie';
+import { post } from '@/api';
+import { setCookie, getCookie } from '@/cookie'; // Keep your original imports
+import { emitter } from './../utils/event-bus'; // If you use an event bus for global events
 
 export default {
   emits: ["loading-started", "loading-ended"],
   name: 'Login',
-  components: {},
   data() {
     return {
       nextStep: false,
@@ -60,145 +65,338 @@ export default {
       code: ''
     }
   },
-  methods: {
-    scrollToTop() {
-      window.scrollTo({
-        top: 0,
-        behavior: 'smooth'
-      })
+  computed: {
+    isPhoneValid() {
+      // Simple validation: phone should be 11 digits
+      return this.phone.length === 11 && /^\d+$/.test(this.phone);
     },
+    isCodeValid() {
+      // Simple validation: code should be at least 3 digits
+      return this.code.length >= 3;
+    }
+  },
+  methods: {
+    // --- API Methods (Kept identical to original) ---
     verify() {
-      if (this.code.length < 3) return;
+      if (!this.isCodeValid) return; // Use computed property for guard
+
       this.$emit("loading-started", "true");
       post('/auth/verify', { phone: this.phone, code: this.code })
         .then(response => {
+          this.$emit("loading-ended", "true");
           // Handle the response data
           if (response.success) {
             setCookie("app-token", response.token, 7);
             setCookie("app-channel", response.channel, 7);
-            window.location.assign("/");
+            // Use router push for better Vue integration, but window.location.assign works too
+            emitter.emit('refresh-navigation-state');
+            this.$router.push('/');
+          } else {
+            // Handle specific verification failure UI if needed
+            alert('کد تایید اشتباه است.');
           }
         })
         .catch(error => {
+          this.$emit("loading-ended", "true");
           // Handle the error
           console.error(error);
+          alert('خطا در احراز هویت. لطفا دوباره تلاش کنید.');
         });
     },
+
     login() {
-      // Make a POST request
+      if (!this.isPhoneValid) return; // Use computed property for guard
+
+      this.$emit("loading-started", "true");
       post('/auth/entry', { phone: this.phone })
         .then(response => {
+          this.$emit("loading-ended", "true");
           // Handle the response data
           if (response.success) {
             this.nextStep = true;
+          } else {
+            alert('خطا در ارسال کد تایید. لطفا شماره را بررسی کنید.');
           }
         })
         .catch(error => {
+          this.$emit("loading-ended", "true");
           // Handle the error
           console.error(error);
+          alert('خطای شبکه. لطفا اتصال خود را بررسی کنید.');
         });
+    }
+    // --- End API Methods ---
+  },
+  mounted() {
+    // Optional: Auto-redirect if already logged in (using your cookie function)
+    if (getCookie('app-token')) {
+      this.$router.replace('/');
     }
   }
 }
-
 </script>
 
 <style scoped>
-.page {
-  animation: slideUp 0.2s ease-out;
+/* Base Setup */
+.login-terminal-page {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  min-height: 100vh;
+  padding: 30px;
+  background-color: #0d0d2a;
+  /* Deep space background */
+  background-image: radial-gradient(circle at center, rgba(30, 30, 60, 0.5), #0d0d2a);
+  animation: backgroundPulse 15s infinite alternate;
 }
 
+@keyframes backgroundPulse {
+  0% {
+    background-color: #0d0d2a;
+  }
 
-@keyframes slideUp {
+  100% {
+    background-color: #08081a;
+  }
+}
+
+.terminal-container {
+  width: 100%;
+  max-width: 450px;
+  perspective: 1000px;
+}
+
+/* Glass/Holographic Panel Styling */
+.terminal-glass-panel {
+  background: rgba(18, 18, 48, 0.8);
+  backdrop-filter: blur(20px) saturate(180%);
+  border-radius: 20px;
+  border: 1px solid rgba(25, 25, 75, 0.5);
+  box-shadow:
+    0 0 30px rgba(60, 100, 255, 0.3),
+    inset 0 0 10px rgba(100, 150, 255, 0.1);
+  padding: 30px;
+  animation: terminalFadeIn 0.8s ease-out;
+}
+
+@keyframes terminalFadeIn {
   from {
-    transform: scaleX(0.2);
-    transition: transform 0.5s ease-in-out;
+    opacity: 0;
+    transform: rotateX(10deg) scale(0.9);
   }
 
   to {
-    transform: scaleX(1.2);
-    transition: transform 0.2s ease-in-out;
+    opacity: 1;
+    transform: rotateX(0deg) scale(1);
   }
 }
 
-.inner-box {
-  background: #000;
-  margin-bottom: 10px;
+/* Header/Logo Styling */
+.terminal-header {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-bottom: 30px;
 }
 
-.box {
-  background: #000;
-  margin-bottom: 10px;
-  border-radius: 1rem;
-  border: 1px solid #555;
-  box-shadow: 0 0 2px #222;
-  overflow: hidden;
+.brand-text {
+  color: #00ffc8;
+  /* Bright teal/cyan for a futuristic glow */
+  font-weight: 700;
+  font-size: 32px;
+  text-shadow: 0 0 8px rgba(0, 255, 200, 0.7);
+  letter-spacing: 2px;
+  font-family: "Honk", system-ui;
+  /* Keeping your font choice */
+  font-optical-sizing: auto;
+  font-weight: 400;
+  font-style: normal;
+}
+
+.logo-hologram {
+  margin-left: 10px;
+}
+
+.hologram-circle {
+  width: 35px;
+  height: 35px;
+  border-radius: 50%;
+  background: conic-gradient(from 0deg, #1d9bf0, #00ba7c, #f91880, #1d9bf0);
+  animation: rotate 4s linear infinite;
   position: relative;
-  cursor: pointer;
-  width: 100%;
+  box-shadow: 0 0 10px rgba(0, 255, 200, 0.8);
 }
 
-.add-box {
+.hologram-circle::before {
+  content: '';
+  position: absolute;
+  inset: 3px;
+  background: #0d0d2a;
+  border-radius: 50%;
+}
+
+@keyframes rotate {
+  from {
+    transform: rotate(0deg);
+  }
+
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+/* Content Styling */
+.terminal-title {
+  color: #00ffc8;
+  font-size: 18px;
+  font-weight: 600;
+  text-align: center;
+  margin-bottom: 25px;
+  padding-bottom: 10px;
+  border-bottom: 1px dashed rgba(0, 255, 200, 0.3);
+}
+
+.verification-info {
+  color: #fddb92;
+  text-align: center;
+  margin-bottom: 20px;
+  font-size: 14px;
+}
+
+/* Input Fields */
+.input-field-group {
+  margin-bottom: 25px;
+  position: relative;
+}
+
+.input-label {
+  display: block;
+  color: #a3c4ff;
+  font-size: 12px;
+  margin-bottom: 8px;
+}
+
+.terminal-input {
+  width: 100%;
+  background: rgba(40, 40, 70, 0.9);
+  border: 1px solid rgba(100, 150, 255, 0.5);
+  border-radius: 6px;
+  padding: 10px 15px;
+  color: #ffffff;
+  font-size: 16px;
+  outline: none;
+  transition: all 0.3s ease;
+  box-shadow: inset 0 0 5px rgba(0, 0, 0, 0.3);
+  text-align: right;
+  /* RTL support */
+}
+
+.terminal-input.code-input {
+  letter-spacing: 5px;
   text-align: center;
 }
 
-.add-box img {
-  width: 60%;
-  display: inline-block;
-  height: auto;
-  margin: auto;
+.terminal-input::placeholder {
+  color: rgba(255, 255, 255, 0.4);
 }
 
-.box h2 {
-  font-size: 1rem;
-  color: #ffffff;
+.terminal-input:focus {
+  border-color: #00ffc8;
+  box-shadow: 0 0 10px rgba(0, 255, 200, 0.5);
 }
 
-.box label {
-  color: #ffffff;
-  font-size: 0.8rem;
-}
-
-.box:hover {
-  transform: translateY(-4px);
-  box-shadow: 0 10px 20px rgba(0, 0, 0, 0.2);
-}
-
-
-.full-post .box {
-  padding-top: 10px;
-  position: fixed;
-  overflow: hidden;
+/* Buttons */
+.terminal-btn {
   width: 100%;
+  padding: 12px 20px;
+  border: none;
+  border-radius: 8px;
+  font-weight: 700;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  position: relative;
+  overflow: hidden;
+  margin-top: 15px;
+}
+
+.terminal-btn:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+  background: #444 !important;
+}
+
+.btn-text {
+  position: relative;
+  z-index: 2;
+  color: #0d0d2a;
+}
+
+/* Primary Glow Button (Login/Send Code) */
+.btn-primary-glow {
+  background: #3c64ff;
+  color: #0d0d2a;
+}
+
+.btn-primary-glow .btn-glow {
+  background: rgba(60, 100, 255, 0.7);
+}
+
+/* Success Glow Button (Verify) */
+.btn-success-glow {
+  background: #00ffc8;
+  color: #0d0d2a;
+}
+
+.btn-success-glow .btn-glow {
+  background: rgba(0, 255, 200, 0.7);
+}
+
+.btn-glow {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  z-index: 1;
+  transition: opacity 0.3s;
+  opacity: 0;
+}
+
+.terminal-btn:hover:not(:disabled) {
+  transform: translateY(-2px);
+  box-shadow: 0 5px 15px rgba(0, 255, 200, 0.4);
+}
+
+.terminal-btn:hover:not(:disabled) .btn-glow {
   opacity: 1;
 }
 
-.full-post .box img {
-  border-radius: 1rem;
+/* Secondary Text Button */
+.btn-secondary-text {
+  background: none;
+  color: #a3c4ff;
+  border: 1px solid rgba(163, 196, 255, 0.3);
+  font-size: 14px;
 }
 
-
-.box .content h2 {
-  font-weight: 500;
-  color: #ffffff;
-  font-size: 16px;
-  width: 100%;
+.btn-secondary-text:hover {
+  background: rgba(163, 196, 255, 0.1);
 }
 
-.full-post .box .content p {
-  font-size: 1rem;
-  text-wrap: normal;
-  word-break: break-all;
-  color: #ffffff;
+/* Animation for the terminal's content slide up */
+.terminal-content {
+  animation: contentSlideUp 0.5s ease-out;
 }
 
-button {
-  margin-top: 20px;
-  background-color: #222;
-  float: left;
-}
+@keyframes contentSlideUp {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
 
-button img {
-  width: 30px;
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
 }
 </style>

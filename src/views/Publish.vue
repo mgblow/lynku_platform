@@ -17,9 +17,8 @@
 
       <!-- Tweet Text Area -->
       <div class="tweet-textarea">
-        <textarea v-model="tweetText" class="tweet-input" placeholder="چه خبر؟..." maxlength="280"
+        <textarea v-model="publishText" class="tweet-input" placeholder="چه خبر؟..." maxlength="280"
           @input="updateCharacterCount"></textarea>
-        <input type="file" ref="fileInput" style="display: none" accept="image/*" @change="handleImageUpload" />
         <div class="textarea-actions">
           <span class="character-count" :class="{ 'warning': characterCount > 250, 'danger': characterCount > 270 }">
             {{ characterCount }}/280
@@ -30,14 +29,6 @@
       <!-- Tweet Actions -->
       <div class="tweet-actions">
         <div class="action-buttons">
-          <!-- Add Picture -->
-          <button class="action-btn" @click="triggerImageUpload">
-            <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" fill="currentColor" viewBox="0 0 16 16">
-              <path d="M6.002 5.5a1.5 1.5 0 1 1-3 0 1.5 1.5 0 0 1 3 0z" />
-              <path
-                d="M2.002 1a2 2 0 0 0-2 2v10a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V3a2 2 0 0 0-2-2h-12zm12 1a1 1 0 0 1 1 1v6.5l-3.777-1.947a.5.5 0 0 0-.577.093l-3.71 3.71-2.66-1.772a.5.5 0 0 0-.63.062L1.002 12V3a1 1 0 0 1 1-1h12z" />
-            </svg>
-          </button>
           <!-- Emoji Picker Trigger -->
           <button class="action-btn" @click="toggleEmojiPicker">
             <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" fill="currentColor" viewBox="0 0 16 16">
@@ -56,7 +47,7 @@
         </div>
 
         <!-- Tweet Button -->
-        <button class="tweet-btn" :disabled="!canTweet" @click="postTweet">
+        <button class="tweet-btn" :disabled="!canPublish" @click="postPublish">
           <span class="btn-text">توییت</span>
           <svg v-if="isLoading" class="spinner" width="20" height="20" viewBox="0 0 20 20">
             <circle cx="10" cy="10" r="8" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round">
@@ -91,12 +82,12 @@
       </div>
     </div>
     <!-- Preview -->
-    <div v-if="tweetText || imagePreview" class="tweet-preview">
+    <div v-if="publishText || imagePreview" class="tweet-preview">
       <div class="preview-header">
         <h4>پیش نمایش توییت</h4>
       </div>
       <div class="preview-content">
-        <div class="preview-text">{{ tweetText }}</div>
+        <div class="preview-text">{{ publishText }}</div>
         <div v-if="imagePreview" class="preview-image-container">
           <img :src="imagePreview" alt="Preview" class="preview-image" />
         </div>
@@ -113,10 +104,11 @@ import { post } from "../api";
 import { getCookie } from '@/cookie';
 
 export default {
-  name: 'AddTweet',
+  name: 'Publish',
   data() {
     return {
-      tweetText: '',
+      coords: null,
+      publishText: '',
       location: '',
       showEmojiPicker: false,
       isLoading: false,
@@ -129,9 +121,9 @@ export default {
     };
   },
   computed: {
-    canTweet() {
-      return this.tweetText.trim().length > 0 &&
-        this.tweetText.trim().length <= 280 &&
+    canPublish() {
+      return this.publishText.trim().length > 0 &&
+        this.publishText.trim().length <= 280 &&
         !this.isLoading;
     }
   },
@@ -139,36 +131,8 @@ export default {
     this.scrollToTop();
   },
   methods: {
-    handleImageUpload(event) {
-      const file = event.target.files[0];
-      if (file) {
-        // Check file size (4MB limit)
-        if (file.size > 4 * 1024 * 1024) {
-          this.showError('حجم فایل باید کمتر از ۴ مگابایت باشد');
-          return;
-        }
-
-        // Check file type
-        if (!file.type.match('image.*')) {
-          this.showError('لطفاً فقط فایل تصویر انتخاب کنید');
-          return;
-        }
-
-        this.selectedImage = file;
-
-        // Create preview
-        const reader = new FileReader();
-        reader.onload = (e) => {
-          this.imagePreview = e.target.result;
-        };
-        reader.readAsDataURL(file);
-      }
-    },
-    triggerImageUpload() {
-      this.$refs.fileInput.click();
-    },
     updateCharacterCount() {
-      this.characterCount = this.tweetText.length;
+      this.characterCount = this.publishText.length;
     },
 
     toggleEmojiPicker() {
@@ -176,13 +140,14 @@ export default {
     },
 
     addEmoji(emoji) {
-      this.tweetText += emoji;
+      this.publishText += emoji;
       this.showEmojiPicker = false;
       this.updateCharacterCount();
     },
 
-    addLocation() {
+    async addLocation() {
       // Simulate getting location (in real app, use geolocation API)
+      this.$data.coords = await this.getUserLocation();
       const locations = ['تهران، ایران', 'اصفهان، ایران', 'شیراز، ایران', 'مشهد، ایران'];
       this.location = locations[Math.floor(Math.random() * locations.length)];
     },
@@ -191,25 +156,33 @@ export default {
       this.location = '';
     },
 
-    async postTweet() {
-      if (!this.canTweet) return;
+    async postPublish() {
+      if (!this.canPublish) return;
 
       this.isLoading = true;
 
       try {
-        const response = await post("/proxy", {
-          token: getCookie("app-token"),
-          topic: "createTweet",
-          data: {
-            text: this.tweetText,
-            location: this.location,
-            timestamp: new Date().toISOString()
+        const response = await post(
+          "/api/v1",
+          {
+            topic: "createContract",
+            data: {
+              categoryId: "690f5a0f663c9a59b44c8e18",
+              text: this.publishText,
+              location: {
+                type: "Point",
+                coordinates: [this.coords.lng, this.coords.lat], // notice: lng first!
+              },
+            }
+          },
+          {
+            "token": getCookie("app-token")
           }
-        });
+        );
 
-        if (response && response.success) {
+        if (response && response.data.success) {
           // Reset form
-          this.tweetText = '';
+          this.publishText = '';
           this.location = '';
           this.characterCount = 0;
 
@@ -242,7 +215,26 @@ export default {
         top: 0,
         behavior: 'smooth'
       });
+    },
+    async getUserLocation() {
+      return new Promise((resolve, reject) => {
+        if (!navigator.geolocation) {
+          reject(new Error("Geolocation is not supported by this browser."));
+        } else {
+          navigator.geolocation.getCurrentPosition(
+            (position) => {
+              resolve({
+                lat: position.coords.latitude,
+                lng: position.coords.longitude,
+              });
+            },
+            (err) => reject(err),
+            { enableHighAccuracy: true }
+          );
+        }
+      });
     }
+
   }
 }
 </script>
@@ -588,7 +580,7 @@ export default {
   background: #555;
 }
 
-.preview-image{
+.preview-image {
   width: 100%;
   border-radius: 15px;
   box-shadow: 0 0 5px #eee;
