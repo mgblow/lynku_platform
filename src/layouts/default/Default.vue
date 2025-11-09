@@ -1,11 +1,11 @@
 <template>
   <!-- Splash Screen -->
-  <SplashScreen 
-    v-if="showSplash" 
-    @login="handleLogin" 
-    @register="handleRegister" 
+  <SplashScreen
+    v-if="showSplash"
+    @login="handleLogin"
+    @register="handleRegister"
   />
-  
+
   <!-- Main App -->
   <div v-else class="col default-page-wrapper">
     <slot />
@@ -73,9 +73,9 @@ export default {
       }
     })
 
-    return { 
-      showSnackbar, 
-      snackbarMessage, 
+    return {
+      showSnackbar,
+      snackbarMessage,
       showSplash,
       handleLogin,
       handleRegister

@@ -15,8 +15,8 @@
                     </div>
                 </div>
                 <div class="header-text">
-                    <h1>سازنده آواتار متاورس</h1>
-                    <p>آواتار خودت رو شخصی‌سازی کن و در جهان دیجیتال ظاهر شو</p>
+                  <h1>آغاز سفری به جهان متاورس</h1>
+                  <p>چهره دیجیتال خود را خلق کن و با استایل منحصربه‌فرد وارد لِینکو شو</p>
                 </div>
             </div>
         </div>
@@ -517,9 +517,9 @@ export default {
             try {
                 // Save avatar configuration to localStorage or send to backend
                 localStorage.setItem('userAvatarConfig', JSON.stringify(this.avatarConfig))
-
+                // also publish avatar change event
                 // Show success message
-                this.showSuccess('آواتار شما با موفقیت ذخیره شد!')
+                this.$router.push('/born')
             } catch (error) {
                 console.error('Error saving avatar:', error)
                 this.showError('خطا در ذخیره‌سازی آواتار')

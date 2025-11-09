@@ -1,15 +1,16 @@
-import { emitter } from './../utils/event-bus';
+import { emitter } from './../utils/event-bus'
 import { createRouter, createWebHashHistory } from 'vue-router'
-import Box from "../views/Box.vue"
-import Profile from "../views/Profile.vue";
-import Publish from "../views/Publish.vue";
-import Login from "../views/Login.vue";
-import Others from "../views/Others.vue";
-import Mail from "../views/Mail.vue";
-import Chat from "../views/Chat.vue";
-import Feed from '../views/Feed.vue';
-import Tweet from '../views/Tweet.vue';
-import AvatarGenerator from '../views/AvatarGenerator.vue';
+import Box from '../views/Box.vue'
+import Profile from '../views/Profile.vue'
+import Publish from '../views/Publish.vue'
+import Login from '../views/Login.vue'
+import Others from '../views/Others.vue'
+import Mail from '../views/Mail.vue'
+import Chat from '../views/Chat.vue'
+import Feed from '../views/Feed.vue'
+import Tweet from '../views/Tweet.vue'
+import AvatarGenerator from '../views/AvatarGenerator.vue'
+import Born from '@/views/Born.vue'
 
 const history = createWebHashHistory()
 const routes = [
@@ -93,6 +94,15 @@ const routes = [
             layout: 'default'
         }
     },
+  {
+    path: '/born',
+    name: 'Born',
+    component: Born,
+    meta: {
+      layout: 'default'
+    }
+  }
+    ,
     {
         path: '/map',
         name: 'Map',
