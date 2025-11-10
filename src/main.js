@@ -4,6 +4,7 @@ import { createApp } from 'vue'
 import { createPinia } from 'pinia'
 import { router } from './router'
 import { useMqtt } from './services/mqtt'
+import { emitter } from '@/utils/event-bus'
 
 const app = createApp(App)
 
@@ -14,6 +15,9 @@ app.use(router)
 // connect MQTT globally
 // const mqttClient = useMqtt()
 // app.provide('mqtt', mqttClient)
+
+// Provide emitter globally
+app.provide('emitter', emitter);
 
 app.mount('#app')
 export const eventBus = app;

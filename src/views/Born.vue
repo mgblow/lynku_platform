@@ -1,6 +1,5 @@
 <template>
-  <div class="avatar-profile-container" style="margin-top: 70px;">
-
+  <div class="avatar-profile-container" style="margin-top: 70px">
     <!-- Progress Steps -->
     <div class="progress-steps">
       <div class="step" :class="{ active: currentStep === 1, completed: currentStep > 1 }">
@@ -18,10 +17,9 @@
     </div>
     <!-- Step 2: Personal Information -->
     <div v-if="currentStep === 1" class="step-container">
-
       <div class="step-header">
-        <div class="avatar-preview-large" style="display: inline-block; text-align: center;">
-          <img :src="avatarUrl" alt="Avatar Preview" class="preview-image" style="display: inline-block"/>
+        <div class="avatar-preview-large" style="display: inline-block; text-align: center">
+          <img :src="avatarUrl" alt="Avatar Preview" class="preview-image" style="display: inline-block" />
         </div>
         <h2>اطلاعات شخصی</h2>
         <p>لطفا اطلاعات پایه خود را وارد کنید</p>
@@ -30,26 +28,18 @@
       <div class="form-container">
         <div class="form-group">
           <label for="username">نام کاربری</label>
-          <input
-            type="text"
-            id="username"
-            v-model="userProfile.username"
-            placeholder="نام کاربری خود را وارد کنید"
-            required
-          >
+          <input type="text" id="username" v-model="userProfile.username" placeholder="نام کاربری خود را وارد کنید" required />
+        </div>
+
+        <div class="form-group">
+          <label for="gender">نام کاربری</label>
+          <input type="text" id="gender" v-model="userProfile.gender" placeholder="جنسیا خودت رو تعیین کن" required />
         </div>
 
         <div class="form-row">
           <div class="form-group">
             <label for="age">سن</label>
-            <input
-              type="number"
-              id="age"
-              v-model="userProfile.age"
-              min="1"
-              max="120"
-              placeholder="سن خود را وارد کنید"
-            >
+            <input type="number" id="age" v-model="userProfile.age" min="1" max="120" placeholder="سن خود را وارد کنید" />
           </div>
 
           <div class="form-group">
@@ -61,18 +51,13 @@
               min="1"
               max="300"
               placeholder="وزن خود را وارد کنید"
-            >
+            />
           </div>
         </div>
 
         <div class="form-group">
           <label for="bio">درباره من</label>
-          <textarea
-            id="bio"
-            v-model="userProfile.bio"
-            rows="4"
-            placeholder="درباره خودتان بنویسید..."
-          ></textarea>
+          <textarea id="bio" v-model="userProfile.bio" rows="4" placeholder="درباره خودتان بنویسید..."></textarea>
         </div>
 
         <div class="form-actions">
@@ -133,7 +118,7 @@
             id="customInterests"
             v-model="userProfile.customInterests"
             placeholder="مثلا: برنامه‌نویسی، عکاسی، سفر"
-          >
+          />
         </div>
 
         <div class="form-actions">
@@ -197,11 +182,7 @@
               <div class="info-item full-width">
                 <span class="info-label">علایق:</span>
                 <div class="interests-review">
-                  <span
-                    v-for="hobbyId in userProfile.hobbies"
-                    :key="hobbyId"
-                    class="interest-tag"
-                  >
+                  <span v-for="hobbyId in userProfile.hobbies" :key="hobbyId" class="interest-tag">
                     {{ getHobbyName(hobbyId) }}
                   </span>
                   <span
@@ -239,9 +220,7 @@
               </svg>
               در حال ثبت...
             </span>
-            <span v-else>
-              ثبت نهایی پروفایل
-            </span>
+            <span v-else> ثبت نهایی پروفایل </span>
           </button>
         </div>
       </div>
@@ -257,15 +236,17 @@
         </div>
         <h3>پروفایل با موفقیت ایجاد شد!</h3>
         <p>اطلاعات شما با موفقیت در سیستم ثبت شد.</p>
-        <button class="action-btn primary" @click="showSuccessModal = false">
-          باشه
-        </button>
+        <button class="action-btn primary" @click="showSuccessModal = false">باشه</button>
       </div>
     </div>
   </div>
 </template>
 
 <script>
+import { post } from '@/api'
+import { getCookie } from '@/cookie'
+import { emitter } from '@/utils/event-bus'
+
 export default {
   name: 'Born',
   data() {
@@ -294,6 +275,7 @@ export default {
       // User profile data
       userProfile: {
         username: '',
+        gender: 'زن',
         age: null,
         weight: null,
         bio: '',
@@ -329,7 +311,7 @@ export default {
         { id: 'arts', name: 'هنر و طراحی' },
         { id: 'hospitality', name: 'مهمان‌نوازی' },
         { id: 'other', name: 'سایر' }
-      ],
+      ]
     }
   },
   computed: {
@@ -365,7 +347,7 @@ export default {
     },
 
     getCategoryTitle(categoryId) {
-      const category = this.categories.find(cat => cat.id === categoryId)
+      const category = this.categories.find((cat) => cat.id === categoryId)
       return category ? category.name : 'گزینه‌ها'
     },
 
@@ -415,12 +397,12 @@ export default {
     },
 
     getHobbyName(hobbyId) {
-      const hobby = this.hobbiesList.find(h => h.id === hobbyId)
+      const hobby = this.hobbiesList.find((h) => h.id === hobbyId)
       return hobby ? hobby.name : hobbyId
     },
 
     getBusinessName(businessId) {
-      const business = this.businessTypes.find(b => b.id === businessId)
+      const business = this.businessTypes.find((b) => b.id === businessId)
       return business ? business.name : businessId
     },
 
@@ -444,32 +426,28 @@ export default {
           avatar: this.avatarConfig,
           avatarUrl: this.avatarUrl,
           hobbies: this.userProfile.hobbies,
-          customInterests: this.userProfile.customInterests ?
-            this.userProfile.customInterests.split(',').map(i => i.trim()) : [],
+          customInterests: this.userProfile.customInterests
+            ? this.userProfile.customInterests.split(',').map((i) => i.trim())
+            : [],
           business: this.userProfile.business,
           createdAt: new Date().toISOString()
         }
 
-        // Send to API
-        const response = await fetch('https://api.example.com/users', {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json',
+        const response = await post(
+          '/api/v1',
+          {
+            topic: 'updatePersonProfile',
+            data: profileData
           },
-          body: JSON.stringify(profileData)
-        })
-
-        if (!response.ok) {
-          throw new Error('Network response was not ok')
+          {
+            token: getCookie('app-token')
+          }
+        )
+        if (response && response.data.success) {
+          this.$router.push('/')
+        } else {
+          emitter.emit('error-message', response.data.message)
         }
-
-        // Show success message
-        this.showSuccessModal = true
-
-        // Reset form after successful submission
-        setTimeout(() => {
-          this.resetForm()
-        }, 2000)
 
       } catch (error) {
         console.error('Error submitting profile:', error)
@@ -495,7 +473,7 @@ export default {
 
     showError(message) {
       // You can replace this with a proper toast notification
-      alert(message)
+      emitter.emit('error-message', message);
     }
   },
   mounted() {
@@ -642,7 +620,9 @@ label {
   font-weight: 500;
 }
 
-input, select, textarea {
+input,
+select,
+textarea {
   width: 100%;
   padding: 12px 16px;
   background: rgba(255, 255, 255, 0.05);
@@ -653,13 +633,16 @@ input, select, textarea {
   transition: all 0.3s ease;
 }
 
-input:focus, select:focus, textarea:focus {
+input:focus,
+select:focus,
+textarea:focus {
   outline: none;
   border-color: #1da1f2;
   box-shadow: 0 0 0 2px rgba(29, 161, 242, 0.2);
 }
 
-input::placeholder, textarea::placeholder {
+input::placeholder,
+textarea::placeholder {
   color: #8899a6;
 }
 
@@ -866,8 +849,12 @@ textarea {
 }
 
 @keyframes spin {
-  from { transform: rotate(0deg); }
-  to { transform: rotate(360deg); }
+  from {
+    transform: rotate(0deg);
+  }
+  to {
+    transform: rotate(360deg);
+  }
 }
 
 /* Success Modal */

@@ -13,7 +13,11 @@
 
     <!-- Snackbar -->
     <transition name="slide-up">
-      <div v-if="showSnackbar" class="snackbar">
+      <div
+        v-if="showSnackbar"
+        class="snackbar"
+        :class="snackbarType"
+      >
         {{ snackbarMessage }}
       </div>
     </transition>
@@ -21,7 +25,7 @@
 </template>
 
 <script>
-import { inject, ref, onMounted } from 'vue'
+import { inject, ref, onMounted, onBeforeUnmount } from 'vue'
 import DefaultNav from './DefaultNav.vue'
 import SplashScreen from './SplashScreen.vue'
 
@@ -29,9 +33,10 @@ export default {
   name: 'LayoutDefault',
   components: { DefaultNav, SplashScreen },
   setup() {
-    const mqtt = inject('mqtt')
+    const emitter = inject('emitter') // inject mitt instance
     const showSnackbar = ref(false)
     const snackbarMessage = ref('')
+    const snackbarType = ref('') // success or error
     const showSplash = ref(true)
 
     const checkAuthStatus = () => {
@@ -44,13 +49,11 @@ export default {
     const handleLogin = () => {
       console.log('Navigate to login')
       showSplash.value = false
-      // Add your login navigation logic here
     }
 
     const handleRegister = () => {
       console.log('Navigate to register')
       showSplash.value = false
-      // Add your register navigation logic here
     }
 
     const getCookie = (name) => {
@@ -60,27 +63,41 @@ export default {
       return null
     }
 
+    const showMessage = (message, type = 'success') => {
+      console.log('show message', message, type)
+      snackbarMessage.value = message
+      snackbarType.value = type
+      showSnackbar.value = true
+      setTimeout(() => (showSnackbar.value = false), 3000)
+    }
+
     onMounted(() => {
       checkAuthStatus()
-      setInterval(() => showSplash.value = false, 4000);
-      if (mqtt) {
-        mqtt.subscribe('notification', (payload) => {
-          snackbarMessage.value = payload
-          showSnackbar.value = true
+      setInterval(() => (showSplash.value = false), 4000)
 
-          setTimeout(() => (showSnackbar.value = false), 3000)
-        })
+      // Listen for mitt events
+      if (emitter) {
+        emitter.on('success-message', (msg) => showMessage(msg, 'success'))
+        emitter.on('error-message', (msg) => showMessage(msg, 'error'))
+      }
+    })
+
+    onBeforeUnmount(() => {
+      if (emitter) {
+        emitter.off('success-message')
+        emitter.off('error-message')
       }
     })
 
     return {
       showSnackbar,
       snackbarMessage,
+      snackbarType,
       showSplash,
       handleLogin,
-      handleRegister
+      handleRegister,
     }
-  }
+  },
 }
 </script>
 
@@ -119,24 +136,11 @@ button:active {
   box-shadow: 0 0 4px #555555;
 }
 
-@keyframes slideUp {
-  from {
-    transform: scaleX(0.2);
-    transition: transform 0.5s ease-in-out;
-  }
-
-  to {
-    transform: scaleX(1.2);
-    transition: transform 0.2s ease-in-out;
-  }
-}
-
 /* Snackbar */
 .snackbar {
   position: fixed;
   bottom: 20px;
   right: 20px;
-  background: linear-gradient(135deg, #43e97b 0%, #38f9d7 100%);
   color: #000;
   padding: 14px 20px;
   border-radius: 10px;
@@ -146,7 +150,15 @@ button:active {
   animation: fadeIn 0.3s ease;
 }
 
-/* Animation for showing/hiding */
+.snackbar.success {
+  background: linear-gradient(135deg, #43e97b 0%, #38f9d7 100%);
+}
+
+.snackbar.error {
+  background: linear-gradient(135deg, #ff416c 0%, #ff4b2b 100%);
+}
+
+/* Animation */
 .slide-up-enter-active,
 .slide-up-leave-active {
   transition: all 0.3s ease;

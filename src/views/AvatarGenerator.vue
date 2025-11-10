@@ -282,6 +282,7 @@
 <script>
 import { post } from '@/api'
 import { getCookie } from '@/cookie'
+import { emitter } from '@/utils/event-bus'
 
 export default {
   name: 'AvatarGenerator',
@@ -597,8 +598,30 @@ export default {
         // Save avatar configuration to localStorage or send to backend
         localStorage.setItem('userAvatarConfig', JSON.stringify(this.avatarConfig))
         // also publish avatar change event
-        // Show success message
-        this.$router.push('/born')
+        try {
+          const response = await post(
+            '/api/v1',
+            {
+              topic: 'updatePersonAvatar',
+              data: this.avatarConfig
+            },
+            {
+              token: getCookie('app-token')
+            }
+          )
+          if (response && response.data.success) {
+            emitter.emit('success-message', 'آواتارت با موفقیت ساخته شد')
+            console.log(response);
+            this.$router.push('/born')
+          } else {
+            emitter.emit('error-message', response.data.message)
+          }
+        } catch (error) {
+          console.error('Error posting tweet:', error)
+          // this.showError('خطا در ارسال توییت. لطفاً دوباره تلاش کنید.')
+        } finally {
+          this.isLoading = false
+        }
       } catch (error) {
         console.error('Error saving avatar:', error)
         this.showError('خطا در ذخیره‌سازی آواتار')
@@ -649,18 +672,18 @@ export default {
       console.log('=========', newAvatarConfig)
 
       // Use Vue.set() (for Vue 2) or spread assignment (for Vue 3)
-      this.avatarStyles = {...newAvatarConfig.avatarStyles}
-      this.topTypes = {...newAvatarConfig.topTypes}
-      this.accessoriesTypes = {...newAvatarConfig.accessoriesTypes}
-      this.hairColors = {...newAvatarConfig.hairColors}
-      this.facialHairTypes = {...newAvatarConfig.facialHairTypes}
-      this.facialHairColors = {...newAvatarConfig.facialHairColors}
-      this.clotheTypes = {...newAvatarConfig.clotheTypes}
-      this.clotheColors = {...newAvatarConfig.clotheColors}
-      this.eyeTypes = {...newAvatarConfig.eyeTypes}
-      this.eyebrowTypes = {...newAvatarConfig.eyebrowTypes}
-      this.mouthTypes = {...newAvatarConfig.mouthTypes}
-      this.skinColors = {...newAvatarConfig.skinColors}
+      this.avatarStyles = { ...newAvatarConfig.avatarStyles }
+      this.topTypes = { ...newAvatarConfig.topTypes }
+      this.accessoriesTypes = { ...newAvatarConfig.accessoriesTypes }
+      this.hairColors = { ...newAvatarConfig.hairColors }
+      this.facialHairTypes = { ...newAvatarConfig.facialHairTypes }
+      this.facialHairColors = { ...newAvatarConfig.facialHairColors }
+      this.clotheTypes = { ...newAvatarConfig.clotheTypes }
+      this.clotheColors = { ...newAvatarConfig.clotheColors }
+      this.eyeTypes = { ...newAvatarConfig.eyeTypes }
+      this.eyebrowTypes = { ...newAvatarConfig.eyebrowTypes }
+      this.mouthTypes = { ...newAvatarConfig.mouthTypes }
+      this.skinColors = { ...newAvatarConfig.skinColors }
 
       // Load saved avatar configuration if exists
       const savedConfig = localStorage.getItem('userAvatarConfig')
