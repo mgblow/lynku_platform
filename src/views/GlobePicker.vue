@@ -9,89 +9,93 @@ import { onMounted, onBeforeUnmount, ref } from 'vue'
 import Globe from 'globe.gl'
 
 const emit = defineEmits(['select-location'])
-
 const globeContainer = ref(null)
 const globe = ref(null)
 const globeReady = ref(false)
 const marker = ref(null)
-const isDragging = ref(false)
 
-let lastCoords = null
-let dragStart = { x: 0, y: 0 }
+const majorCities = [
+  { lat: 35.6892, lng: 51.389, name: 'Tehran', color: '#ffcc00' },
+  { lat: 40.7128, lng: -74.006, name: 'NewYork', color: '#00aaff' },
+  { lat: 51.5074, lng: -0.1278, name: 'London', color: '#ff6699' },
+  { lat: 48.8566, lng: 2.3522, name: 'Paris', color: '#66ff66' },
+  { lat: 35.6762, lng: 139.6503, name: 'Tokyo', color: '#ff6600' },
+  { lat: 55.7558, lng: 37.6173, name: 'Mosscow', color: '#00ffff' },
+  { lat: 24.7136, lng: 46.6753, name: 'Riaz', color: '#ffaa00' },
+  { lat: 30.0444, lng: 31.2357, name: 'Qahere', color: '#ff3300' }
+]
 
-// Create simple marker object
 function createMarker(lat, lng) {
   return {
     lat,
     lng,
-    size: 0.6,
-    color: '#34A853'
+    size: 0.8,
+    color: '#FF4444'
   }
 }
 
 onMounted(() => {
-  globe.value = Globe()(globeContainer.value)
-    .globeImageUrl('//unpkg.com/three-globe/example/img/earth-dark.jpg')
-    .bumpImageUrl('//unpkg.com/three-globe/example/img/earth-topology.png')
-    .backgroundColor('#000')
+  // Initialize the globe
+  const g = Globe()(globeContainer.value)
+    .globeImageUrl('https://unpkg.com/three-globe/example/img/earth-dark.jpg')
+    .bumpImageUrl('https://unpkg.com/three-globe/example/img/earth-topology.png')
+    .backgroundColor('#000011')
     .showGraticules(true)
     .onGlobeClick(({ lat, lng }) => {
-      // Add or move marker
       marker.value = createMarker(lat, lng)
-      globe.value
-        .pointsData([marker.value])
-        .pointAltitude('size')
-        .pointColor('color')
-
+      updateMarkers()
       emit('select-location', { lat, lon: lng })
     })
 
-  // Set camera position and auto-rotation
-  globe.value.controls().autoRotate = true
-  globe.value.controls().autoRotateSpeed = 0.5
-  globe.value.pointOfView({ lat: 35.6892, lng: 51.389, altitude: 2.5 })
+  // Add city labels
+  g.labelsData(majorCities)
+    .labelText('name')
+    .labelSize(0.8)
+    .labelColor(() => '#ffffff')
+    .labelAltitude(0.01)
+    .onLabelClick(city => {
+      marker.value = createMarker(city.lat, city.lng)
+      updateMarkers()
+      emit('select-location', { lat: city.lat, lon: city.lng })
+      g.pointOfView({ lat: city.lat, lng: city.lng, altitude: 1.8 }, 800)
+    })
 
-  // Default marker (Tehran)
+  // Add base city points
+  g.pointsData(majorCities)
+    .pointColor(d => d.color)
+    .pointAltitude(0.015)
+    .pointRadius(0.25)
+
+  // Disable rotation for static view
+  const controls = g.controls()
+  controls.autoRotate = false
+  controls.enableZoom = true
+  controls.enablePan = true
+
+  // Initial camera position
+  g.pointOfView({ lat: 25, lng: 45, altitude: 2 })
+
+  globe.value = g
   marker.value = createMarker(35.6892, 51.389)
-  globe.value
-    .pointsData([marker.value])
-    .pointAltitude('size')
-    .pointColor('color')
-
-  // Event listeners for dragging the marker
-  globeContainer.value.addEventListener('mousedown', onMouseDown)
-  globeContainer.value.addEventListener('mousemove', onMouseMove)
-  globeContainer.value.addEventListener('mouseup', onMouseUp)
-
-  // When the globe is rendered for the first time
-  setTimeout(() => {
-    globeReady.value = true
-  }, 1500)
+  updateMarkers()
+  globeReady.value = true
 })
 
 onBeforeUnmount(() => {
-  if (globeContainer.value) {
-    globeContainer.value.removeEventListener('mousedown', onMouseDown)
-    globeContainer.value.removeEventListener('mousemove', onMouseMove)
-    globeContainer.value.removeEventListener('mouseup', onMouseUp)
+  if (globe.value) {
+    globe.value = null
   }
-  globe.value = null
 })
 
-function onMouseDown(e) {
-  isDragging.value = true
-  dragStart = { x: e.clientX, y: e.clientY }
-}
+function updateMarkers() {
+  if (!globe.value) return
+  const allPoints = [...majorCities, ...(marker.value ? [marker.value] : [])]
 
-function onMouseUp() {
-  isDragging.value = false
-}
-
-function onMouseMove(e) {
-  if (!isDragging.value) return
-
-  // Optional: you could calculate new lat/lng by screen delta, but it's complex
-  // We keep it simple — dragging moves globe, not marker.
+  globe.value
+    .pointsData(allPoints)
+    .pointColor(d => d.color || '#ffffff')
+    .pointAltitude(d => (d === marker.value ? 0.05 : 0.015))
+    .pointRadius(d => (d === marker.value ? 0.8 : 0.25))
 }
 </script>
 
@@ -99,8 +103,8 @@ function onMouseMove(e) {
 .globe-container {
   width: 100%;
   height: 100%;
+  background: #000011;
   position: relative;
-  overflow: hidden;
 }
 
 .loading {
@@ -108,12 +112,10 @@ function onMouseMove(e) {
   top: 50%;
   left: 50%;
   transform: translate(-50%, -50%);
-  font-size: 1.1rem;
+  color: #fff;
+  background: rgba(0, 0, 0, 0.8);
+  padding: 12px 18px;
+  border-radius: 8px;
   font-weight: bold;
-  color: #222;
-  background: rgba(255, 255, 255, 0.9);
-  padding: 16px 24px;
-  border-radius: 10px;
-  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.15);
 }
 </style>
