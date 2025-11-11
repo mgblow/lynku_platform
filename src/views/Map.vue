@@ -17,7 +17,7 @@
 </template>
 
 <script setup>
-import { onMounted, onBeforeUnmount, ref, nextTick, watch } from 'vue'
+import { onMounted, onBeforeUnmount, ref, nextTick } from 'vue'
 import Globe from 'globe.gl'
 
 const globeContainer = ref(true)
@@ -110,7 +110,7 @@ function generateRandomAvatar() {
     mouthType: mouths[Math.floor(Math.random() * mouths.length)],
     skinColor: skins[Math.floor(Math.random() * skins.length)]
   })
-  return `http://10.54.25.166:5000/avatars?${params.toString()}`
+  return `http://localhost:5000/avatars?${params.toString()}`
 }
 
 const avatarUsers = users.map(u => ({
@@ -120,8 +120,6 @@ const avatarUsers = users.map(u => ({
 
 async function initGlobe() {
   await nextTick()
-
-  // Wait a bit more to ensure DOM is stable
   await new Promise(resolve => setTimeout(resolve, 100))
 
   const container = document.getElementById('globe-container')
@@ -132,24 +130,34 @@ async function initGlobe() {
 
   try {
     const g = Globe()(container)
-      .globeImageUrl('//unpkg.com/three-globe/example/img/earth-blue-marble.jpg')
-      .bumpImageUrl('//unpkg.com/three-globe/example/img/earth-topology.png')
-      .backgroundColor('#0a0a15')
-      .showAtmosphere(false)
-      .atmosphereColor('#000000')
-      .atmosphereAltitude(0.5)
-      .showGraticules(false)
+      .globeImageUrl('//unpkg.com/three-globe/example/img/earth-dark.jpg')
+      .backgroundColor('#000010')
+      .showAtmosphere(true)
+      .atmosphereColor('#4a90e2')
+      .atmosphereAltitude(0.15)
       .width(window.innerWidth)
       .height(window.innerHeight)
 
     // Configure controls
     const controls = g.controls()
-    controls.autoRotate = true // Set to true to enable auto-rotation
-    controls.autoRotateSpeed = 0.3 // Adjust this value: lower = slower (default is 2.0)
+    controls.autoRotate = true
+    controls.autoRotateSpeed = 0.5
     controls.enableZoom = true
     controls.enablePan = true
-    controls.minDistance = 150
-    controls.maxDistance = 1000
+    controls.minDistance = 180
+    controls.maxDistance = 800
+
+    // Add points (cities) with labels
+    g.pointsData(avatarUsers)
+      .pointLat(d => d.lat)
+      .pointLng(d => d.lng)
+      .pointColor(() => '#00ff88')
+      .pointAltitude(0.01)
+      .pointRadius(0.3)
+      .pointLabel(d => `<div style="background: rgba(0,0,0,0.9); padding: 8px 12px; border-radius: 8px; color: white; font-family: sans-serif;">
+        <b style="color: #00ff88;">${d.city}</b><br/>
+        <span style="color: #aaa;">${d.name}</span>
+      </div>`)
 
     // Add HTML elements for avatars
     g.htmlElementsData(avatarUsers)
@@ -170,8 +178,8 @@ async function initGlobe() {
           width: 40px;
           height: 40px;
           border-radius: 50%;
-          border: 3px solid #4a90e2;
-          box-shadow: 0 0 15px rgba(74, 144, 226, 0.8);
+          border: 3px solid #00ff88;
+          box-shadow: 0 0 15px rgba(0, 255, 136, 0.8);
           background: white;
           transition: all 0.3s;
           display: block;
@@ -193,14 +201,14 @@ async function initGlobe() {
 
         el.onmouseenter = () => {
           el.style.transform = 'scale(1.2)'
-          img.style.borderColor = '#00ff88'
-          img.style.boxShadow = '0 0 20px rgba(0, 255, 136, 1)'
+          img.style.borderColor = '#ffeb3b'
+          img.style.boxShadow = '0 0 20px rgba(255, 235, 59, 1)'
         }
 
         el.onmouseleave = () => {
           el.style.transform = 'scale(1)'
-          img.style.borderColor = '#4a90e2'
-          img.style.boxShadow = '0 0 15px rgba(74, 144, 226, 0.8)'
+          img.style.borderColor = '#00ff88'
+          img.style.boxShadow = '0 0 15px rgba(0, 255, 136, 0.8)'
         }
 
         el.onclick = (e) => {
@@ -215,14 +223,13 @@ async function initGlobe() {
       })
       .htmlLat(d => d.lat)
       .htmlLng(d => d.lng)
-      .htmlAltitude(0.005) // Very close to surface
+      .htmlAltitude(0.01)
 
-    // Set initial view - wider angle to see more of the globe
+    // Set initial view
     g.pointOfView({ lat: 30, lng: 20, altitude: 2.2 }, 0)
 
     globe.value = g
 
-    // Force a render after a short delay to ensure proper positioning
     setTimeout(() => {
       if (globe.value) {
         globe.value.pointOfView({ lat: 30, lng: 20, altitude: 2.2 }, 0)
@@ -240,7 +247,6 @@ async function initGlobe() {
 
     window.addEventListener('resize', handleResize)
 
-    // Store cleanup function
     globe.value._cleanupResize = () => {
       window.removeEventListener('resize', handleResize)
     }
@@ -256,7 +262,6 @@ onMounted(() => {
 })
 
 onBeforeUnmount(() => {
-  // Clean up everything before unmount
   globeReady.value = false
   selectedUser.value = null
 
@@ -270,12 +275,14 @@ onBeforeUnmount(() => {
         globe.value._cleanupResize()
       }
 
-      // Clear HTML elements first
       if (typeof globe.value.htmlElementsData === 'function') {
         globe.value.htmlElementsData([])
       }
 
-      // Destroy the globe
+      if (typeof globe.value.pointsData === 'function') {
+        globe.value.pointsData([])
+      }
+
       if (typeof globe.value._destructor === 'function') {
         globe.value._destructor()
       }
@@ -286,7 +293,6 @@ onBeforeUnmount(() => {
     globe.value = null
   }
 
-  // Clear the container
   globeContainer.value = false
 })
 </script>
@@ -297,7 +303,7 @@ onBeforeUnmount(() => {
   height: 100vh;
   position: relative;
   overflow: hidden;
-  background: radial-gradient(circle at 30% 30%, #1a1a2e, #0a0a15, #000000);
+  background: #000010;
 }
 
 .globe-container {
@@ -407,7 +413,9 @@ onBeforeUnmount(() => {
 }
 
 :deep(.scene-tooltip) {
-  display: none !important;
+  padding: 0 !important;
+  background: transparent !important;
+  border: none !important;
 }
 
 :deep(.avatar-marker) {
