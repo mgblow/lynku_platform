@@ -37,8 +37,8 @@ function createMarker(lat, lng) {
 onMounted(() => {
   // Initialize the globe
   const g = Globe()(globeContainer.value)
-    .globeImageUrl('https://unpkg.com/three-globe/example/img/earth-dark.jpg')
-    .bumpImageUrl('https://unpkg.com/three-globe/example/img/earth-topology.png')
+    .globeImageUrl('//unpkg.com/three-globe/example/img/earth-blue-marble.jpg')
+    .bumpImageUrl('//unpkg.com/three-globe/example/img/earth-topology.png')
     .backgroundColor('#000011')
     .showGraticules(true)
     .onGlobeClick(({ lat, lng }) => {
@@ -50,7 +50,7 @@ onMounted(() => {
   // Add city labels
   g.labelsData(majorCities)
     .labelText('name')
-    .labelSize(0.8)
+    .labelSize(1)
     .labelColor(() => '#ffffff')
     .labelAltitude(0.01)
     .onLabelClick(city => {
