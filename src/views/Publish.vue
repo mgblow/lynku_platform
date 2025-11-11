@@ -1,12 +1,14 @@
 <template>
-  <div style="margin-top: 70px;margin-bottom: 50px;">
+  <div style="margin-top: 70px; margin-bottom: 50px">
     <div class="tweet-box p-3">
       <!-- Header -->
       <div class="tweet-header">
         <div class="user-avatar">
           <div class="avatar-placeholder">
-            <img style="width: 100%;"
-              src='https://avataaars.io/?avatarStyle=Circle&topType=LongHairStraight&accessoriesType=Blank&hairColor=SilverGray&facialHairType=BeardMajestic&facialHairColor=Auburn&clotheType=BlazerSweater&eyeType=Close&eyebrowType=Default&mouthType=ScreamOpen&skinColor=Black' />
+            <img
+              style="width: 100%"
+              src="https://avataaars.io/?avatarStyle=Circle&topType=LongHairStraight&accessoriesType=Blank&hairColor=SilverGray&facialHairType=BeardMajestic&facialHairColor=Auburn&clotheType=BlazerSweater&eyeType=Close&eyebrowType=Default&mouthType=ScreamOpen&skinColor=Black"
+            />
           </div>
         </div>
         <div class="header-text">
@@ -14,13 +16,22 @@
           <p>افکارت رو با جهان به اشتراک بذار</p>
         </div>
       </div>
-
+      <transition name="fade">
+        <div v-if="showGlobe" class="globe-overlay" style=";height: 50vh;">
+          <GlobePicker @close="showGlobe = false" @select-location="handleLocationSelect" />
+        </div>
+      </transition>
       <!-- Tweet Text Area -->
       <div class="tweet-textarea">
-        <textarea v-model="publishText" class="tweet-input" placeholder="چه خبر؟..." maxlength="280"
-          @input="updateCharacterCount"></textarea>
+        <textarea
+          v-model="publishText"
+          class="tweet-input"
+          placeholder="چه خبر؟..."
+          maxlength="280"
+          @input="updateCharacterCount"
+        ></textarea>
         <div class="textarea-actions">
-          <span class="character-count" :class="{ 'warning': characterCount > 250, 'danger': characterCount > 270 }">
+          <span class="character-count" :class="{ warning: characterCount > 250, danger: characterCount > 270 }">
             {{ characterCount }}/280
           </span>
         </div>
@@ -34,7 +45,8 @@
             <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" fill="currentColor" viewBox="0 0 16 16">
               <path d="M8 15A7 7 0 1 1 8 1a7 7 0 0 1 0 14zm0 1A8 8 0 1 0 8 0a8 8 0 0 0 0 16z" />
               <path
-                d="M4.285 9.567a.5.5 0 0 1 .683.183A3.498 3.498 0 0 0 8 11.5a3.498 3.498 0 0 0 3.032-1.75.5.5 0 1 1 .866.5A4.498 4.498 0 0 1 8 12.5a4.498 4.498 0 0 1-3.898-2.25.5.5 0 0 1 .183-.683zM7 6.5C7 7.328 6.552 8 6 8s-1-.672-1-1.5S5.448 5 6 5s1 .672 1 1.5zm4 0c0 .828-.448 1.5-1 1.5s-1-.672-1-1.5S9.448 5 10 5s1 .672 1 1.5z" />
+                d="M4.285 9.567a.5.5 0 0 1 .683.183A3.498 3.498 0 0 0 8 11.5a3.498 3.498 0 0 0 3.032-1.75.5.5 0 1 1 .866.5A4.498 4.498 0 0 1 8 12.5a4.498 4.498 0 0 1-3.898-2.25.5.5 0 0 1 .183-.683zM7 6.5C7 7.328 6.552 8 6 8s-1-.672-1-1.5S5.448 5 6 5s1 .672 1 1.5zm4 0c0 .828-.448 1.5-1 1.5s-1-.672-1-1.5S9.448 5 10 5s1 .672 1 1.5z"
+              />
             </svg>
           </button>
 
@@ -51,8 +63,7 @@
           <span class="btn-text">توییت</span>
           <svg v-if="isLoading" class="spinner" width="20" height="20" viewBox="0 0 20 20">
             <circle cx="10" cy="10" r="8" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round">
-              <animate attributeName="stroke-dasharray" values="1, 50; 50, 1; 1, 50" dur="1.5s"
-                repeatCount="indefinite" />
+              <animate attributeName="stroke-dasharray" values="1, 50; 50, 1; 1, 50" dur="1.5s" repeatCount="indefinite" />
               <animate attributeName="stroke-dashoffset" values="0; -15; -34" dur="1.5s" repeatCount="indefinite" />
             </circle>
           </svg>
@@ -76,11 +87,10 @@
           </svg>
           {{ location }}
         </span>
-        <button class="remove-location" @click="removeLocation">
-          ×
-        </button>
+        <button class="remove-location" @click="removeLocation">×</button>
       </div>
     </div>
+
     <!-- Preview -->
     <div v-if="publishText || imagePreview" class="tweet-preview">
       <div class="preview-header">
@@ -100,13 +110,16 @@
 </template>
 
 <script>
-import { post } from "../api";
-import { getCookie } from '@/cookie';
+import { post } from '../api'
+import { getCookie } from '@/cookie'
+import GlobePicker from '@/views/GlobePicker.vue'
 
 export default {
   name: 'Publish',
+  components: { GlobePicker },
   data() {
     return {
+      showGlobe: false,
       coords: null,
       publishText: '',
       location: '',
@@ -114,127 +127,127 @@ export default {
       isLoading: false,
       characterCount: 0,
       imagePreview: null,
-      popularEmojis: [
-        '😊', '😂', '❤️', '🔥', '👍', '👏', '🎉', '🙏',
-        '😍', '😎', '🤔', '😢', '🙌', '💯', '✨', '🌟'
-      ]
-    };
+      popularEmojis: ['😊', '😂', '❤️', '🔥', '👍', '👏', '🎉', '🙏', '😍', '😎', '🤔', '😢', '🙌', '💯', '✨', '🌟']
+    }
   },
   computed: {
     canPublish() {
-      return this.publishText.trim().length > 0 &&
-        this.publishText.trim().length <= 280 &&
-        !this.isLoading;
+      return this.publishText.trim().length > 0 && this.publishText.trim().length <= 280 && !this.isLoading
     }
   },
   mounted() {
-    this.scrollToTop();
+    this.scrollToTop()
   },
   methods: {
+    handleLocationSelect(coords) {
+      // this.showGlobe = false
+      // this.location = `Lat: ${coords.lat.toFixed(4)}, Lon: ${coords.lon.toFixed(4)}`
+      console.log("========>",coords)
+    },
     updateCharacterCount() {
-      this.characterCount = this.publishText.length;
+      this.characterCount = this.publishText.length
     },
 
     toggleEmojiPicker() {
-      this.showEmojiPicker = !this.showEmojiPicker;
+      this.showEmojiPicker = !this.showEmojiPicker
     },
 
     addEmoji(emoji) {
-      this.publishText += emoji;
-      this.showEmojiPicker = false;
-      this.updateCharacterCount();
+      this.publishText += emoji
+      this.showEmojiPicker = false
+      this.updateCharacterCount()
     },
 
     async addLocation() {
       // Simulate getting location (in real app, use geolocation API)
-      this.$data.coords = await this.getUserLocation();
-      const locations = ['تهران، ایران', 'اصفهان، ایران', 'شیراز، ایران', 'مشهد، ایران'];
-      this.location = locations[Math.floor(Math.random() * locations.length)];
+      this.showGlobe = true;
+      this.$data.coords = await this.getUserLocation()
+      const locations = ['تهران، ایران', 'اصفهان، ایران', 'شیراز، ایران', 'مشهد، ایران']
+      this.location = locations[Math.floor(Math.random() * locations.length)]
     },
 
     removeLocation() {
-      this.location = '';
+      this.location = ''
     },
 
     async postPublish() {
-      if (!this.canPublish) return;
+      if (!this.canPublish) return
 
-      this.isLoading = true;
+      this.isLoading = true
 
       try {
         const response = await post(
-          "/api/v1",
+          '/api/v1',
           {
-            topic: "createContract",
+            topic: 'createContract',
             data: {
-              categoryId: "690f5a0f663c9a59b44c8e18",
+              categoryId: '690f5a0f663c9a59b44c8e18',
               text: this.publishText,
               location: {
-                type: "Point",
-                coordinates: [this.coords.lng, this.coords.lat], // notice: lng first!
-              },
+                type: 'Point',
+                coordinates: [this.coords.lng, this.coords.lat] // notice: lng first!
+              }
             }
           },
           {
-            "token": getCookie("app-token")
+            token: getCookie('app-token')
           }
-        );
+        )
 
         if (response && response.data.success) {
           // Reset form
-          this.publishText = '';
-          this.location = '';
-          this.characterCount = 0;
+          this.publishText = ''
+          this.location = ''
+          this.characterCount = 0
 
           // Show success message
-          this.showSuccess('توییت شما با موفقیت منتشر شد!');
+          this.showSuccess('توییت شما با موفقیت منتشر شد!')
 
           // Emit event for parent component if needed
-          this.$emit('tweetPosted');
+          this.$emit('tweetPosted')
         }
       } catch (error) {
-        console.error('Error posting tweet:', error);
-        this.showError('خطا در ارسال توییت. لطفاً دوباره تلاش کنید.');
+        console.error('Error posting tweet:', error)
+        this.showError('خطا در ارسال توییت. لطفاً دوباره تلاش کنید.')
       } finally {
-        this.isLoading = false;
+        this.isLoading = false
       }
     },
 
     showSuccess(message) {
       // You can replace this with a proper toast notification
-      alert(message);
+      alert(message)
     },
 
     showError(message) {
       // You can replace this with a proper toast notification
-      alert(message);
+      alert(message)
     },
 
     scrollToTop() {
       window.scrollTo({
         top: 0,
         behavior: 'smooth'
-      });
+      })
     },
     async getUserLocation() {
       return new Promise((resolve, reject) => {
         if (!navigator.geolocation) {
-          reject(new Error("Geolocation is not supported by this browser."));
+          reject(new Error('Geolocation is not supported by this browser.'))
         } else {
           navigator.geolocation.getCurrentPosition(
             (position) => {
               resolve({
                 lat: position.coords.latitude,
-                lng: position.coords.longitude,
-              });
+                lng: position.coords.longitude
+              })
             },
             (err) => reject(err),
             { enableHighAccuracy: true }
-          );
+          )
         }
-      });
+      })
     }
-
   }
 }
 </script>

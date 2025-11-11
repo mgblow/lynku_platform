@@ -729,7 +729,7 @@ export default {
   height: 220px;
   border-radius: 50%;
   overflow: hidden;
-  border: 3px solid #1da1f2;
+  border: 3px solid #ff00ff;
   box-shadow: 0 8px 25px rgba(29, 161, 242, 0.3);
 }
 
@@ -758,7 +758,7 @@ export default {
 }
 
 .download-btn {
-  background: linear-gradient(135deg, #1da1f2 0%, #1a91da 100%);
+  background: linear-gradient(135deg, #000000 0%, #1a0a2a 50%, #cc00ff 100%);
   border: none;
   color: white;
   padding: 8px 16px;
@@ -835,7 +835,7 @@ export default {
 }
 
 .category-btn.active {
-  background: linear-gradient(135deg, #1da1f2 0%, #1a91da 100%);
+  background: linear-gradient(180deg, #000000 20%, #1a0a2a 30%, #cc00ff 100%);
   border-color: #1da1f2;
   color: white;
 }
@@ -901,7 +901,7 @@ export default {
 }
 
 .option-card.selected {
-  border-color: #1da1f2;
+  border-color: #cc00ff;
   background: rgba(29, 161, 242, 0.1);
   box-shadow: 0 4px 15px rgba(29, 161, 242, 0.2);
 }
@@ -931,7 +931,7 @@ export default {
 }
 
 .style-preview.Circle {
-  background: conic-gradient(from 0deg, #1da1f2, #00ba7c, #f91880, #1da1f2);
+  background: linear-gradient(180deg, #000000 0%, #1a0a2a 50%, #cc00ff 100%);
 }
 
 .style-preview.Transparent {
@@ -975,12 +975,12 @@ export default {
 }
 
 .action-btn.primary {
-  background: linear-gradient(135deg, #1da1f2 0%, #1a91da 100%);
+  background: linear-gradient(180deg, #000000 50%, #ffcc00 90%, #ff9500 30%);
   color: white;
 }
 
 .action-btn.primary:hover {
-  background: linear-gradient(135deg, #1a91da 0%, #1a7bb9 100%);
+  background: linear-gradient(180deg, #ff9500 0%, #ffcc00 50%, #ffaa00 100%);
   transform: translateY(-2px);
   box-shadow: 0 6px 20px rgba(29, 161, 242, 0.4);
 }

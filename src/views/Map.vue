@@ -93,7 +93,7 @@
 
 <script>
 import { nextTick } from "vue";
-import "@openglobus/og/css/og.css";
+
 import {
   Globe,
   XYZ,
@@ -253,7 +253,7 @@ export default {
           attribution: "Lynku Avatars On Earth",
         });
 
-        // Create Globe
+        // Create GlobePicker
         this.globe = new Globe({
           target: "earth",
           name: "Earth",
@@ -276,7 +276,7 @@ export default {
         // Handle resize events
         window.addEventListener("resize", this.handleResize);
 
-        console.log("Globe initialized successfully with", this.avatars.length, "avatars");
+        console.log("GlobePicker initialized successfully with", this.avatars.length, "avatars");
 
       } catch (error) {
         console.error("Error initializing globe:", error);

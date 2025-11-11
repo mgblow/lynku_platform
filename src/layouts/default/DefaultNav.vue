@@ -136,7 +136,7 @@ const quickActionsOriginalList = [
     id: 1,
     name: 'خانه',
     icon: 'M10 20v-6h4v6h5v-8h3L12 3 2 12h3v8z',
-    gradient: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
+    gradient: 'linear-gradient(135deg, #111111 0%, #222233 50%, #334455 100%)',
     link: '/',
     requireAuth: false
   },
@@ -144,7 +144,7 @@ const quickActionsOriginalList = [
     id: 2,
     name: 'پست جدید',
     icon: 'M19 13H5v-2h14v2zm-7-8a1 1 0 0 1 1 1v3h3a1 1 0 0 1 0 2h-3v3a1 1 0 0 1-2 0v-3H8a1 1 0 0 1 0-2h3V6a1 1 0 0 1 1-1z',
-    gradient: 'linear-gradient(135deg, #ff9a9e 0%, #fecfef 100%)',
+    gradient: 'linear-gradient(135deg, #111111 0%, #222233 50%, #334455 100%)',
     link: '/publish',
     requireAuth: true
   },
@@ -152,7 +152,7 @@ const quickActionsOriginalList = [
     id: 3,
     name: 'پیام‌ها',
     icon: 'M20 2H4a2 2 0 0 0-2 2v16l4-4h14a2 2 0 0 0 2-2V4a2 2 0 0 0-2-2z',
-    gradient: 'linear-gradient(135deg, #43e97b 0%, #38f9d7 100%)',
+    gradient: 'linear-gradient(135deg, #111111 0%, #222233 50%, #334455 100%)',
     link: '/mail',
     requireAuth: true
   },
@@ -160,7 +160,7 @@ const quickActionsOriginalList = [
     id: 7,
     name: 'نقشه جهان',
     icon: 'M12 2a10 10 0 1 0 0 20 10 10 0 0 0 0-20zm7.73 6h-3.58a6.5 6.5 0 0 0-4.15-3.32A8 8 0 0 1 19.73 8zM4.27 8a8 8 0 0 1 7.73-5.32A6.5 6.5 0 0 0 7.85 8H4.27zm0 8h3.58a6.5 6.5 0 0 0 4.15 3.32A8 8 0 0 1 4.27 16zm15.46 0a8 8 0 0 1-7.73 5.32A6.5 6.5 0 0 0 16.15 16h3.58zm-5.08-2h-5.3A4.5 4.5 0 0 1 8 12c0-.71.16-1.37.44-2h7.12c.28.63.44 1.29.44 2 0 1.39-.56 2.64-1.35 3.6z',
-    gradient: 'linear-gradient(135deg, #00c6ff 0%, #0072ff 100%)',
+    gradient: 'linear-gradient(135deg, #111111 0%, #222233 50%, #334455 100%)',
     link: '/map',
     requireAuth: false
   },
@@ -168,43 +168,36 @@ const quickActionsOriginalList = [
     id: 4,
     name: 'اعلان‌ها',
     icon: 'M10 21h4a2 2 0 0 1-4 0zm6-6v-5a6 6 0 1 0-12 0v5l-2 2v1h16v-1l-2-2z',
-    gradient: 'linear-gradient(135deg, #fddb92 0%, #d1fdff 100%)',
+    gradient: 'linear-gradient(135deg, #111111 0%, #222233 50%, #334455 100%)',
     link: '/notifications',
-    requireAuth: true
-  },
-  {
-    id: 5,
-    name: 'تولید آواتار',
-    icon: 'M12 2a10 10 0 0 0-3.16 19.48c.5.09.68-.22.68-.48v-1.68c-2.78.6-3.37-1.34-3.37-1.34-.46-1.15-1.11-1.46-1.11-1.46-.91-.62.07-.61.07-.61 1 .07 1.52 1.04 1.52 1.04.9 1.52 2.35 1.08 2.92.83.09-.65.35-1.09.63-1.34-2.22-.26-4.55-1.12-4.55-4.98 0-1.1.39-2 .1-2.7 0 0 .84-.27 2.75 1.02A9.5 9.5 0 0 1 12 6.8c.85 0 1.7.11 2.5.32 1.9-1.3 2.75-1.02 2.75-1.02.29.7.1 1.6.1 2.7 0 3.88-2.34 4.72-4.57 4.98.36.31.67.92.67 1.85v2.74c0 .26.18.57.68.48A10 10 0 0 0 12 2z',
-    gradient: 'linear-gradient(135deg, #a1c4fd 0%, #c2e9fb 100%)',
-    link: '/avatar',
     requireAuth: true
   },
   {
     id: 6,
     name: 'تنظیمات',
     icon: 'M19.14 12.94c.04-.3.06-.61.06-.94 0-.32-.02-.64-.07-.94l2.03-1.58c.18-.14.23-.41.12-.61l-1.92-3.32c-.12-.22-.37-.29-.59-.22l-2.39.96c-.5-.38-1.03-.7-1.62-.94l-.36-2.54c-.04-.24-.24-.41-.48-.41h-3.84c-.24 0-.43.17-.47.41l-.36 2.54c-.59.24-1.13.57-1.62.94l-2.39-.96c-.22-.08-.47 0-.59.22L2.74 8.87c-.12.21-.08.47.12.61l2.03 1.58c-.05.3-.09.63-.09.94s.02.64.07.94l-2.03 1.58c-.18.14-.23.41-.12.61l1.92 3.32c.12.22.37.29.59.22l2.39-.96c.5.38 1.03.7 1.62.94l.36 2.54c.05.24.24.41.48.41h3.84c.24 0 .44-.17.47-.41l.36-2.54c.59-.24 1.13-.56 1.62-.94l2.39.96c.22.08.47 0 .59-.22l1.92-3.32c.12-.22.07-.47-.12-.61l-2.01-1.58zM12 15.6c-1.98 0-3.6-1.62-3.6-3.6s1.62-3.6 3.6-3.6 3.6 1.62 3.6 3.6-1.62 3.6-3.6 3.6z',
-    gradient: 'linear-gradient(135deg, #f093fb 0%, #f5576c 100%)',
+    gradient: 'linear-gradient(135deg, #111111 0%, #222233 50%, #334455 100%)',
     link: '/settings',
     requireAuth: true
   },
   {
-    id: 7,
+    id: 8,
     name: 'خروج',
     icon: 'M16 13v-2H7V8l-5 4 5 4v-3z M20 3h-8v2h8v14h-8v2h8a2 2 0 0 0 2-2V5a2 2 0 0 0-2-2z',
-    gradient: 'linear-gradient(135deg, #fa709a 0%, #fee140 100%)',
+    gradient: 'linear-gradient(135deg, #111111 0%, #222233 50%, #334455 100%)',
     link: '/logout',
     requireAuth: true
   },
   {
-    id: 7,
+    id: 9,
     name: 'ورود',
     icon: 'M16 13v-2H7V8l-5 4 5 4v-3z M20 3h-8v2h8v14h-8v2h8a2 2 0 0 0 2-2V5a2 2 0 0 0-2-2z',
-    gradient: 'linear-gradient(135deg, #fa709a 0%, #fee140 100%)',
+    gradient: 'linear-gradient(135deg, #111111 0%, #222233 50%, #334455 100%)',
     link: '/login',
     requireAuth: false
   }
 ];
+
 export default {
   name: 'MetaverseNavigation',
   data() {
@@ -219,9 +212,9 @@ export default {
       unreadMessages: 5,
       quickActions: [],
       notifications: [
-        { id: 1, title: 'پیام جدید', message: 'شما یک پیام جدید دارید', time: '5 دقیقه پیش', icon: 'M20 2H4c-1.1 0-1.99.9-1.99 2L2 22l4-4h14c1.1 0 2-.9 2-2V4c0-1.1-.9-2-2-2zm-2 12H6v-2h12v2zm0-3H6V9h12v2zm0-3H6V6h12v2z', color: '#1d9bf0' },
-        { id: 2, title: 'دعوت به جهان', message: 'شما به جهان جدید دعوت شده‌اید', time: '1 ساعت پیش', icon: 'M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-2 15l-5-5 1.41-1.41L10 14.17l7.59-7.59L19 8l-9 9z', color: '#00ba7c' },
-        { id: 3, title: 'به‌روزرسانی', message: 'نسخه جدید متاورس در دسترس است', time: '2 ساعت پیش', icon: 'M13 3c-4.97 0-9 4.03-9 9H1l3.89 3.89.07.14L9 12H6c0-3.87 3.13-7 7-7s7 3.13 7 7-3.13 7-7 7c-1.93 0-3.68-.79-4.94-2.06l-1.42 1.42C8.27 19.99 10.51 21 13 21c4.97 0 9-4.03 9-9s-4.03-9-9-9zm-1 5v5l4.28 2.54.72-1.21-3.5-2.08V8H12z', color: '#f91880' }
+        { id: 1, title: 'پیام جدید', message: 'شما یک پیام جدید دارید', time: '5 دقیقه پیش', icon: 'M20 2H4c-1.1 0-1.99.9-1.99 2L2 22l4-4h14c1.1 0 2-.9 2-2V4c0-1.1-.9-2-2-2zm-2 12H6v-2h12v2zm0-3H6V9h12v2zm0-3H6V6h12v2z', color: '#334455' },
+        { id: 2, title: 'دعوت به جهان', message: 'شما به جهان جدید دعوت شده‌اید', time: '1 ساعت پیش', icon: 'M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-2 15l-5-5 1.41-1.41L10 14.17l7.59-7.59L19 8l-9 9z', color: '#334455' },
+        { id: 3, title: 'به‌روزرسانی', message: 'نسخه جدید متاورس در دسترس است', time: '2 ساعت پیش', icon: 'M13 3c-4.97 0-9 4.03-9 9H1l3.89 3.89.07.14L9 12H6c0-3.87 3.13-7 7-7s7 3.13 7 7-3.13 7-7 7c-1.93 0-3.68-.79-4.94-2.06l-1.42 1.42C8.27 19.99 10.51 21 13 21c4.97 0 9-4.03 9-9s-4.03-9-9-9zm-1 5v5l4.28 2.54.72-1.21-3.5-2.08V8H12z', color: '#334455' }
       ]
     }
   },
@@ -503,7 +496,7 @@ export default {
   transform: translateX(-50%);
   z-index: 10001;
   pointer-events: all;
-  opacity: 0.8;
+  opacity: 0.9;
 }
 
 .nav-orb {
