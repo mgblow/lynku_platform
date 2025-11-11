@@ -1,5 +1,5 @@
 <template>
-  <div style="margin-top: 70px; margin-bottom: 50px">
+  <div style="margin-top: 70px; margin-bottom: 100px">
     <div class="tweet-box p-3">
       <!-- Header -->
       <div class="tweet-header">
@@ -16,11 +16,6 @@
           <p>افکارت رو با جهان به اشتراک بذار</p>
         </div>
       </div>
-      <transition name="fade">
-        <div v-if="showGlobe" class="globe-overlay" style=";height: 50vh;">
-          <GlobePicker @close="showGlobe = false" @select-location="handleLocationSelect" />
-        </div>
-      </transition>
       <!-- Tweet Text Area -->
       <div class="tweet-textarea">
         <textarea
@@ -30,6 +25,11 @@
           maxlength="280"
           @input="updateCharacterCount"
         ></textarea>
+        <transition name="fade" style="max-height: 50vh; max-width: 100%">
+          <div v-if="showGlobe" class="globe-overlay" style="height: 50vh">
+            <GlobePicker @close="showGlobe = false" @select-location="handleLocationSelect" />
+          </div>
+        </transition>
         <div class="textarea-actions">
           <span class="character-count" :class="{ warning: characterCount > 250, danger: characterCount > 270 }">
             {{ characterCount }}/280
@@ -90,22 +90,6 @@
         <button class="remove-location" @click="removeLocation">×</button>
       </div>
     </div>
-
-    <!-- Preview -->
-    <div v-if="publishText || imagePreview" class="tweet-preview">
-      <div class="preview-header">
-        <h4>پیش نمایش توییت</h4>
-      </div>
-      <div class="preview-content">
-        <div class="preview-text">{{ publishText }}</div>
-        <div v-if="imagePreview" class="preview-image-container">
-          <img :src="imagePreview" alt="Preview" class="preview-image" />
-        </div>
-        <div v-if="location" class="preview-location">
-          <small>📍 {{ location }}</small>
-        </div>
-      </div>
-    </div>
   </div>
 </template>
 
@@ -140,9 +124,9 @@ export default {
   },
   methods: {
     handleLocationSelect(coords) {
+      console.log('========>', coords)
+      this.location = `Lat: ${coords.lat.toFixed(4)}, Lon: ${coords.lon.toFixed(4)}`
       // this.showGlobe = false
-      // this.location = `Lat: ${coords.lat.toFixed(4)}, Lon: ${coords.lon.toFixed(4)}`
-      console.log("========>",coords)
     },
     updateCharacterCount() {
       this.characterCount = this.publishText.length
@@ -160,14 +144,14 @@ export default {
 
     async addLocation() {
       // Simulate getting location (in real app, use geolocation API)
-      this.showGlobe = true;
-      this.$data.coords = await this.getUserLocation()
-      const locations = ['تهران، ایران', 'اصفهان، ایران', 'شیراز، ایران', 'مشهد، ایران']
-      this.location = locations[Math.floor(Math.random() * locations.length)]
-    },
-
-    removeLocation() {
-      this.location = ''
+      if (this.showGlobe) {
+        this.showGlobe = false
+        this.coords = null;
+        this.location = '';
+      } else {
+        this.showGlobe = true
+        this.$data.coords = await this.getUserLocation()
+      }
     },
 
     async postPublish() {
@@ -591,6 +575,10 @@ export default {
 
 .tweet-input::-webkit-scrollbar-thumb:hover {
   background: #555;
+}
+
+.globe-container {
+  overflow: hidden;
 }
 
 .preview-image {

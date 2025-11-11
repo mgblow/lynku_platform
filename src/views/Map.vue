@@ -110,7 +110,7 @@ function generateRandomAvatar() {
     mouthType: mouths[Math.floor(Math.random() * mouths.length)],
     skinColor: skins[Math.floor(Math.random() * skins.length)]
   })
-  return `http://localhost:5000/avatars?${params.toString()}`
+  return `http://10.88.176.166:5000/avatars?${params.toString()}`
 }
 
 const avatarUsers = users.map(u => ({
