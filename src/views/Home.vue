@@ -1,18 +1,31 @@
 <template>
-  <div class="container page" style="padding:0;margin-top: 50px;margin-bottom: 50px;">
+  <div class="container page" style="padding: 0; margin-top: 50px; margin-bottom: 50px">
     <div class="row">
       <div class="col-12 p-1">
         <div class="box" @click="boxClicked(post)">
-          <img class="" :src="(post.img) ? post.img : 'https://upload.wikimedia.org/wikipedia/commons/thumb/d/d1/Image_not_available.png/800px-Image_not_available.png?20210219185637'">
-          <hr>
+          <img
+            class=""
+            :src="
+              post.img
+                ? post.img
+                : 'https://upload.wikimedia.org/wikipedia/commons/thumb/d/d1/Image_not_available.png/800px-Image_not_available.png?20210219185637'
+            "
+          />
+          <hr />
           <div class="row content">
             <h2 v-text="post.title.slice(0, 60)"></h2>
           </div>
           <div class="row inside">
             <div class="col-6 p-1 col-xs-6 col-sm-3 col-md-3" v-for="post in posts">
               <div class="box" @click="boxClicked(post)">
-                <img class="image"
-                     :src="(post.img) ? post.img : 'https://upload.wikimedia.org/wikipedia/commons/thumb/d/d1/Image_not_available.png/800px-Image_not_available.png?20210219185637'">
+                <img
+                  class="image"
+                  :src="
+                    post.img
+                      ? post.img
+                      : 'https://upload.wikimedia.org/wikipedia/commons/thumb/d/d1/Image_not_available.png/800px-Image_not_available.png?20210219185637'
+                  "
+                />
                 <div class="row content">
                   <h2 v-text="post.title.slice(0, 60)"></h2>
                 </div>
@@ -23,16 +36,29 @@
       </div>
       <div class="col-12 p-1">
         <div class="box" @click="boxClicked(post)">
-          <img class="" :src="(post.img) ? post.img : 'https://upload.wikimedia.org/wikipedia/commons/thumb/d/d1/Image_not_available.png/800px-Image_not_available.png?20210219185637'">
-          <hr>
+          <img
+            class=""
+            :src="
+              post.img
+                ? post.img
+                : 'https://upload.wikimedia.org/wikipedia/commons/thumb/d/d1/Image_not_available.png/800px-Image_not_available.png?20210219185637'
+            "
+          />
+          <hr />
           <div class="row content">
             <h2 v-text="post.title.slice(0, 60)"></h2>
           </div>
           <div class="row inside">
             <div class="col-6 p-1 col-xs-6 col-sm-3 col-md-3" v-for="post in posts">
               <div class="box" @click="boxClicked(post)">
-                <img class="image"
-                     :src="(post.img) ? post.img : 'https://upload.wikimedia.org/wikipedia/commons/thumb/d/d1/Image_not_available.png/800px-Image_not_available.png?20210219185637'">
+                <img
+                  class="image"
+                  :src="
+                    post.img
+                      ? post.img
+                      : 'https://upload.wikimedia.org/wikipedia/commons/thumb/d/d1/Image_not_available.png/800px-Image_not_available.png?20210219185637'
+                  "
+                />
                 <div class="row content">
                   <h2 v-text="post.title.slice(0, 60)"></h2>
                 </div>
@@ -43,16 +69,29 @@
       </div>
       <div class="col-12 p-1">
         <div class="box" @click="boxClicked(post)">
-          <img class="" :src="(post.img) ? post.img : 'https://upload.wikimedia.org/wikipedia/commons/thumb/d/d1/Image_not_available.png/800px-Image_not_available.png?20210219185637'">
-          <hr>
+          <img
+            class=""
+            :src="
+              post.img
+                ? post.img
+                : 'https://upload.wikimedia.org/wikipedia/commons/thumb/d/d1/Image_not_available.png/800px-Image_not_available.png?20210219185637'
+            "
+          />
+          <hr />
           <div class="row content">
             <h2 v-text="post.title.slice(0, 60)"></h2>
           </div>
           <div class="row inside">
             <div class="col-6 p-1 col-xs-6 col-sm-3 col-md-3" v-for="post in posts">
               <div class="box" @click="boxClicked(post)">
-                <img class="image"
-                     :src="(post.img) ? post.img : 'https://upload.wikimedia.org/wikipedia/commons/thumb/d/d1/Image_not_available.png/800px-Image_not_available.png?20210219185637'">
+                <img
+                  class="image"
+                  :src="
+                    post.img
+                      ? post.img
+                      : 'https://upload.wikimedia.org/wikipedia/commons/thumb/d/d1/Image_not_available.png/800px-Image_not_available.png?20210219185637'
+                  "
+                />
                 <div class="row content">
                   <h2 v-text="post.title.slice(0, 60)"></h2>
                 </div>
@@ -61,13 +100,12 @@
           </div>
         </div>
       </div>
-
     </div>
   </div>
 </template>
 
 <script>
-import { setCookie, getCookie } from '@/cookie';
+import { setCookie, getCookie } from '@/cookie'
 
 export default {
   name: 'Home',
@@ -76,21 +114,20 @@ export default {
     return {
       post: {
         title: 'لورم ایپسوم متن ساختگی با تولید داخلی بر پایه منطق خارجی',
-        text: 'Finally, modify the template section to bind the boxExpanded property to the class of the box div. When the boxExpanded property is true, the box-expanded class will be applied to the box div, which will cause it to fill the entire screen',
+        text: 'Finally, modify the template section to bind the boxExpanded property to the class of the box div. When the boxExpanded property is true, the box-expanded class will be applied to the box div, which will cause it to fill the entire screen'
       },
       posts: [
         {
           expanded: false,
           title: 'Online Daf Sessions With Hooman Tootoonchian',
           text: 'Finally, modify the template section to bind the boxExpanded property to the class of the box div. When the boxExpanded property is true, the box-expanded class will be applied to the box div, which will cause it to fill the entire screen',
-          img: "https://i.pinimg.com/564x/8f/95/1b/8f951b9d4df725eb600bcb550c5860e0.jpg",
+          img: 'https://i.pinimg.com/564x/8f/95/1b/8f951b9d4df725eb600bcb550c5860e0.jpg'
         },
         {
           expanded: false,
           title: 'Packahge B',
           text: 'This appears to be a Vue.js single file component that contains a template, script, and style section. The template section contains HTML code that defines the structure of the component, including a container div, row divs, and box divs that contain images, headers, and paragraphs. The script section defines a Vue.js component named "Home", which has an empty components object and a method named "boxClicked". The style section contains CSS code that styles the box divs with background colors, borders, and box shadows, as well as hover and active effects on the boxes.',
-          img: "https://i.pinimg.com/564x/9b/3e/6b/9b3e6b629891dec3087b0f06df508b6a.jpg"
-
+          img: 'https://i.pinimg.com/564x/9b/3e/6b/9b3e6b629891dec3087b0f06df508b6a.jpg'
         },
         {
           expanded: false,
@@ -112,7 +149,7 @@ export default {
           expanded: false,
           title: 'Online JAVA with Mojtaba Asadi',
           text: 'This appears to be a Vue.js single file component that contains a template, script, and style section. The template section contains HTML code that defines the structure of the component, including a container div, row divs, and box divs that contain images, headers, and paragraphs. The script section defines a Vue.js component named "Home", which has an empty components object and a method named "boxClicked". The style section contains CSS code that styles the box divs with background colors, borders, and box shadows, as well as hover and active effects on the boxes.',
-          img: "https://i.pinimg.com/564x/0b/e3/3b/0be33b1c04e4453f3e5a4b3fb22158ca.jpg"
+          img: 'https://i.pinimg.com/564x/0b/e3/3b/0be33b1c04e4453f3e5a4b3fb22158ca.jpg'
         },
         {
           expanded: false,
@@ -134,10 +171,7 @@ export default {
           title: 'Packahge B',
           text: 'This appears to be a Vue.js single file component that contains a template, script, and style section. The template section contains HTML code that defines the structure of the component, including a container div, row divs, and box divs that contain images, headers, and paragraphs. The script section defines a Vue.js component named "Home", which has an empty components object and a method named "boxClicked". The style section contains CSS code that styles the box divs with background colors, borders, and box shadows, as well as hover and active effects on the boxes.'
         }
-
-      ],
-
-
+      ]
     }
   },
   methods: {
@@ -148,18 +182,19 @@ export default {
       })
     },
     boxClicked(post) {
-      this.$router.push('/box/12');
+      this.$router.push('/box/12')
     }
+  },
+  mounted() {
+    this.scrollToTop();
   }
 }
-
 </script>
 
 <style scoped>
 .page {
   animation: slideUp 0.2s ease-out;
 }
-
 
 @keyframes slideUp {
   from {
@@ -172,7 +207,6 @@ export default {
     transition: transform 0.2s ease-in-out;
   }
 }
-
 
 .inner-box {
   background: #ffffff;
@@ -192,7 +226,7 @@ export default {
   cursor: pointer;
   width: 100%;
 }
-.box .box{
+.box .box {
   height: 200px;
 }
 

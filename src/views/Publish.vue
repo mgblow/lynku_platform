@@ -97,6 +97,7 @@
 import { post } from '../api'
 import { getCookie } from '@/cookie'
 import GlobePicker from '@/views/GlobePicker.vue'
+import { emitter } from '@/utils/event-bus'
 
 export default {
   name: 'Publish',
@@ -163,9 +164,8 @@ export default {
         const response = await post(
           '/api/v1',
           {
-            topic: 'createContract',
+            topic: 'createPublish',
             data: {
-              categoryId: '690f5a0f663c9a59b44c8e18',
               text: this.publishText,
               location: {
                 type: 'Point',
@@ -185,10 +185,8 @@ export default {
           this.characterCount = 0
 
           // Show success message
-          this.showSuccess('توییت شما با موفقیت منتشر شد!')
-
-          // Emit event for parent component if needed
-          this.$emit('tweetPosted')
+          emitter.emit('success-message', "متن شما با موفقیت منتشر شد!")
+          this.$router.push('/');
         }
       } catch (error) {
         console.error('Error posting tweet:', error)

@@ -19,6 +19,7 @@
 <script setup>
 import { onMounted, onBeforeUnmount, ref, nextTick } from 'vue'
 import Globe from 'globe.gl'
+import countries from '@/utils/countries'
 
 const globeContainer = ref(true)
 const globe = ref(null)
@@ -130,11 +131,16 @@ async function initGlobe() {
 
   try {
     const g = Globe()(container)
-      .globeImageUrl('//unpkg.com/three-globe/example/img/earth-dark.jpg')
-      .backgroundColor('#000010')
-      .showAtmosphere(true)
-      .atmosphereColor('#4a90e2')
-      .atmosphereAltitude(0.15)
+      .globeImageUrl('//cdn.jsdelivr.net/npm/three-globe/example/img/earth-dark.jpg')
+      .hexPolygonsData(countries.features)
+      .hexPolygonResolution(3)
+      .hexPolygonMargin(0.3)
+      .hexPolygonUseDots(true)
+      .hexPolygonColor(() => `#${Math.round(Math.random() * Math.pow(2, 24)).toString(16).padStart(6, '0')}`)
+      .hexPolygonLabel(({ properties: d }) => `
+          <b>${d.ADMIN} (${d.ISO_A2})</b> <br />
+          Population: <i>${d.POP_EST}</i>
+        `)
       .width(window.innerWidth)
       .height(window.innerHeight)
 

@@ -6,6 +6,7 @@
 
 <script setup>
 import { onMounted, onBeforeUnmount, ref } from 'vue'
+import countries from './../utils/countries'
 import Globe from 'globe.gl'
 
 const emit = defineEmits(['select-location'])
@@ -34,13 +35,20 @@ function createMarker(lat, lng) {
   }
 }
 
+
 onMounted(() => {
   // Initialize the globe
   const g = Globe()(globeContainer.value)
-    .globeImageUrl('//unpkg.com/three-globe/example/img/earth-blue-marble.jpg')
-    .bumpImageUrl('//unpkg.com/three-globe/example/img/earth-topology.png')
-    .backgroundColor('#000011')
-    .showGraticules(true)
+    .globeImageUrl('//cdn.jsdelivr.net/npm/three-globe/example/img/earth-dark.jpg')
+    .hexPolygonsData(countries.features)
+    .hexPolygonResolution(3)
+    .hexPolygonMargin(0.4)
+    .hexPolygonUseDots(true)
+    .hexPolygonColor(() => `#${Math.round(Math.random() * Math.pow(2, 24)).toString(16).padStart(6, '0')}`)
+    .hexPolygonLabel(({ properties: d }) => `
+          <b>${d.ADMIN} (${d.ISO_A2})</b> <br />
+          Population: <i>${d.POP_EST}</i>
+        `)
     .onGlobeClick(({ lat, lng }) => {
       marker.value = createMarker(lat, lng)
       updateMarkers()
