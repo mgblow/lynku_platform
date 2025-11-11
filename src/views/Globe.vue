@@ -1,5 +1,5 @@
 <template>
-  <div class="globe-wrapper">
+  <div class="globe-wrapper" style="padding-top: 170px">
     <div v-if="globeContainer" id="globe-container" ref="globeContainer" class="globe-container"></div>
     <div v-if="!globeReady" class="loading">در حال بارگذاری کره زمین ...</div>
 
@@ -147,7 +147,7 @@ async function initGlobe() {
     // Configure controls
     const controls = g.controls()
     controls.autoRotate = true
-    controls.autoRotateSpeed = 0.5
+    controls.autoRotateSpeed = 0.3
     controls.enableZoom = true
     controls.enablePan = true
     controls.minDistance = 180
@@ -425,6 +425,6 @@ onBeforeUnmount(() => {
 }
 
 :deep(.avatar-marker) {
-  pointer-events: auto !important;
+  pointer-events: auto !important;;
 }
 </style>
