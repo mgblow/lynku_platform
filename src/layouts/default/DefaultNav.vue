@@ -232,7 +232,6 @@ export default {
     })
     emitter.on('loading', (l) => {
       this.loading = l;
-      console.log(l);
     })
     console.log(this.loading);
   },

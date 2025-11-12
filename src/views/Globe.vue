@@ -157,7 +157,7 @@ async function initGlobe() {
     // Configure controls
     const controls = g.controls()
     controls.autoRotate = true
-    controls.autoRotateSpeed = 0.3
+    controls.autoRotateSpeed = 0.5
     controls.enableZoom = true
     controls.enablePan = true
     controls.minDistance = 180
@@ -168,11 +168,11 @@ async function initGlobe() {
       .pointLat((d) => d.lat)
       .pointLng((d) => d.lng)
       .pointColor(() => '#c0392b')
-      .pointAltitude(0.08)
-      .pointRadius(0.1)
+      .pointAltitude(0.1)
+      .pointRadius(0.2)
       .pointLabel(
         (d) => `<div style="background: rgba(0,0,0,0.9); padding: 8px 12px; border-radius: 8px; color: white;">
-        <b style="color: #00ff88;">${d.city}</b><br/>
+        <b style="color: #fff;">${d.city}</b><br/>
         <span style="color: #aaa;">${d.name}</span>
       </div>`
       )
@@ -241,7 +241,7 @@ async function initGlobe() {
       })
       .htmlLat((d) => d.lat)
       .htmlLng((d) => d.lng)
-      .htmlAltitude(0.1)
+      .htmlAltitude(0.5)
 
     // Set initial view
     g.pointOfView({ lat: 30, lng: 20, altitude: 2.1 }, 0)
