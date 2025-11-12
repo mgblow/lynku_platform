@@ -12,7 +12,7 @@
           </div>
         </div>
         <div class="header-text">
-          <h3>توییت جدید</h3>
+          <h3>یه پینگ جدید ارسال کن</h3>
           <p>افکارت رو با جهان به اشتراک بذار</p>
         </div>
       </div>
@@ -23,6 +23,7 @@
           class="tweet-input"
           placeholder="چه خبر؟..."
           maxlength="280"
+          style="font-family: inherit;"
           @input="updateCharacterCount"
         ></textarea>
         <transition name="fade" style="max-height: 50vh; max-width: 100%">
@@ -60,7 +61,7 @@
 
         <!-- Tweet Button -->
         <button class="tweet-btn" :disabled="!canPublish" @click="postPublish">
-          <span class="btn-text">توییت</span>
+          <span class="btn-text">پینگ کن</span>
           <svg v-if="isLoading" class="spinner" width="20" height="20" viewBox="0 0 20 20">
             <circle cx="10" cy="10" r="8" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round">
               <animate attributeName="stroke-dasharray" values="1, 50; 50, 1; 1, 50" dur="1.5s" repeatCount="indefinite" />
@@ -185,12 +186,12 @@ export default {
           this.characterCount = 0
 
           // Show success message
-          emitter.emit('success-message', "متن شما با موفقیت منتشر شد!")
+          emitter.emit('success-message', "پینگت با موفقیت انجام شد!")
           this.$router.push('/');
         }
       } catch (error) {
         console.error('Error posting tweet:', error)
-        this.showError('خطا در ارسال توییت. لطفاً دوباره تلاش کنید.')
+        emitter.emit('error-message', "تو پینگ کردنت مشکلی به وجود اومده! دوباره تلاش کن.");
       } finally {
         this.isLoading = false
       }
