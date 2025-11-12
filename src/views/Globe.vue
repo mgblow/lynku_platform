@@ -17,7 +17,7 @@
 </template>
 
 <script setup>
-import { onMounted, onBeforeUnmount, ref, nextTick } from 'vue'
+import { nextTick, onBeforeUnmount, onMounted, ref } from 'vue'
 import Globe from 'globe.gl'
 import countries from '@/utils/countries'
 
@@ -27,15 +27,7 @@ const globeReady = ref(false)
 const selectedUser = ref(null)
 let animationFrameId = null
 
-const avatarStyles = [
-  'ShortHairShortFlat',
-  'LongHairFro',
-  'Hat',
-  'Hijab',
-  'WinterHat1',
-  'Turban',
-  'LongHairStraight'
-]
+const avatarStyles = ['ShortHairShortFlat', 'LongHairFro', 'Hat', 'Hijab', 'WinterHat1', 'Turban', 'LongHairStraight']
 
 const clothes = ['Hoodie', 'ShirtCrewNeck', 'BlazerSweater', 'Overall']
 const eyes = ['Happy', 'Close', 'Surprised', 'Squint']
@@ -114,14 +106,14 @@ function generateRandomAvatar() {
   return `http://31.57.109.158:5000/avatars?${params.toString()}`
 }
 
-const avatarUsers = users.map(u => ({
+const avatarUsers = users.map((u) => ({
   ...u,
   avatarUrl: generateRandomAvatar()
 }))
 
 async function initGlobe() {
   await nextTick()
-  await new Promise(resolve => setTimeout(resolve, 100))
+  await new Promise((resolve) => setTimeout(resolve, 100))
 
   const container = document.getElementById('globe-container')
   if (!container) {
@@ -136,11 +128,18 @@ async function initGlobe() {
       .hexPolygonResolution(3)
       .hexPolygonMargin(0.3)
       .hexPolygonUseDots(true)
-      .hexPolygonColor(() => `#${Math.round(Math.random() * Math.pow(2, 24)).toString(16).padStart(6, '0')}`)
-      .hexPolygonLabel(({ properties: d }) => `
+      .hexPolygonColor(
+        () =>
+          `#${Math.round(Math.random() * Math.pow(2, 24))
+            .toString(16)
+            .padStart(6, '0')}`
+      )
+      .hexPolygonLabel(
+        ({ properties: d }) => `
           <b>${d.ADMIN} (${d.ISO_A2})</b> <br />
           Population: <i>${d.POP_EST}</i>
-        `)
+        `
+      )
       .width(window.innerWidth)
       .height(window.innerHeight)
 
@@ -155,19 +154,23 @@ async function initGlobe() {
 
     // Add points (cities) with labels
     g.pointsData(avatarUsers)
-      .pointLat(d => d.lat)
-      .pointLng(d => d.lng)
+      .pointLat((d) => d.lat)
+      .pointLng((d) => d.lng)
       .pointColor(() => '#00ff88')
       .pointAltitude(0.01)
       .pointRadius(0.3)
-      .pointLabel(d => `<div style="background: rgba(0,0,0,0.9); padding: 8px 12px; border-radius: 8px; color: white; font-family: sans-serif;">
+      .pointLabel(
+        (
+          d
+        ) => `<div style="background: rgba(0,0,0,0.9); padding: 8px 12px; border-radius: 8px; color: white; font-family: sans-serif;">
         <b style="color: #00ff88;">${d.city}</b><br/>
         <span style="color: #aaa;">${d.name}</span>
-      </div>`)
+      </div>`
+      )
 
     // Add HTML elements for avatars
     g.htmlElementsData(avatarUsers)
-      .htmlElement(user => {
+      .htmlElement((user) => {
         const el = document.createElement('div')
         el.className = 'avatar-marker'
         el.style.cssText = `
@@ -227,8 +230,8 @@ async function initGlobe() {
 
         return el
       })
-      .htmlLat(d => d.lat)
-      .htmlLng(d => d.lng)
+      .htmlLat((d) => d.lat)
+      .htmlLng((d) => d.lng)
       .htmlAltitude(0.01)
 
     // Set initial view
@@ -256,7 +259,6 @@ async function initGlobe() {
     globe.value._cleanupResize = () => {
       window.removeEventListener('resize', handleResize)
     }
-
   } catch (error) {
     console.error('Error initializing globe:', error)
     globeReady.value = false
@@ -304,12 +306,14 @@ onBeforeUnmount(() => {
 </script>
 
 <style scoped>
+/* Base Globe Styles (Keep them mostly the same) */
 .globe-wrapper {
   width: 100vw;
   height: 100vh;
   position: relative;
   overflow: hidden;
-  background: #000010;
+  background: #000010; /* Dark space background */
+  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
 }
 
 .globe-container {
@@ -320,102 +324,153 @@ onBeforeUnmount(() => {
   left: 0;
 }
 
+/* 🚀 Futuristic Loading Component (Glass-morphism) */
 .loading {
   position: absolute;
   top: 50%;
   left: 50%;
   transform: translate(-50%, -50%);
-  color: #fff;
-  background: rgba(10, 10, 21, 0.9);
-  padding: 15px 30px;
-  border-radius: 12px;
-  font-weight: bold;
-  font-size: 1.1rem;
-  border: 2px solid #4a90e2;
-  box-shadow: 0 0 20px rgba(74, 144, 226, 0.5);
+  color: #e0f7fa; /* Light cyan */
+  background: rgba(0, 50, 80, 0.4); /* Translucent dark blue */
+  backdrop-filter: blur(15px); /* Key glass effect */
+  padding: 20px 40px;
+  border-radius: 15px;
+  font-weight: 600;
+  font-size: 1.2rem;
+  border: 1px solid rgba(74, 144, 226, 0.5); /* Subtle blue border */
+  box-shadow: 0 4px 30px rgba(0, 0, 0, 0.2), 0 0 40px rgba(74, 144, 226, 0.4); /* Deep glow */
   z-index: 1000;
+  animation: pulse 1.5s infinite alternate; /* Nice loading animation */
 }
 
+@keyframes pulse {
+  from {
+    box-shadow: 0 0 10px rgba(74, 144, 226, 0.5);
+  }
+  to {
+    box-shadow: 0 0 25px rgba(74, 144, 226, 0.9);
+  }
+}
+
+/* 💫 Futuristic User Info Popup (Glass-morphism) */
 .user-popup {
   position: fixed;
-  top: 20px;
+  top: 50%;
   right: 20px;
-  background: rgba(10, 10, 21, 0.95);
-  border: 2px solid #4a90e2;
-  border-radius: 16px;
-  padding: 20px;
+  transform: translateY(-50%);
+  background: rgba(10, 10, 30, 0.85); /* Darker translucent background */
+  border: 1px solid rgba(74, 144, 226, 0.6);
+  border-radius: 20px;
+  padding: 30px 20px;
   color: white;
-  min-width: 250px;
-  box-shadow: 0 8px 32px rgba(74, 144, 226, 0.3);
-  backdrop-filter: blur(10px);
+  width: 280px;
+  box-shadow: 0 10px 40px rgba(74, 144, 226, 0.4);
+  backdrop-filter: blur(12px) brightness(1.2); /* Stronger blur and light boost */
   z-index: 10000;
-  animation: slideIn 0.3s ease-out;
+  animation: slideIn 0.4s cubic-bezier(0.25, 0.8, 0.25, 1);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
 }
 
 @keyframes slideIn {
   from {
     opacity: 0;
-    transform: translateX(20px);
+    transform: translateY(-50%) translateX(50px);
   }
   to {
     opacity: 1;
-    transform: translateX(0);
+    transform: translateY(-50%) translateX(0);
   }
 }
 
 .close-btn {
   position: absolute;
-  top: 10px;
-  right: 10px;
-  background: transparent;
+  top: 15px;
+  right: 15px;
+  background: rgba(255, 255, 255, 0.1);
   border: none;
-  color: white;
-  font-size: 24px;
+  color: #e0f7fa;
+  font-size: 20px;
   cursor: pointer;
   padding: 0;
-  width: 30px;
-  height: 30px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
+  width: 35px;
+  height: 35px;
   border-radius: 50%;
-  transition: background 0.2s;
+  transition: background 0.3s, transform 0.3s;
+  line-height: 1;
 }
 
 .close-btn:hover {
-  background: rgba(255, 255, 255, 0.1);
+  background: rgba(255, 255, 255, 0.2);
+  transform: rotate(90deg);
 }
 
 .popup-avatar {
-  width: 80px;
-  height: 80px;
+  width: 90px;
+  height: 90px;
   border-radius: 50%;
-  border: 3px solid #4a90e2;
-  margin: 0 auto 15px;
+  border: 4px solid #00ff88; /* Green accent */
+  margin-bottom: 20px;
   display: block;
-  box-shadow: 0 4px 12px rgba(74, 144, 226, 0.4);
+  box-shadow: 0 0 15px rgba(0, 255, 136, 0.7), 0 0 25px rgba(74, 144, 226, 0.4);
+  background: #fff;
+  object-fit: cover;
 }
 
 .user-popup h3 {
-  margin: 0 0 10px 0;
-  font-size: 1.3rem;
-  text-align: center;
-  color: #4a90e2;
+  margin: 0 0 5px 0;
+  font-size: 1.5rem;
+  color: #4a90e2; /* Primary blue */
+  text-shadow: 0 0 5px rgba(74, 144, 226, 0.5);
 }
 
 .city {
-  margin: 8px 0;
-  font-size: 1rem;
-  text-align: center;
-  color: #00ff88;
+  margin: 5px 0 10px 0;
+  font-size: 1.1rem;
+  color: #00ff88; /* Secondary green */
+  font-weight: 500;
 }
 
 .coords {
-  margin: 8px 0 0 0;
-  font-size: 0.85rem;
-  text-align: center;
-  color: #888;
-  font-family: monospace;
+  margin-top: 15px;
+  padding-top: 10px;
+  border-top: 1px solid rgba(255, 255, 255, 0.1);
+  font-size: 0.9rem;
+  color: #aaa;
+  font-family: 'Roboto Mono', monospace;
+}
+
+/* 📱 Mobile Optimization */
+@media (max-width: 600px) {
+  .user-popup {
+    top: auto;
+    bottom: 0;
+    right: 0;
+    left: 0;
+    width: 100%;
+    transform: none; /* Override desktop transform */
+    border-radius: 20px 20px 0 0;
+    padding: 20px;
+    animation: slideInMobile 0.4s cubic-bezier(0.25, 0.8, 0.25, 1);
+  }
+
+  @keyframes slideInMobile {
+    from {
+      opacity: 0;
+      transform: translateY(100%);
+    }
+    to {
+      opacity: 1;
+      transform: translateY(0);
+    }
+  }
+
+  .close-btn {
+    top: 10px;
+    right: 10px;
+  }
 }
 
 :deep(.scene-tooltip) {
@@ -425,6 +480,6 @@ onBeforeUnmount(() => {
 }
 
 :deep(.avatar-marker) {
-  pointer-events: auto !important;;
+  pointer-events: auto !important;
 }
 </style>
