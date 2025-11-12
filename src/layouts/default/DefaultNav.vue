@@ -143,7 +143,7 @@ const quickActionsOriginalList = [
     id: 2,
     name: 'لایو پینگ',
     icon: 'M12 8c-2.21 0-4 1.79-4 4s1.79 4 4 4 4-1.79 4-4-1.79-4-4-4zm0-2c3.31 0 6 2.69 6 6s-2.69 6-6 6-6-2.69-6-6 2.69-6 6-6z', // Live/Target circle
-    gradient: 'linear-gradient(135deg, #111111 0%, #222233 50%, #334455 100%)',
+    gradient: 'linear-gradient(135deg, #000 0%, # 50%, #FFA0A0 100%)',
     link: '/live',
     requireAuth: false
   },

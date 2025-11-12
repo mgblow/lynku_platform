@@ -2,23 +2,34 @@
   <div class="globe-wrapper">
     <div ref="globeContainer" class="globe-container"></div>
 
-    <!-- Tweet-style Info Panel -->
-    <transition name="slide-up">
+    <!-- Slide-down panel -->
+    <transition name="slide-down">
       <div v-if="selectedItem" class="info-panel">
-        <div class="info-header">
-          <div class="post-avatar" v-if="selectedItem.avatar">
-            <img :src="selectedItem.avatar" alt="avatar" />
-          </div>
-          <button class="close-btn" @click="selectedItem = null">×</button>
-        </div>
         <div class="post-content">
-          <div v-if="selectedItem.svg" class="item-icon" v-html="selectedItem.svg"></div>
-          <h3 class="post-name">{{ selectedItem.name }}</h3>
-          <p class="post-city" v-if="selectedItem.city">
-            {{ selectedItem.city.name }}, {{ selectedItem.city.country }}
-          </p>
-          <p class="post-text" v-if="selectedItem.text">{{ selectedItem.text }}</p>
+            <Feed></Feed>
         </div>
+
+        <div class="button-group">
+          <!-- Close Button -->
+          <button class="flat-btn close-btn" @click="selectedItem = null">
+            <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <line x1="18" y1="6" x2="6" y2="18"/>
+              <line x1="6" y1="6" x2="18" y2="18"/>
+            </svg>
+            ببند ×
+          </button>
+
+          <!-- Feed Button -->
+          <button class="flat-btn feed-btn" @click="this.$router.push('/topic')">
+            <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M4 4h16v16H4z"/>
+              <polyline points="4,4 12,12 20,4"/>
+            </svg>
+            پینگ بیشتر...
+          </button>
+        </div>
+
+
       </div>
     </transition>
   </div>
@@ -28,8 +39,8 @@
 import { ref, nextTick, onMounted } from 'vue'
 import Globe from 'globe.gl'
 import countries from '@/utils/countries'
-
-// Cities
+import Feed from './Feed.vue'
+// --- Cities ---
 const cities = [
   { id: 1, name: 'Tokyo', lat: 35.6762, lng: 139.6503, country: 'Japan' },
   { id: 2, name: 'New York', lat: 40.7128, lng: -74.006, country: 'USA' },
@@ -39,22 +50,10 @@ const cities = [
   { id: 6, name: 'Sydney', lat: -33.8688, lng: 151.2093, country: 'Australia' }
 ]
 
-// SVG markers
+// --- SVG markers ---
 const itemSVGs = {
-  home: `
-    <svg viewBox="0 0 64 64">
-      <polygon points="32,8 8,32 56,32" fill="#4ECDC4" stroke="#00aaa0" stroke-width="1"/>
-      <rect x="16" y="32" width="32" height="24" fill="#008080" stroke="#00aaa0" stroke-width="1"/>
-      <rect x="28" y="42" width="8" height="14" fill="#004d4d" stroke="#00aaa0" stroke-width="1"/>
-      <polygon points="48,32 48,56 56,56 56,32" fill="rgba(0,170,160,0.3)"/>
-      <polygon points="32,8 32,32 56,32" fill="rgba(0,170,160,0.3)"/>
-    </svg>
-  `,
-  star: `
-    <svg viewBox="0 0 64 64">
-      <polygon points="32,4 39,24 60,24 42,38 48,58 32,46 16,58 22,38 4,24 25,24" fill="#FFE66D" stroke="#FFDD33" stroke-width="1"/>
-    </svg>
-  `
+  home: `<svg viewBox="0 0 64 64"><polygon points="32,8 8,32 56,32" fill="#4ECDC4" stroke="#00aaa0" stroke-width="1"/><rect x="16" y="32" width="32" height="24" fill="#008080" stroke="#00aaa0" stroke-width="1"/><rect x="28" y="42" width="8" height="14" fill="#004d4d" stroke="#00aaa0" stroke-width="1"/><polygon points="48,32 48,56 56,56 56,32" fill="rgba(0,170,160,0.3)"/><polygon points="32,8 32,32 56,32" fill="rgba(0,170,160,0.3)"/></svg>`,
+  star: `<svg viewBox="0 0 64 64"><polygon points="32,4 39,24 60,24 42,38 48,58 32,46 16,58 22,38 4,24 25,24" fill="#FFE66D" stroke="#FFDD33" stroke-width="1"/></svg>`
 }
 
 const itemTypes = [
@@ -62,7 +61,7 @@ const itemTypes = [
   { id: 'star', name: 'Favorite', svg: itemSVGs.star }
 ]
 
-// Generate items near cities
+// --- Items near cities ---
 const items = []
 cities.forEach((city) => {
   const type = itemTypes[Math.floor(Math.random() * itemTypes.length)]
@@ -74,7 +73,7 @@ cities.forEach((city) => {
   })
 })
 
-// Tweets/Pings with avatars
+// --- Tweets/pings ---
 const posts = []
 const sampleTexts = [
   'Just visited this place, amazing views!',
@@ -136,7 +135,7 @@ async function initGlobe() {
         transform-origin:center;
         text-align:center;
         pointer-events:auto;
-        margin: 0 auto;
+        margin:0 auto;
       `
       if (d.svg) {
         el.innerHTML = d.svg
@@ -144,25 +143,25 @@ async function initGlobe() {
         const avatarEl = document.createElement('img')
         avatarEl.src = d.avatar
         avatarEl.style.cssText = `
-          width: 40px;
-          height: 40px;
-          border-radius: 50%;
-          border: 2px solid #1da1f2;
-          box-shadow: 0 0 8px #1da1f2;
-          margin-bottom: 4px;
+          width:40px;
+          height:40px;
+          border-radius:50%;
+          border:2px solid #1da1f2;
+          box-shadow:0 0 8px #1da1f2;
+          margin-bottom:4px;
         `
         el.appendChild(avatarEl)
 
         const textEl = document.createElement('div')
         textEl.textContent = d.text
         textEl.style.cssText = `
-          font-size: 12px;
-          color: #fff;
-          background: rgba(21,32,43,0.9);
-          padding: 3px 6px;
-          border-radius: 12px;
-          max-width: 120px;
-          text-align: center;
+          font-size:12px;
+          color:#fff;
+          background:rgba(21,32,43,0.9);
+          padding:3px 6px;
+          border-radius:12px;
+          max-width:120px;
+          text-align:center;
         `
         el.appendChild(textEl)
       }
@@ -198,7 +197,6 @@ onMounted(() => initGlobe())
   overflow: hidden;
   background: #000010;
 }
-
 .globe-container {
   width: 100%;
   height: 100%;
@@ -207,74 +205,46 @@ onMounted(() => initGlobe())
   left: 0;
 }
 
-/* Slide-up animation */
-.slide-up-enter-from {
-  transform: translateY(100%);
+/* Slide-down panel */
+.slide-down-enter-from {
+  transform: translateY(-100%);
   opacity: 0;
 }
-.slide-up-enter-to {
+.slide-down-enter-to {
   transform: translateY(0);
   opacity: 1;
 }
-.slide-up-leave-from {
+.slide-down-leave-from {
   transform: translateY(0);
   opacity: 1;
 }
-.slide-up-leave-to {
-  transform: translateY(100%);
+.slide-down-leave-to {
+  transform: translateY(-100%);
   opacity: 0;
 }
-.slide-up-enter-active,
-.slide-up-leave-active {
+.slide-down-enter-active,
+.slide-down-leave-active {
   transition: transform 0.35s ease, opacity 0.35s ease;
 }
 
-/* Panel styling like Twitter */
+/* Info panel: top to half of screen */
 .info-panel {
   position: fixed;
-  bottom: 0;
+  top: 0;
   left: 50%;
   transform: translateX(-50%);
-  width: 360px;
+  width: 100%;
   max-width: 95%;
+  height: 80vh;
   background: #000;
   color: #fff;
-  border-radius: 16px 16px 0 0;
   padding: 16px;
   z-index: 1000;
-  box-shadow: 0 -4px 16px rgba(0, 0, 0, 0.6);
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.6);
   backdrop-filter: blur(12px);
   display: flex;
   flex-direction: column;
-  gap: 12px;
-}
-
-/* Header */
-.info-header {
-  display: flex;
   justify-content: space-between;
-  align-items: center;
-}
-
-.close-btn {
-  background: transparent;
-  border: none;
-  color: #1da1f2;
-  font-size: 24px;
-  cursor: pointer;
-  font-weight: bold;
-  transition: color 0.2s;
-}
-.close-btn:hover {
-  color: #0d8ddb;
-}
-
-/* Avatar */
-.post-avatar img {
-  width: 48px;
-  height: 48px;
-  border-radius: 50%;
-  object-fit: cover;
 }
 
 /* Post content */
@@ -282,6 +252,76 @@ onMounted(() => initGlobe())
   display: flex;
   flex-direction: column;
   gap: 6px;
+  overflow-y: auto;
+}
+
+/* Close button at bottom */
+.button-group {
+  display: flex;
+  gap: 12px;
+  justify-content: center;
+  margin-top: 16px;
+}
+
+.flat-btn {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  background-color: #1a1a1f;
+  color: #ffffffcc;
+  font-size: 16px;
+  font-weight: 600;
+  padding: 10px 18px;
+  border-radius: 12px;
+  border: 1px solid #2a2a35;
+  cursor: pointer;
+  transition: all 0.25s ease;
+}
+
+.flat-btn svg {
+  stroke: #ffffffcc;
+  transition: stroke 0.25s ease, transform 0.25s ease;
+}
+
+.flat-btn:hover {
+  background-color: #2a2a35;
+  border-color: #3a3a45;
+}
+
+.flat-btn:hover svg {
+  stroke: #ffffff;
+  transform: scale(1.1);
+}
+
+.close-btn {
+  background-color: #2b1a1a;
+  border-color: #3a2a2a;
+  color: #ff6b6b;
+}
+
+.close-btn:hover {
+  background-color: #3a2a2a;
+  color: #ff4c4c;
+}
+
+.feed-btn {
+  background-color: #1a1a2b;
+  border-color: #2a2a3a;
+  color: #6bb0ff;
+}
+
+.feed-btn:hover {
+  background-color: #2a2a3a;
+  color: #4c8fff;
+}
+
+
+
+.post-avatar img {
+  width: 48px;
+  height: 48px;
+  border-radius: 50%;
+  object-fit: cover;
 }
 
 .item-icon svg {
