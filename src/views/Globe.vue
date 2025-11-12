@@ -311,6 +311,7 @@ onBeforeUnmount(() => {
   width: 100vw;
   height: 100vh;
   position: relative;
+  position: relative;
   overflow: hidden;
   background: #000010; /* Dark space background */
   font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
@@ -330,17 +331,100 @@ onBeforeUnmount(() => {
   top: 50%;
   left: 50%;
   transform: translate(-50%, -50%);
-  color: #e0f7fa; /* Light cyan */
-  background: rgba(0, 50, 80, 0.4); /* Translucent dark blue */
-  backdrop-filter: blur(15px); /* Key glass effect */
-  padding: 20px 40px;
-  border-radius: 15px;
-  font-weight: 600;
-  font-size: 1.2rem;
-  border: 1px solid rgba(74, 144, 226, 0.5); /* Subtle blue border */
-  box-shadow: 0 4px 30px rgba(0, 0, 0, 0.2), 0 0 40px rgba(74, 144, 226, 0.4); /* Deep glow */
+  color: #00f3ff; /* Cyber cyan */
+  background: rgba(0, 20, 40, 0.3); /* Deep space blue */
+  backdrop-filter: blur(20px) brightness(1.2);
+  padding: 30px 50px;
+  border-radius: 20px;
+  font-weight: 700;
+  font-size: 0.9rem;
+  text-align: center;
+  border: 1px solid rgba(0, 243, 255, 0.6);
+  border-bottom: 2px solid rgba(0, 243, 255, 0.8);
+  box-shadow:
+    0 0 60px rgba(0, 243, 255, 0.3),
+    0 0 100px rgba(138, 43, 226, 0.2),
+    inset 0 0 40px rgba(0, 243, 255, 0.1);
   z-index: 1000;
-  animation: pulse 1.5s infinite alternate; /* Nice loading animation */
+  text-transform: uppercase;
+  letter-spacing: 3px;
+  text-shadow: 0 0 10px #00f3ff, 0 0 20px #00f3ff;
+  animation: metaversePulse 2s infinite ease-in-out;
+}
+
+.loading::before {
+  content: '';
+  position: absolute;
+  top: -2px;
+  left: -2px;
+  right: -2px;
+  bottom: -2px;
+  background: linear-gradient(45deg,
+  #00f3ff, #8a2be2, #ff00ff, #00f3ff);
+  border-radius: 22px;
+  z-index: -1;
+  animation: rotateBorder 3s linear infinite;
+  opacity: 0.7;
+}
+
+.loading::after {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background:
+    radial-gradient(circle at 30% 30%, rgba(0, 243, 255, 0.1) 0%, transparent 50%),
+    radial-gradient(circle at 70% 70%, rgba(138, 43, 226, 0.1) 0%, transparent 50%);
+  border-radius: 20px;
+  z-index: -1;
+}
+
+.loading-dots {
+  display: inline-block;
+  margin-left: 5px;
+}
+
+.loading-dots::after {
+  content: '...';
+  animation: dotPulse 1.5s infinite steps(4);
+}
+
+@keyframes metaversePulse {
+  0%, 100% {
+    transform: translate(-50%, -50%) scale(1);
+    box-shadow:
+      0 0 60px rgba(0, 243, 255, 0.3),
+      0 0 100px rgba(138, 43, 226, 0.2),
+      inset 0 0 40px rgba(0, 243, 255, 0.1);
+  }
+  50% {
+    transform: translate(-50%, -50%) scale(1.05);
+    box-shadow:
+      0 0 80px rgba(0, 243, 255, 0.5),
+      0 0 120px rgba(138, 43, 226, 0.3),
+      inset 0 0 60px rgba(0, 243, 255, 0.2);
+    text-shadow: 0 0 15px #00f3ff, 0 0 30px #00f3ff;
+  }
+}
+
+@keyframes rotateBorder {
+  0% {
+    transform: rotate(0deg);
+    filter: hue-rotate(0deg);
+  }
+  100% {
+    transform: rotate(360deg);
+    filter: hue-rotate(360deg);
+  }
+}
+
+@keyframes dotPulse {
+  0% { content: '.'; }
+  33% { content: '..'; }
+  66% { content: '...'; }
+  100% { content: '...'; }
 }
 
 @keyframes pulse {
