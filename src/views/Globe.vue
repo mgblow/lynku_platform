@@ -156,13 +156,13 @@ async function initGlobe() {
     g.pointsData(avatarUsers)
       .pointLat((d) => d.lat)
       .pointLng((d) => d.lng)
-      .pointColor(() => '#00ff88')
-      .pointAltitude(0.01)
-      .pointRadius(0.3)
+      .pointColor(() => '#c0392b')
+      .pointAltitude(0.08)
+      .pointRadius(0.1)
       .pointLabel(
         (
           d
-        ) => `<div style="background: rgba(0,0,0,0.9); padding: 8px 12px; border-radius: 8px; color: white; font-family: sans-serif;">
+        ) => `<div style="background: rgba(0,0,0,0.9); padding: 8px 12px; border-radius: 8px; color: white;">
         <b style="color: #00ff88;">${d.city}</b><br/>
         <span style="color: #aaa;">${d.name}</span>
       </div>`
@@ -232,10 +232,10 @@ async function initGlobe() {
       })
       .htmlLat((d) => d.lat)
       .htmlLng((d) => d.lng)
-      .htmlAltitude(0.01)
+      .htmlAltitude(0.1)
 
     // Set initial view
-    g.pointOfView({ lat: 30, lng: 20, altitude: 2.2 }, 0)
+    g.pointOfView({ lat: 30, lng: 20, altitude: 2.1 }, 0)
 
     globe.value = g
 
