@@ -7,7 +7,7 @@
           <div class="avatar-placeholder">
             <img
               style="width: 100%"
-              src="https://avataaars.io/?avatarStyle=Circle&topType=LongHairStraight&accessoriesType=Blank&hairColor=SilverGray&facialHairType=BeardMajestic&facialHairColor=Auburn&clotheType=BlazerSweater&eyeType=Close&eyebrowType=Default&mouthType=ScreamOpen&skinColor=Black"
+              :src="avatarUrl"
             />
           </div>
         </div>
@@ -119,6 +119,11 @@ export default {
   computed: {
     canPublish() {
       return this.publishText.trim().length > 0 && this.publishText.trim().length <= 280 && !this.isLoading
+    },
+    avatarUrl() {
+      const baseUrl = 'http://31.57.109.158:5000/avatars'
+      const params = new URLSearchParams(this.avatarConfig)
+      return `${baseUrl}?${params.toString()}`
     }
   },
   mounted() {
