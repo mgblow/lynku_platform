@@ -149,7 +149,7 @@ const quickActionsOriginalList = [
   },
   {
     id: 3,
-    name: 'پست جدید',
+    name: 'پینگ جدید',
     icon: 'M19 13H5v-2h14v2zm-7-8a1 1 0 0 1 1 1v3h3a1 1 0 0 1 0 2h-3v3a1 1 0 0 1-2 0v-3H8a1 1 0 0 1 0-2h3V6a1 1 0 0 1 1-1z', // Add Post / Plus
     gradient: 'linear-gradient(135deg, #111111 0%, #222233 50%, #334455 100%)',
     link: '/publish',

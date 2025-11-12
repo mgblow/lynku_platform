@@ -12,20 +12,12 @@
         <div class="button-group">
           <!-- Close Button -->
           <button class="flat-btn close-btn" @click="selectedItem = null">
-            <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-              <line x1="18" y1="6" x2="6" y2="18"/>
-              <line x1="6" y1="6" x2="18" y2="18"/>
-            </svg>
-            ببند ×
+            ببند
           </button>
 
           <!-- Feed Button -->
           <button class="flat-btn feed-btn" @click="this.$router.push('/topic')">
-            <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-              <path d="M4 4h16v16H4z"/>
-              <polyline points="4,4 12,12 20,4"/>
-            </svg>
-            پینگ بیشتر...
+            برو تو این تاپیک
           </button>
         </div>
 
@@ -235,7 +227,7 @@ onMounted(() => initGlobe())
   transform: translateX(-50%);
   width: 100%;
   max-width: 95%;
-  height: 80vh;
+  height: 70vh;
   background: #000;
   color: #fff;
   padding: 16px;
@@ -269,9 +261,9 @@ onMounted(() => initGlobe())
   gap: 8px;
   background-color: #1a1a1f;
   color: #ffffffcc;
-  font-size: 16px;
+  font-size: 13px;
   font-weight: 600;
-  padding: 10px 18px;
+  padding: 5px 18px;
   border-radius: 12px;
   border: 1px solid #2a2a35;
   cursor: pointer;

@@ -519,7 +519,7 @@ onBeforeUnmount(() => {
   text-align: center;
 
   background: rgba(18, 24, 38, 0.55);
-  padding: 28px 40px;
+  padding: 35px 40px;
   border-radius: 100%;
   border: 1px solid rgba(0, 255, 230, 0.25);
   backdrop-filter: blur(16px) saturate(1.2);
@@ -533,8 +533,8 @@ onBeforeUnmount(() => {
 }
 
 .globe-svg {
-  width: 90px;
-  height: 90px;
+  width: 70px;
+  height: 70px;
   display: block;
   margin: 0 auto 12px;
   filter: drop-shadow(0 0 8px rgba(0, 255, 230, 0.4));
