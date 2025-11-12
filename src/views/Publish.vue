@@ -5,10 +5,7 @@
       <div class="tweet-header">
         <div class="user-avatar">
           <div class="avatar-placeholder">
-            <img
-              style="width: 100%"
-              :src="avatarUrl"
-            />
+            <img style="width: 100%" :src="avatarUrl" />
           </div>
         </div>
         <div class="header-text">
@@ -23,7 +20,7 @@
           class="tweet-input"
           placeholder="چه خبر؟..."
           maxlength="280"
-          style="font-family: inherit;"
+          style="font-family: inherit"
           @input="updateCharacterCount"
         ></textarea>
         <transition name="fade" style="max-height: 50vh; max-width: 100%">
@@ -102,6 +99,7 @@ import { emitter } from '@/utils/event-bus'
 
 export default {
   name: 'Publish',
+  avatarConfig: {},
   components: { GlobePicker },
   data() {
     return {
@@ -121,6 +119,11 @@ export default {
       return this.publishText.trim().length > 0 && this.publishText.trim().length <= 280 && !this.isLoading
     },
     avatarUrl() {
+      this.avatarConfig = Object.assign(
+        JSON.parse(localStorage.getItem('userAvatarConfig')),
+        this.avatarConfig
+      )
+      console.log(this.avatarConfig)
       const baseUrl = 'http://31.57.109.158:5000/avatars'
       const params = new URLSearchParams(this.avatarConfig)
       return `${baseUrl}?${params.toString()}`
@@ -153,8 +156,8 @@ export default {
       // Simulate getting location (in real app, use geolocation API)
       if (this.showGlobe) {
         this.showGlobe = false
-        this.coords = null;
-        this.location = '';
+        this.coords = null
+        this.location = ''
       } else {
         this.showGlobe = true
         this.$data.coords = await this.getUserLocation()
@@ -191,12 +194,12 @@ export default {
           this.characterCount = 0
 
           // Show success message
-          emitter.emit('success-message', "پینگت با موفقیت انجام شد!")
-          this.$router.push('/');
+          emitter.emit('success-message', 'پینگت با موفقیت انجام شد!')
+          this.$router.push('/')
         }
       } catch (error) {
         console.error('Error posting tweet:', error)
-        emitter.emit('error-message', "تو پینگ کردنت مشکلی به وجود اومده! دوباره تلاش کن.");
+        emitter.emit('error-message', 'تو پینگ کردنت مشکلی به وجود اومده! دوباره تلاش کن.')
       } finally {
         this.isLoading = false
       }
