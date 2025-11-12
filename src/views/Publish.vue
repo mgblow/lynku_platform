@@ -134,9 +134,7 @@ export default {
   },
   methods: {
     handleLocationSelect(coords) {
-      console.log('========>', coords)
       this.location = `Lat: ${coords.lat.toFixed(4)}, Lon: ${coords.lon.toFixed(4)}`
-      // this.showGlobe = false
     },
     updateCharacterCount() {
       this.characterCount = this.publishText.length
@@ -168,7 +166,7 @@ export default {
       if (!this.canPublish) return
 
       this.isLoading = true
-
+      emitter.emit("http-start", true);
       try {
         const response = await post(
           '/api/v1',
@@ -201,7 +199,7 @@ export default {
         console.error('Error posting tweet:', error)
         emitter.emit('error-message', 'تو پینگ کردنت مشکلی به وجود اومده! دوباره تلاش کن.')
       } finally {
-        this.isLoading = false
+        emitter.emit("http-stop", true);
       }
     },
 
