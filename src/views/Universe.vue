@@ -138,7 +138,7 @@ async function initGlobe() {
           width:40px;
           height:40px;
           border-radius:50%;
-          border:2px solid #1da1f2;
+          border:2px solid #FFF26F;
           box-shadow:0 0 8px #1da1f2;
           margin-bottom:4px;
         `
@@ -149,10 +149,10 @@ async function initGlobe() {
         textEl.style.cssText = `
           font-size:12px;
           color:#fff;
-          background:rgba(21,32,43,0.9);
-          padding:3px 6px;
-          border-radius:12px;
-          max-width:120px;
+          background:rgba(9,19,30,0.9);
+          padding:3px 8px;
+          border-radius:5px;
+          max-width:130px;
           text-align:center;
         `
         el.appendChild(textEl)
@@ -320,7 +320,7 @@ onMounted(() => initGlobe())
   width: 50px;
   height: 50px;
   margin-bottom: 6px;
-  filter: drop-shadow(0 0 8px #1da1f2);
+  filter: drop-shadow(0 0 8px #FF40AF);
 }
 
 .post-name {
