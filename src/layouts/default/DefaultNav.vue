@@ -338,19 +338,18 @@ export default {
   right: 0;
   z-index: 10000;
   pointer-events: none;
+  background: none;
 }
 
 /* Holographic Header */
 .hologram-header {
-  background: rgba(0, 0, 0, 0.9);
-  backdrop-filter: blur(20px);
-  border-bottom: 1px solid rgba(29, 155, 240, 0.3);
   padding: 12px 20px;
   display: flex;
   justify-content: space-between;
   align-items: center;
   position: relative;
   pointer-events: all;
+  background: none;
 }
 
 .hologram-effect {
@@ -435,7 +434,7 @@ export default {
   height: 40px;
   border-radius: 50%;
   background: rgba(29, 155, 240, 0.2);
-  border: 1px solid rgba(29, 155, 240, 0.5);
+  border: 1px solid rgba(255, 255, 130, 0.5);
   display: flex;
   align-items: center;
   justify-content: center;
@@ -452,7 +451,7 @@ export default {
 .search-orb svg {
   width: 20px;
   height: 20px;
-  color: #1d9bf0;
+  color: rgb(255, 255, 130, 0.4);
 }
 
 .search-field {
@@ -516,23 +515,23 @@ export default {
   height: 65px;
   border-radius: 50%;
   background: radial-gradient(circle at 30% 30%, #000, #444);
-  border: 2px solid rgba(29, 155, 240, 0.8);
+  border: 2px solid #FF44AF;
   cursor: pointer;
   position: relative;
   transition: all 0.5s cubic-bezier(0.68, -0.55, 0.265, 1.55);
-  box-shadow: 0 0 20px rgba(29, 155, 240, 0.5), inset 0 0 20px rgba(255, 255, 255, 0.1);
+  box-shadow: 0 0 20px rgba(29, 155, 240, 0.5), inset 0 0 20px rgba(255, 220, 97, 0.1);
   transform: translateX(-50%) scale(1);
   display: inline-block;
 }
 
 .nav-orb:hover {
   transform: scale(1.1) translateX(-50%);
-  box-shadow: 0 0 30px rgba(29, 155, 240, 0.8), inset 0 0 30px rgba(255, 255, 255, 0.2);
+  box-shadow: 0 0 30px #FF44AF, inset 0 0 30px rgba(255, 255, 255, 0.2);
 }
 
 .nav-orb.active {
   transform: scale(1.2) translateX(-50%);
-  background: radial-gradient(circle at 30% 30%, #00ba7c, #000);
+  background: radial-gradient(circle at 30% 30%, #FF40AF, #000);
   border-color: rgba(0, 186, 124, 0.8);
 }
 
