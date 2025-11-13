@@ -156,6 +156,17 @@ const quickActionsOriginalList = [
     requireAuth: true
   },
   {
+    id: 8,
+    name: 'هم‌نوا',
+    icon: 'M12 17.27L18.18 21l-1.64-7.03L22 9.24l-7.19-.61L12 2 9.19 8.63 2 9.24l5.46 4.73L5.82 21z',
+    gradient: 'linear-gradient(135deg, #111111 0%, #222233 50%, #334455 100%)',
+    link: '/match',
+    requireAuth: true
+  }
+
+
+  ,
+  {
     id: 4,
     name: 'پیام‌ها',
     icon: 'M20 2H4c-1.1 0-2 .9-2 2v16l4-4h14a2 2 0 0 0 2-2V4c0-1.1-.9-2-2-2z', // Message bubble
@@ -179,16 +190,7 @@ const quickActionsOriginalList = [
     link: '/logout',
     requireAuth: true
   },
-  {
-    id: 7,
-    name: 'ورود',
-    icon: 'M16 13v-2H7V8l-5 4 5 4v-3h9v-2zm4-11h-8v2h8v14h-8v2h8a2 2 0 0 0 2-2V4a2 2 0 0 0-2-2z', // Login
-    gradient: 'linear-gradient(135deg, #111111 0%, #222233 50%, #334455 100%)',
-    link: '/login',
-    requireAuth: false
-  }
-];
-
+]
 
 export default {
   name: 'MetaverseNavigation',
@@ -240,9 +242,9 @@ export default {
       this.buildQuickActions()
     })
     emitter.on('loading', (l) => {
-      this.loading = l;
+      this.loading = l
     })
-    console.log(this.loading);
+    console.log(this.loading)
   },
   unmounted() {
     emitter.off('refresh-navigation-state') // cleanup
@@ -515,7 +517,7 @@ export default {
   height: 65px;
   border-radius: 50%;
   background: radial-gradient(circle at 30% 30%, #000, #444);
-  border: 2px solid #FF44AF;
+  border: 2px solid #ff44af;
   cursor: pointer;
   position: relative;
   transition: all 0.5s cubic-bezier(0.68, -0.55, 0.265, 1.55);
@@ -526,12 +528,12 @@ export default {
 
 .nav-orb:hover {
   transform: scale(1.1) translateX(-50%);
-  box-shadow: 0 0 30px #FF44AF, inset 0 0 30px rgba(255, 255, 255, 0.2);
+  box-shadow: 0 0 30px #ff44af, inset 0 0 30px rgba(255, 255, 255, 0.2);
 }
 
 .nav-orb.active {
   transform: scale(1.2) translateX(-50%);
-  background: radial-gradient(circle at 30% 30%, #FF40AF, #000);
+  background: radial-gradient(circle at 30% 30%, #ff40af, #000);
   border-color: rgba(0, 186, 124, 0.8);
 }
 
