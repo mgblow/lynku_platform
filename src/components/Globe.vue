@@ -16,6 +16,7 @@
         <button class="close-btn" @click="closePanel()">×</button>
         <Ping v-if="selectedData.type === 'ping'"></Ping>
         <Person v-if="selectedData.type === 'person'" :selectedData="selectedData"></Person>
+        <Gift v-if="selectedData.type === 'gift'" :selectedData="selectedData"></Gift>
       </div>
     </Teleport>
   </div>
@@ -29,6 +30,7 @@ import Person from '@/components/Person.vue'
 import Ping from '@/components/Ping.vue'
 import wires from '@/data/wire-data'
 import countries from '@/data/countries'
+import Gift from '@/components/Gift.vue'
 
 const globeContainer = ref(true)
 const globe = ref(null)
@@ -147,7 +149,7 @@ function pinData(newData = []) {
       el.appendChild(img)
       el.appendChild(name)
 
-      // 🌌 If it's a ping (tweet)
+      // 🌌 If it's a ping
       if (data.type === 'ping') {
         const card = document.createElement('div')
         card.className = 'ping-card'
@@ -176,6 +178,58 @@ function pinData(newData = []) {
       position: relative;
       direction: rtl;
       text-align: right;
+    `
+        // Ping text
+        const style = document.createElement('style')
+        style.textContent = `
+      .ping-card .ping-text {
+        line-height: 1.4;
+        margin-bottom: 6px;
+        font-weight: 400;
+        text-shadow: 0 0 2px rgba(0,0,0,0.4);
+        direction: ${/[آ-ی]/.test(data.text) ? 'rtl' : 'ltr'};
+      }
+      .ping-card .ping-meta {
+        display: flex;
+        justify-content: space-between;
+        font-size: 10px;
+        opacity: 0.8;
+      }
+      .globe-marker:hover .ping-card {
+        box-shadow: 0 6px 26px rgba(255,0,200,0.35);
+      }
+      @keyframes fadeIn {
+        from { opacity: 0; transform: translateY(10px); }
+        to { opacity: 1; transform: translateY(0); }
+      }
+    `
+        document.head.appendChild(style)
+        el.appendChild(card)
+      } else if (data.type === 'gift') {
+        const card = document.createElement('div')
+        card.className = 'gift-card'
+        card.innerHTML = `
+      <p class="gift-text">${data.text}</p>
+      <div class="gift-meta">
+          ${data.gift}
+      </div>
+    `
+        card.style.cssText = `
+      background: rgba(10,10,20,0.75);
+      backdrop-filter: blur(8px) saturate(1.3);
+      -webkit-backdrop-filter: blur(8px) saturate(1.3);
+      border: 1px solid rgba(255,255,255,0.05);
+      border-radius: 10px;
+      margin-top: 10px;
+      color: #fff;
+      font-size: 11px;
+      width: 180px;
+      box-shadow: 0 4px 20px rgba(255,0,180,0.25);
+      animation: fadeIn 0.4s ease;
+      position: relative;
+      direction: rtl;
+      text-align: center;
+      padding-top: 10px;
     `
         // Ping text
         const style = document.createElement('style')
