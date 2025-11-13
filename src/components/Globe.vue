@@ -12,15 +12,10 @@
     </div>
 
     <Teleport to="body">
-      <div v-if="selectedUser" class="user-popup">
-        <button class="close-btn" @click="selectedUser = null">×</button>
-        <Ping></Ping>
-        <div class="user-popup-content" style="display: none;">
-          <img :src="selectedUser.avatarUrl" alt="Avatar" class="popup-avatar" />
-          <h3>{{ selectedUser.name }}</h3>
-          <p class="city">📍 {{ selectedUser.city }}</p>
-          <p class="coords">{{ selectedUser.lat.toFixed(4) }}°, {{ selectedUser.lng.toFixed(4) }}°</p>
-        </div>
+      <div v-if="selectedData" class="user-popup">
+        <button class="close-btn" @click="selectedData = null">×</button>
+<!--        <Ping></Ping>-->
+        <Person :selectedData="selectedData"></Person>
       </div>
     </Teleport>
   </div>
@@ -32,10 +27,11 @@ import Globe from 'globe.gl'
 import countries from '@/utils/countries'
 import { emitter } from '@/utils/event-bus'
 import Ping from '@/components/Ping.vue'
+import Person from '@/components/Person.vue'
 const globeContainer = ref(true)
 const globe = ref(null)
 const globeReady = ref(false)
-const selectedUser = ref(null)
+const selectedData = ref(null)
 
 const avatarStyles = ['ShortHairShortFlat','LongHairFro','Hat','Hijab','WinterHat1','Turban','LongHairStraight']
 const clothes = ['Hoodie','ShirtCrewNeck','BlazerSweater','Overall']
@@ -90,13 +86,13 @@ function addPeopleToGlobe(newPeople = []) {
 
   // Avatars
   globe.value.htmlElementsData(newPeople.map(u => ({ ...u, avatarUrl: generateRandomAvatar() })))
-    .htmlElement(user => {
+    .htmlElement(data => {
       const el = document.createElement('div')
       el.className = 'avatar-marker'
       el.style.cssText = 'position: relative; cursor: pointer; text-align: center; transition: transform 0.2s; pointer-events: auto;'
 
       const img = document.createElement('img')
-      img.src = user.avatarUrl
+      img.src = data.avatarUrl
       img.style.cssText = `
         width: 40px;
         height: 40px;
@@ -109,7 +105,7 @@ function addPeopleToGlobe(newPeople = []) {
       `
 
       const label = document.createElement('div')
-      label.textContent = user.name
+      label.textContent = data.name
       label.style.cssText = 'color: #fff; font-size: 10px; margin-top: 4px; text-shadow: 0 0 3px #000,0 0 5px #000; font-weight: 600; white-space: nowrap;'
 
       el.appendChild(img)
@@ -127,8 +123,8 @@ function addPeopleToGlobe(newPeople = []) {
       }
       el.onclick = (e) => {
         e.stopPropagation()
-        selectedUser.value = user
-        globe.value?.pointOfView({ lat: user.lat, lng: user.lng, altitude: 1.5 }, 1500)
+        selectedData.value = data
+        globe.value?.pointOfView({ lat: data.lat, lng: data.lng, altitude: 1.5 }, 1500)
       }
 
       return el
@@ -186,7 +182,7 @@ watch(() => props.imageUrl, (url) => { if (globe.value) globe.value.globeImageUr
 
 onMounted(initGlobe)
 onBeforeUnmount(() => {
-  selectedUser.value = null
+  selectedData.value = null
   globeReady.value = false
   if (globe.value?._cleanupResize) globe.value._cleanupResize()
   globe.value?.pointsData([])
@@ -263,7 +259,7 @@ onBeforeUnmount(() => {
   -webkit-backdrop-filter: blur(12px);
   border: 1px solid rgba(255, 255, 255, 0.08);
   box-shadow: 0 0 25px rgba(0, 0, 0, 0.6);
-  padding: 30px 20px;
+  padding: 60px 20px;
   color: white;
   width: 280px;
   z-index: 10000;
