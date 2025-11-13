@@ -46,7 +46,7 @@ const skins = ['Light','Tanned','Brown','DarkBrown']
 const props = defineProps({
   autoRotateSpeed: { type: Number, default: 0.5 },
   imageUrl: { type: String, default: '#000000' },
-  people: { type: Array, default: () => [] }
+  data: { type: Array, default: () => [] }
 })
 
 function generateRandomAvatar() {
@@ -166,7 +166,7 @@ async function initGlobe() {
     controls.minDistance = 180
     controls.maxDistance = 800
 
-    addPeopleToGlobe(props.people)
+    addPeopleToGlobe(props.data)
     globe.value.pointOfView({ lat: 30, lng: 20, altitude: 3.5 }, 0)
     globeReady.value = true
 
@@ -180,7 +180,7 @@ async function initGlobe() {
 }
 
 // Reactive watchers
-watch(() => props.people, (newPeople) => addPeopleToGlobe(newPeople), { deep: true })
+watch(() => props.data, (newPeople) => addPeopleToGlobe(newPeople), { deep: true })
 watch(() => props.autoRotateSpeed, (speed) => { if (globe.value) globe.value.controls().autoRotateSpeed = speed })
 watch(() => props.imageUrl, (url) => { if (globe.value) globe.value.globeImageUrl(url) })
 

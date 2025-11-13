@@ -1,5 +1,5 @@
 <template>
-  <Globe :autoRotateSpeed="0.2" :imageUrl="'//cdn.jsdelivr.net/npm/three-globe/example/img/earth-dark.jpg'" :people="people" />
+  <Globe :autoRotateSpeed="0.2" :imageUrl="'//cdn.jsdelivr.net/npm/three-globe/example/img/earth-dark.jpg'" :data="people" />
 </template>
 
 <script setup>

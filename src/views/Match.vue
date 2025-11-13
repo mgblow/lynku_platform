@@ -2,7 +2,7 @@
   <Globe
     :autoRotateSpeed="0.2"
     :imageUrl="'//cdn.jsdelivr.net/npm/three-globe/example/img/earth-dark.jpg'"
-    :people="people"
+    :data="people"
   />
 </template>
 
