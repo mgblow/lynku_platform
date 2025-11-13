@@ -14,10 +14,13 @@
     <Teleport to="body">
       <div v-if="selectedUser" class="user-popup">
         <button class="close-btn" @click="selectedUser = null">×</button>
-        <img :src="selectedUser.avatarUrl" alt="Avatar" class="popup-avatar" />
-        <h3>{{ selectedUser.name }}</h3>
-        <p class="city">📍 {{ selectedUser.city }}</p>
-        <p class="coords">{{ selectedUser.lat.toFixed(4) }}°, {{ selectedUser.lng.toFixed(4) }}°</p>
+        <Ping></Ping>
+        <div class="user-popup-content" style="display: none;">
+          <img :src="selectedUser.avatarUrl" alt="Avatar" class="popup-avatar" />
+          <h3>{{ selectedUser.name }}</h3>
+          <p class="city">📍 {{ selectedUser.city }}</p>
+          <p class="coords">{{ selectedUser.lat.toFixed(4) }}°, {{ selectedUser.lng.toFixed(4) }}°</p>
+        </div>
       </div>
     </Teleport>
   </div>
@@ -28,7 +31,7 @@ import { ref, watch, onMounted, onBeforeUnmount, nextTick } from 'vue'
 import Globe from 'globe.gl'
 import countries from '@/utils/countries'
 import { emitter } from '@/utils/event-bus'
-
+import Ping from '@/views/Ping.vue'
 const globeContainer = ref(true)
 const globe = ref(null)
 const globeReady = ref(false)
