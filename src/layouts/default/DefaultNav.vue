@@ -140,14 +140,6 @@ const quickActionsOriginalList = [
     requireAuth: false
   },
   {
-    id: 2,
-    name: 'لایو پینگ',
-    icon: 'M12 8c-2.21 0-4 1.79-4 4s1.79 4 4 4 4-1.79 4-4-1.79-4-4-4zm0-2c3.31 0 6 2.69 6 6s-2.69 6-6 6-6-2.69-6-6 2.69-6 6-6z', // Live/Target circle
-    gradient: 'linear-gradient(135deg, #000 0%, # 50%, #FFA0A0 100%)',
-    link: '/live',
-    requireAuth: false
-  },
-  {
     id: 3,
     name: 'پینگ جدید',
     icon: 'M19 13H5v-2h14v2zm-7-8a1 1 0 0 1 1 1v3h3a1 1 0 0 1 0 2h-3v3a1 1 0 0 1-2 0v-3H8a1 1 0 0 1 0-2h3V6a1 1 0 0 1 1-1z', // Add Post / Plus
