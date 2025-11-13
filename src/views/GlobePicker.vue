@@ -6,7 +6,7 @@
 
 <script setup>
 import { onMounted, onBeforeUnmount, ref } from 'vue'
-import countries from './../utils/countries'
+import countries from '../data/countries'
 import Globe from 'globe.gl'
 
 const emit = defineEmits(['select-location'])

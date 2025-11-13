@@ -13,33 +13,43 @@
 
     <Teleport to="body">
       <div v-if="selectedData" class="user-popup">
-        <button class="close-btn" @click="selectedData = null">×</button>
-<!--        <Ping></Ping>-->
-        <Person :selectedData="selectedData"></Person>
+        <button class="close-btn" @click="closePanel()">×</button>
+        <Ping v-if="selectedData.type === 'ping'"></Ping>
+        <Person v-if="selectedData.type === 'person'" :selectedData="selectedData"></Person>
       </div>
     </Teleport>
   </div>
 </template>
 
 <script setup>
-import { ref, watch, onMounted, onBeforeUnmount, nextTick } from 'vue'
+import { nextTick, onBeforeUnmount, onMounted, ref, watch } from 'vue'
 import Globe from 'globe.gl'
-import countries from '@/utils/countries'
 import { emitter } from '@/utils/event-bus'
-import Ping from '@/components/Ping.vue'
 import Person from '@/components/Person.vue'
+import Ping from '@/components/Ping.vue'
+import wires from '@/data/wire-data'
+import countries from '@/data/countries'
+
 const globeContainer = ref(true)
 const globe = ref(null)
 const globeReady = ref(false)
 const selectedData = ref(null)
 
-const avatarStyles = ['ShortHairShortFlat','LongHairFro','Hat','Hijab','WinterHat1','Turban','LongHairStraight']
-const clothes = ['Hoodie','ShirtCrewNeck','BlazerSweater','Overall']
-const eyes = ['Happy','Close','Surprised','Squint']
-const mouths = ['Smile','Default','Serious','Disbelief']
-const skins = ['Light','Tanned','Brown','DarkBrown']
+const avatarStyles = ['ShortHairShortFlat', 'LongHairFro', 'Hat', 'Hijab', 'WinterHat1', 'Turban', 'LongHairStraight']
+const clothes = ['Hoodie', 'ShirtCrewNeck', 'BlazerSweater', 'Overall']
+const eyes = ['Happy', 'Close', 'Surprised', 'Squint']
+const mouths = ['Smile', 'Default', 'Serious', 'Disbelief']
+const skins = ['Light', 'Tanned', 'Brown', 'DarkBrown']
 
 const props = defineProps({
+  hexed: {
+    type: Boolean,
+    default: true
+  },
+  wired: {
+    type: Boolean,
+    default: false
+  },
   autoRotateSpeed: { type: Number, default: 0.5 },
   imageUrl: { type: String, default: '#000000' },
   data: { type: Array, default: () => [] }
@@ -61,66 +71,151 @@ function generateRandomAvatar() {
   return `http://31.57.109.158:5000/avatars?${params.toString()}`
 }
 
-function addPeopleToGlobe(newPeople = []) {
+function pinData(newData = []) {
   if (!globe.value) return
 
   // Clear existing points if empty
-  if (!Array.isArray(newPeople) || newPeople.length === 0) {
+  if (!Array.isArray(newData) || newData.length === 0) {
     globe.value.pointsData([])
     globe.value.htmlElementsData([])
     return
   }
 
   // Points
-  const pointAltitude = 0.8;
-  const  pointRadius = 0.1;
-  globe.value.pointsData(newPeople.map(u => ({ ...u, avatarUrl: generateRandomAvatar() })))
-    .pointLat(d => d.lat)
-    .pointLng(d => d.lng)
+  const pointAltitude = 0.8
+  const pointRadius = 0.1
+  globe.value
+    .pointsData(newData.map((u) => ({ ...u, avatarUrl: generateRandomAvatar() })))
+    .pointLat((d) => d.lat)
+    .pointLng((d) => d.lng)
     .pointColor(() => '#c0392b')
     .pointAltitude(pointAltitude)
     .pointRadius(pointRadius)
-    .pointLabel(d => `<div style="background: rgba(0,0,0,0.9); padding: 8px 12px; border-radius: 8px; color: white;">
-      <b style="color: #fff;">${d.city}</b><br/><span style="color: #aaa;">${d.name}</span>
-    </div>`)
+    .pointLabel(
+      (d) => `
+      <div style="background: rgba(0,0,0,0.9); padding: 8px 12px; border-radius: 8px; color: white;">
+          <b style="color: #fff;">${d.city}</b>
+          <br/>
+          <span style="color: #aaa;">
+              ${d.name}
+           </span>
+       </div>
+        `
+    )
 
   // Avatars
-  globe.value.htmlElementsData(newPeople.map(u => ({ ...u, avatarUrl: generateRandomAvatar() })))
-    .htmlElement(data => {
+  globe.value
+    .htmlElementsData(newData.map((u) => ({ ...u, avatarUrl: generateRandomAvatar() })))
+    .htmlElement((data) => {
       const el = document.createElement('div')
-      el.className = 'avatar-marker'
-      el.style.cssText = 'position: relative; cursor: pointer; text-align: center; transition: transform 0.2s; pointer-events: auto;'
+      el.className = 'globe-marker'
+      el.style.cssText = `
+    position: relative;
+    cursor: pointer;
+    text-align: center;
+    pointer-events: auto;
+    transform: translateZ(0);
+    transition: transform 0.25s ease, filter 0.25s ease;
+  `
 
+      // Common avatar
       const img = document.createElement('img')
-      img.src = data.avatarUrl
+      img.src = data.avatarUrl || '/assets/default-avatar.png'
+      img.alt = data.name
       img.style.cssText = `
-        width: 40px;
-        height: 40px;
-        border-radius: 50%;
-        border: 3px solid #00ff88;
-        box-shadow: 0 0 15px rgba(0,255,136,0.8);
-        background: white;
-        transition: all 0.3s;
-        display: block;
-      `
+    width: 42px;
+    height: 42px;
+    border-radius: 50%;
+    border: 2px solid rgba(255,255,255,0.3);
+    box-shadow: 0 0 12px rgba(0,255,180,0.5);
+    display: block;
+    margin: 0 auto;
+    transition: all 0.3s ease;
+  `
 
-      const label = document.createElement('div')
-      label.textContent = data.name
-      label.style.cssText = 'color: #fff; font-size: 10px; margin-top: 4px; text-shadow: 0 0 3px #000,0 0 5px #000; font-weight: 600; white-space: nowrap;'
+      // Name Label
+      const name = document.createElement('div')
+      name.textContent = data.name
+      name.style.cssText = `
+    color: #fff;
+    font-size: 10px;
+    margin-top: 6px;
+    font-weight: 600;
+    text-shadow: 0 0 3px rgba(0,0,0,0.8);
+  `
 
       el.appendChild(img)
-      el.appendChild(label)
+      el.appendChild(name)
 
+      // 🌌 If it's a ping (tweet)
+      if (data.type === 'ping') {
+        const card = document.createElement('div')
+        card.className = 'ping-card'
+        card.innerHTML = `
+      <p class="ping-text">${data.text}</p>
+      <div class="ping-meta">
+        <span>❤️ ${data.likes}</span>
+        <span>🔁 ${data.reping}</span>
+        <span>💬 ${data.comments}</span>
+      </div>
+    `
+        card.style.cssText = `
+      background: rgba(10,10,20,0.75);
+      backdrop-filter: blur(8px) saturate(1.3);
+      -webkit-backdrop-filter: blur(8px) saturate(1.3);
+      border: 1px solid rgba(255,255,255,0.05);
+      border-radius: 10px;
+      padding: 10px;
+      margin-top: 10px;
+      color: #fff;
+      text-align: left;
+      font-size: 11px;
+      width: 180px;
+      box-shadow: 0 4px 20px rgba(255,0,180,0.25);
+      animation: fadeIn 0.4s ease;
+      position: relative;
+      direction: rtl;
+      text-align: right;
+    `
+        // Ping text
+        const style = document.createElement('style')
+        style.textContent = `
+      .ping-card .ping-text {
+        line-height: 1.4;
+        margin-bottom: 6px;
+        font-weight: 400;
+        text-shadow: 0 0 2px rgba(0,0,0,0.4);
+        direction: ${/[آ-ی]/.test(data.text) ? 'rtl' : 'ltr'};
+      }
+      .ping-card .ping-meta {
+        display: flex;
+        justify-content: space-between;
+        font-size: 10px;
+        opacity: 0.8;
+      }
+      .globe-marker:hover .ping-card {
+        box-shadow: 0 6px 26px rgba(255,0,200,0.35);
+      }
+      @keyframes fadeIn {
+        from { opacity: 0; transform: translateY(10px); }
+        to { opacity: 1; transform: translateY(0); }
+      }
+    `
+        document.head.appendChild(style)
+        el.appendChild(card)
+      }
+
+      // 🌍 Hover behavior
       el.onmouseenter = () => {
-        el.style.transform = 'scale(1.2)'
-        img.style.borderColor = '#ffeb3b'
-        img.style.boxShadow = '0 0 20px rgba(255,235,59,1)'
+        el.style.transform = 'scale(1.05)'
+        img.style.boxShadow = '0 0 20px rgba(255,0,200,0.6)'
       }
       el.onmouseleave = () => {
-        el.style.transform = 'scale(1)'
-        img.style.borderColor = '#00ff88'
-        img.style.boxShadow = '0 0 15px rgba(0,255,136,0.8)'
+        el.style.transform = 'scale(1.0)'
+        img.style.boxShadow = '0 0 12px rgba(0,255,180,0.5)'
       }
+
+      // 📍 On click focus globe
       el.onclick = (e) => {
         e.stopPropagation()
         selectedData.value = data
@@ -129,31 +224,65 @@ function addPeopleToGlobe(newPeople = []) {
 
       return el
     })
-    .htmlLat(d => d.lat)
-    .htmlLng(d => d.lng)
+
+    .htmlLat((d) => d.lat)
+    .htmlLng((d) => d.lng)
     .htmlAltitude(0.5)
+}
+
+function closePanel() {
+  selectedData.value = null
+  globe.value.pointOfView({ lat: 30, lng: 20, altitude: 3.5 }, 1500)
 }
 
 async function initGlobe() {
   await nextTick()
   emitter.emit('loading', true)
-  await new Promise(resolve => setTimeout(resolve, 100))
+  await new Promise((resolve) => setTimeout(resolve, 100))
 
   const container = document.getElementById('globe-container')
   if (!container) return console.error('Container not found')
 
   try {
     globe.value = Globe()(container)
-      .globeImageUrl(props.imageUrl)
-      .hexPolygonsData(countries.features)
-      .hexPolygonResolution(3)
-      .hexPolygonMargin(0.3)
-      .hexPolygonUseDots(true)
-      .hexPolygonColor(() => `#${Math.floor(Math.random()*16777215).toString(16).padStart(6,'0')}`)
-      .hexPolygonLabel(({ properties: d }) => `<b>${d.ADMIN} (${d.ISO_A2})</b> <br />Population: <i>${d.POP_EST}</i>`)
+      .globeImageUrl('//cdn.jsdelivr.net/npm/three-globe/example/img/earth-dark.jpg')
+      .bumpImageUrl('//cdn.jsdelivr.net/npm/three-globe/example/img/earth-topology.png')
+      .backgroundImageUrl('//cdn.jsdelivr.net/npm/three-globe/example/img/night-sky.png')
       .width(window.innerWidth)
       .height(window.innerHeight)
 
+    if (props.hexed) {
+      // hex polygon map configuration
+      globe.value
+        .hexPolygonsData(countries.features)
+        .hexPolygonResolution(3)
+        .hexPolygonMargin(0.3)
+        .hexPolygonUseDots(true)
+        .hexPolygonColor(
+          () =>
+            `#${Math.floor(Math.random() * 16777215)
+              .toString(16)
+              .padStart(6, '0')}`
+        )
+    }
+
+    if (props.wired) {
+      let cablePaths = []
+      wires.features.forEach(({ geometry, properties }) => {
+        geometry.coordinates.forEach((coords) => cablePaths.push({ coords, properties }))
+      })
+
+      globe.value
+        .pathsData(cablePaths)
+        .pathPoints('coords')
+        .pathPointLat((p) => p[1])
+        .pathPointLng((p) => p[0])
+        .pathColor((path) => path.properties.color)
+        .pathLabel((path) => path.properties.name)
+        .pathDashLength(0.1)
+        .pathDashGap(0.008)
+        .pathDashAnimateTime(14000)
+    }
     const controls = globe.value.controls()
     controls.autoRotate = true
     controls.autoRotateSpeed = props.autoRotateSpeed
@@ -162,7 +291,7 @@ async function initGlobe() {
     controls.minDistance = 180
     controls.maxDistance = 800
 
-    addPeopleToGlobe(props.data)
+    pinData(props.data)
     globe.value.pointOfView({ lat: 30, lng: 20, altitude: 3.5 }, 0)
     globeReady.value = true
 
@@ -176,9 +305,23 @@ async function initGlobe() {
 }
 
 // Reactive watchers
-watch(() => props.data, (newPeople) => addPeopleToGlobe(newPeople), { deep: true })
-watch(() => props.autoRotateSpeed, (speed) => { if (globe.value) globe.value.controls().autoRotateSpeed = speed })
-watch(() => props.imageUrl, (url) => { if (globe.value) globe.value.globeImageUrl(url) })
+watch(
+  () => props.data,
+  (newPeople) => pinData(newPeople),
+  { deep: true }
+)
+watch(
+  () => props.autoRotateSpeed,
+  (speed) => {
+    if (globe.value) globe.value.controls().autoRotateSpeed = speed
+  }
+)
+watch(
+  () => props.imageUrl,
+  (url) => {
+    if (globe.value) globe.value.globeImageUrl(url)
+  }
+)
 
 onMounted(initGlobe)
 onBeforeUnmount(() => {
@@ -191,7 +334,6 @@ onBeforeUnmount(() => {
   globeContainer.value = false
 })
 </script>
-
 
 <style scoped>
 /* Base Globe Styles (Keep them mostly the same) */

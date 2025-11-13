@@ -30,7 +30,7 @@
 <script setup>
 import { ref, nextTick, onMounted } from 'vue'
 import Globe from 'globe.gl'
-import countries from '@/utils/countries'
+import countries from '@/data/countries'
 import Feed from './Feed.vue'
 // --- Cities ---
 const cities = [
