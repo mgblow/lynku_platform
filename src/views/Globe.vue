@@ -73,12 +73,14 @@ function addPeopleToGlobe(newPeople = []) {
   }
 
   // Points
+  const pointAltitude = 0.8;
+  const  pointRadius = 0.1;
   globe.value.pointsData(newPeople.map(u => ({ ...u, avatarUrl: generateRandomAvatar() })))
     .pointLat(d => d.lat)
     .pointLng(d => d.lng)
     .pointColor(() => '#c0392b')
-    .pointAltitude(0.1)
-    .pointRadius(0.2)
+    .pointAltitude(pointAltitude)
+    .pointRadius(pointRadius)
     .pointLabel(d => `<div style="background: rgba(0,0,0,0.9); padding: 8px 12px; border-radius: 8px; color: white;">
       <b style="color: #fff;">${d.city}</b><br/><span style="color: #aaa;">${d.name}</span>
     </div>`)
@@ -162,7 +164,7 @@ async function initGlobe() {
     controls.maxDistance = 800
 
     addPeopleToGlobe(props.people)
-    globe.value.pointOfView({ lat: 30, lng: 20, altitude: 2.2 }, 0)
+    globe.value.pointOfView({ lat: 30, lng: 20, altitude: 3.5 }, 0)
     globeReady.value = true
 
     const handleResize = () => globe.value && (globe.value.width(window.innerWidth), globe.value.height(window.innerHeight))

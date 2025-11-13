@@ -8,7 +8,7 @@ import Others from '../views/Others.vue'
 import Mail from '../views/Mail.vue'
 import Chat from '../views/Chat.vue'
 import Feed from '../views/Feed.vue'
-import Tweet from '../views/Tweet.vue'
+import Ping from '../views/Ping.vue'
 import AvatarGenerator from '../views/AvatarGenerator.vue'
 import Born from '@/views/Born.vue'
 
@@ -81,7 +81,7 @@ const routes = [
     {
         path: '/post/:id',
         name: 'Tweet',
-        component: Tweet,
+        component: Ping,
         meta: {
             layout: 'default'
         }
