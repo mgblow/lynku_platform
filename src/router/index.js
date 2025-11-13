@@ -8,7 +8,7 @@ import Others from '../views/Others.vue'
 import Mail from '../views/Mail.vue'
 import Chat from '../views/Chat.vue'
 import Feed from '../views/Feed.vue'
-import Ping from '../views/Ping.vue'
+import Ping from '../components/Ping.vue'
 import AvatarGenerator from '../views/AvatarGenerator.vue'
 import Born from '@/views/Born.vue'
 

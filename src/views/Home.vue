@@ -4,7 +4,7 @@
 
 <script setup>
 import { ref } from 'vue'
-import Globe from '@/views/Globe.vue'
+import Globe from '@/components/Globe.vue'
 
 const people = ref([]) // <-- reactive reference
 

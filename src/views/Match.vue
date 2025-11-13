@@ -2,13 +2,13 @@
   <Globe
     :autoRotateSpeed="0.2"
     :imageUrl="'//cdn.jsdelivr.net/npm/three-globe/example/img/earth-dark.jpg'"
-    :inputPings="people"
+    :people="people"
   />
 </template>
 
 <script setup>
 import { ref } from 'vue';
-import Globe from '@/views/Globe.vue';
+import Globe from '@/components/Globe.vue';
 
 const people = ref([]); // <-- reactive reference
 

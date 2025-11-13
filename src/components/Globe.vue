@@ -31,7 +31,7 @@ import { ref, watch, onMounted, onBeforeUnmount, nextTick } from 'vue'
 import Globe from 'globe.gl'
 import countries from '@/utils/countries'
 import { emitter } from '@/utils/event-bus'
-import Ping from '@/views/Ping.vue'
+import Ping from '@/components/Ping.vue'
 const globeContainer = ref(true)
 const globe = ref(null)
 const globeReady = ref(false)
