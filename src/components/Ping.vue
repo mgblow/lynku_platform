@@ -1,5 +1,5 @@
 <template>
-  <div class="container page" style="padding:0;margin-top: 60px;margin-bottom: 50px;">
+  <div class="container page" >
     <div class="tweet-card">
       <!-- Main Tweet -->
       <div class="tweet-main">
@@ -144,7 +144,6 @@ export default {
 }
 
 .tweet-main {
-  padding: 16px;
   border-bottom: 1px solid #2f3336;
 }
 
