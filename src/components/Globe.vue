@@ -84,7 +84,7 @@ function pinData(newData = []) {
   }
 
   // Points
-  const pointAltitude = 0.8
+  const pointAltitude = 0.6
   const pointRadius = 0.1
   globe.value
     .pointsData(newData.map((u) => ({ ...u, avatarUrl: generateRandomAvatar() })))

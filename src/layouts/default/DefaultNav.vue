@@ -148,14 +148,13 @@ const quickActionsOriginalList = [
     requireAuth: true
   },
   {
-    id: 8,
-    name: 'هم‌نوا',
-    icon: 'M12 17.27L18.18 21l-1.64-7.03L22 9.24l-7.19-.61L12 2 9.19 8.63 2 9.24l5.46 4.73L5.82 21z',
+    id: 10,
+    name: 'لینک', // Connection-oriented
+    icon: 'M10 14a2 2 0 0 1 0-2l4-4a2 2 0 0 1 2.83 2.83l-1.17 1.17M14 10a2 2 0 0 1 0 2l-4 4a2 2 0 0 1-2.83-2.83l1.17-1.17', // Minimal chain / link
     gradient: 'linear-gradient(135deg, #111111 0%, #222233 50%, #334455 100%)',
     link: '/match',
     requireAuth: true
   }
-
 
   ,
   {
@@ -193,7 +192,7 @@ const quickActionsOriginalList = [
   {
     id: 7,
     name: 'ورود',
-    icon: 'M16 13v-2H7V8l-5 4 5 4v-3h9v-2zm4-11h-8v2h8v14h-8v2h8a2 2 0 0 0 2-2V4a2 2 0 0 0-2-2z', // Logout
+    icon: 'M10 17l5-5-5-5M15 12H3', // Arrow pointing right into a door-like line
     gradient: 'linear-gradient(135deg, #111111 0%, #222233 50%, #334455 100%)',
     link: '/login',
     requireAuth: false
