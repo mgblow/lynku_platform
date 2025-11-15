@@ -37,7 +37,9 @@ export default {
       const token = getCookie('app-token')
       if (token) {
         showSplash.value = false
+        return true;
       }
+      return false;
     }
 
     const handleLogin = () => {
@@ -58,6 +60,7 @@ export default {
     }
 
     const handleBrokerConnection = () => {
+      console.log('handle broker connection...')
       if (mqttClient) {
         try {
           mqttClient.end()
@@ -77,6 +80,7 @@ export default {
 
       mqttClient.on('connect', () => {
         console.log('MQTT connected!')
+        emitter.emit('success-message', "آنلاین شدی!")
 
         // SUBSCRIBE TO TOPIC
         mqttClient.subscribe(getCookie('app-id') + '/client/#', (err) => {
@@ -110,7 +114,7 @@ export default {
       setTimeout(() => (showSnackbar.value = false), 3000)
     }
     onMounted(() => {
-      checkAuthStatus()
+      if(getCookie('app-token') && mqttClient === null) handleBrokerConnection()
       setInterval(() => (showSplash.value = false), 4000)
 
       // Listen for mitt events
