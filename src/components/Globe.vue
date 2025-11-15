@@ -299,9 +299,9 @@ async function initGlobe() {
 
   try {
     globe.value = Globe()(container)
-      .globeImageUrl('//cdn.jsdelivr.net/npm/three-globe/example/img/earth-dark.jpg')
-      .bumpImageUrl('//cdn.jsdelivr.net/npm/three-globe/example/img/earth-topology.png')
-      .backgroundImageUrl('//cdn.jsdelivr.net/npm/three-globe/example/img/night-sky.png')
+      .globeImageUrl(window.location.origin + '/globe/images/earth-dark.jpg')
+      .bumpImageUrl(window.location.origin + '/globe/images/earth-topology.png')
+      .backgroundImageUrl(window.location.origin + '/globe/images/night-sky.png')
       .width(window.innerWidth)
       .height(window.innerHeight)
 

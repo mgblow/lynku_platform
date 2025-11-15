@@ -3,7 +3,7 @@
     style="height: 100vh; width: 100%;"
     :autoRotateSpeed="0"
     :hexed="false"
-    :imageUrl="'//cdn.jsdelivr.net/npm/three-globe/example/img/earth-dark.jpg'"
+    :imageUrl="'//globe/images/earth-dark.jpg'"
     :data="data"
   />
 </template>

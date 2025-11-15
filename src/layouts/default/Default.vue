@@ -1,23 +1,15 @@
 <template>
   <!-- Splash Screen -->
-  <SplashScreen
-    v-if="showSplash"
-    @login="handleLogin"
-    @register="handleRegister"
-  />
+  <SplashScreen v-if="showSplash" @login="handleLogin" @register="handleRegister" />
 
   <!-- Main App -->
   <div v-else class="col default-page-wrapper">
-    <slot />
     <default-nav />
+    <slot />
 
     <!-- Snackbar -->
     <transition name="slide-up">
-      <div
-        v-if="showSnackbar"
-        class="snackbar"
-        :class="snackbarType"
-      >
+      <div v-if="showSnackbar" class="snackbar" :class="snackbarType">
         {{ snackbarMessage }}
       </div>
     </transition>
@@ -25,9 +17,10 @@
 </template>
 
 <script>
-import { inject, ref, onMounted, onBeforeUnmount } from 'vue'
+import { inject, onBeforeUnmount, onMounted, ref } from 'vue'
 import DefaultNav from './DefaultNav.vue'
 import SplashScreen from './SplashScreen.vue'
+import mqtt from 'mqtt'
 
 export default {
   name: 'LayoutDefault',
@@ -38,6 +31,7 @@ export default {
     const snackbarMessage = ref('')
     const snackbarType = ref('') // success or error
     const showSplash = ref(true)
+    let mqttClient = null
 
     const checkAuthStatus = () => {
       const token = getCookie('app-token')
@@ -63,6 +57,51 @@ export default {
       return null
     }
 
+    const handleBrokerConnection = () => {
+      if (mqttClient) {
+        try {
+          mqttClient.end()
+        } catch {}
+      }
+
+      const url = process.env.VUE_APP_EMQX_APP_URL || '/'
+      const clientId = '123' // fixed for now
+
+      mqttClient = mqtt.connect(url, {
+        clientId: getCookie('app-id'),
+        username: getCookie('app-id'),
+        password: getCookie('app-token'),
+        clean: true,
+        reconnectPeriod: 2000
+      })
+
+      mqttClient.on('connect', () => {
+        console.log('MQTT connected!')
+
+        // SUBSCRIBE TO TOPIC
+        mqttClient.subscribe(getCookie('app-id') + '/client/#', (err) => {
+          if (err) console.error('Subscribe error:', err)
+          else console.log('subscribed to ' + (getCookie('app-id') + '/#'))
+        })
+      })
+
+      mqttClient.on('message', (topic, payload) => {
+        const msg = payload.toString()
+        console.log('broker message:', topic, msg)
+        // Emit through mitt
+        if (emitter) {
+          emitter.emit('mqtt:' + topic.split('client/')[1], msg)
+        }
+      })
+
+      mqttClient.on('error', (err) => {
+        console.error('MQTT Error:', err)
+        if (emitter) emitter.emit('error-message', 'Broker connection failed')
+      })
+
+      mqttClient.on('reconnect', () => {})
+    }
+
     const showMessage = (message, type = 'success') => {
       console.log('show message', message, type)
       snackbarMessage.value = message
@@ -70,7 +109,6 @@ export default {
       showSnackbar.value = true
       setTimeout(() => (showSnackbar.value = false), 3000)
     }
-
     onMounted(() => {
       checkAuthStatus()
       setInterval(() => (showSplash.value = false), 4000)
@@ -79,6 +117,8 @@ export default {
       if (emitter) {
         emitter.on('success-message', (msg) => showMessage(msg, 'success'))
         emitter.on('error-message', (msg) => showMessage(msg, 'error'))
+        emitter.on('brokerCredentials', () => handleBrokerConnection())
+        emitter.on('mqtt:notification', (msg) => showMessage(msg))
       }
     })
 
@@ -95,17 +135,14 @@ export default {
       snackbarType,
       showSplash,
       handleLogin,
-      handleRegister,
+      handleRegister
     }
-  },
+  }
 }
 </script>
 
-<style>
-@import url('https://fonts.googleapis.com/css2?family=Almarai:wght@700&display=swap');
-</style>
-
 <style lang="scss">
+@import url('https://fonts.googleapis.com/css2?family=Almarai:wght@700&display=swap');
 html {
   padding: 0;
   margin: 0;
@@ -140,7 +177,6 @@ button:active {
 .snackbar {
   position: fixed;
   bottom: 20px;
-  right: 20px;
   color: #000;
   padding: 14px 20px;
   border-radius: 10px;
@@ -148,6 +184,7 @@ button:active {
   box-shadow: 0 0 10px rgba(0, 0, 0, 0.4);
   z-index: 9999;
   animation: fadeIn 0.3s ease;
+  width: 100%;
 }
 
 .snackbar.success {

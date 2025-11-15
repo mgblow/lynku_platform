@@ -16,16 +16,16 @@
     "bootstrap": "^5.2.3",
     "bootstrap-icons": "^1.10.4",
     "core-js": "^3.29.1",
+    "globe.gl": "^2.45.0",
     "mitt": "^3.0.1",
     "mqtt": "^5.14.1",
     "pinia": "^2.0.33",
-    "topojson-client": "^3.1.0",
-    "vue": "^3.2.47",
-    "vue-router": "^4.1.6",
-    "globe.gl": "^2.45.0",
     "three": ">=0.154 <1",
     "three-globe": "^2.45",
-    "three-render-objects": "^1.40"
+    "three-render-objects": "^1.40",
+    "topojson-client": "^3.1.0",
+    "vue": "^3.2.47",
+    "vue-router": "^4.1.6"
   },
   "devDependencies": {
     "@commitlint/cli": "^17.5.1",

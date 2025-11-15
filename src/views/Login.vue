@@ -179,15 +179,17 @@ export default {
     verify() {
       if (!this.isCodeValid) return;
 
-      this.$emit("loading-started", "true");
+      this.$emit("loading", true);
       post('/auth/verify', { phone: this.phone, code: this.code })
         .then(response => {
           console.log(response);
-          this.$emit("loading-ended", "true");
+          this.$emit("loading", false);
 
           if (response.success) {
             setCookie("app-token", response.token, 7);
+            setCookie("app-id", response._id, 7);
             setCookie("app-channel", response.channel, 7);
+            emitter.emit('brokerCredentials');
             emitter.emit('refresh-navigation-state');
 
             if(response.firstLogin){
