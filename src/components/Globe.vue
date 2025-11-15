@@ -70,7 +70,7 @@ function generateRandomAvatar() {
     mouthType: mouths[Math.floor(Math.random() * mouths.length)],
     skinColor: skins[Math.floor(Math.random() * skins.length)]
   })
-  return `http://31.57.109.158:5000/avatars?${params.toString()}`
+  return process.env.VUE_APP_AVATAR_APP_URL + `/avatars?${params.toString()}`
 }
 
 function pinData(newData = []) {
