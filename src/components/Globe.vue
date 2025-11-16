@@ -296,10 +296,10 @@ async function initGlobe() {
 
   const container = document.getElementById('globe-container')
   if (!container) return console.error('Container not found')
-
+  const globeImageUrl = (props.imageUrl)? props.imageUrl : window.location.origin + '/globe/images/earth-dark.jpg';
   try {
     globe.value = Globe()(container)
-      .globeImageUrl(window.location.origin + '/globe/images/earth-dark.jpg')
+      .globeImageUrl(globeImageUrl)
       .bumpImageUrl(window.location.origin + '/globe/images/earth-topology.png')
       .backgroundImageUrl(window.location.origin + '/globe/images/night-sky.png')
       .width(window.innerWidth)

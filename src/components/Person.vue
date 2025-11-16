@@ -1,6 +1,8 @@
 <script setup>
 import { computed } from 'vue'
+import { useRouter } from 'vue-router'
 
+const router = useRouter()
 // Props: parent passes selectedUser object
 const props = defineProps({
   selectedData: {
@@ -20,11 +22,18 @@ const emit = defineEmits(['close'])
 const popupStyle = computed(() => ({
   display: props.visible ? 'block' : 'none'
 }))
+
+
+const goToGlobe = () => {
+  router.push('/globes/' + props.selectedData.id)
+}
+
 </script>
 
 <template>
   <div class="user-popup-content" :style="popupStyle">
-    <img v-if="selectedData" :src="selectedData.avatarUrl" alt="Avatar" class="popup-avatar" />
+    <img v-if="selectedData" :src="selectedData.avatarUrl" alt="Avatar" class="popup-avatar" @click="goToGlobe()"/>
+    <h3 v-if="selectedData">{{ selectedData.id }}</h3>
     <h3 v-if="selectedData">{{ selectedData.name }}</h3>
     <p v-if="selectedData" class="city">📍 {{ selectedData.city }}</p>
     <p v-if="selectedData" class="coords">{{ selectedData.lat.toFixed(4) }}°, {{ selectedData.lng.toFixed(4) }}°</p>

@@ -109,7 +109,7 @@ const routes = [
         // route level code-splitting
         // this generates a separate chunk (about.[hash].js) for this route
         // which is lazy-loaded when the route is visited.
-        component: () => import(/* webpackChunkName: "about" */ '../views/Home.vue'),
+        component: () => import( '../views/Home.vue'),
         meta: {
             layout: 'default'
         }
@@ -120,7 +120,7 @@ const routes = [
     // route level code-splitting
     // this generates a separate chunk (about.[hash].js) for this route
     // which is lazy-loaded when the route is visited.
-    component: () => import(/* webpackChunkName: "about" */ '../views/Universe.vue'),
+    component: () => import( '../views/Universe.vue'),
     meta: {
       layout: 'default'
     }
@@ -131,7 +131,7 @@ const routes = [
     // route level code-splitting
     // this generates a separate chunk (about.[hash].js) for this route
     // which is lazy-loaded when the route is visited.
-    component: () => import(/* webpackChunkName: "about" */ '../views/Match.vue'),
+    component: () => import( '../views/Match.vue'),
     meta: {
       layout: 'default'
     }
@@ -142,12 +142,21 @@ const routes = [
     // route level code-splitting
     // this generates a separate chunk (about.[hash].js) for this route
     // which is lazy-loaded when the route is visited.
-    component: () => import(/* webpackChunkName: "about" */ '../views/My.vue'),
+    component: () => import( '../views/My.vue'),
     meta: {
       layout: 'default'
     }
   },
-    {
+  {
+    path: '/globes/:uid',
+    name: 'My',
+    component: () => import('../views/World.vue'),
+    props: true,
+    meta: {
+      layout: 'default'
+    }
+  },
+  {
         path: '/logout',
         name: 'Logout',
         // No component needed as we're just redirecting after logic

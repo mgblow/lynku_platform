@@ -4,7 +4,7 @@
       ref="globeRef"
       :autoRotate="true"
       :autoRotateSpeed="rotateSpeed"
-      :imageUrl="'//globe/images/earth-dark.jpg'"
+      :imageUrl="'//cdn.jsdelivr.net/npm/three-globe/example/img/earth-dark.jpg'"
       :data="people"
     />
 
@@ -57,18 +57,19 @@ const started = ref(false)
 
 const addPeople = () => {
   people.value = [
-    { type: 'person', name: 'Luna', city: 'Hanoi', lat: 21.0278, lng: 105.8342 },
-    { type: 'person', name: 'Tyler', city: 'Seattle', lat: 47.6062, lng: -122.3321 },
-    { type: 'person', name: 'Aria', city: 'Kuala Lumpur', lat: 3.139, lng: 101.6869 },
-    { type: 'person', name: 'Leo', city: 'Singapore', lat: 1.3521, lng: 103.8198 },
-    { type: 'person', name: 'Mason', city: 'Denver', lat: 39.7392, lng: -104.9903 },
-    { type: 'person', name: 'Amelia', city: 'Zurich', lat: 47.3769, lng: 8.5417 },
-    { type: 'person', name: 'Evan', city: 'Montreal', lat: 45.5017, lng: -73.5673 },
-    { type: 'person', name: 'Clara', city: 'Luxembourg', lat: 49.6117, lng: 6.1319 },
-    { type: 'person', name: 'Omar', city: 'Doha', lat: 25.2854, lng: 51.531 },
-    { type: 'person', name: 'Fatima', city: 'Muscat', lat: 23.588, lng: 58.3829 },
-    { type: 'person', name: 'Rami', city: 'Baghdad', lat: 33.3152, lng: 44.3661 }
+    { type: 'person', name: 'Luna', city: 'Hanoi', lat: 21.0278, lng: 105.8342, id: "671fa3c2b19e4d12c831f201" },
+    { type: 'person', name: 'Tyler', city: 'Seattle', lat: 47.6062, lng: -122.3321, id: "671fa3c2b19e4d12c831f202" },
+    { type: 'person', name: 'Aria', city: 'Kuala Lumpur', lat: 3.139, lng: 101.6869, id: "671fa3c2b19e4d12c831f203" },
+    { type: 'person', name: 'Leo', city: 'Singapore', lat: 1.3521, lng: 103.8198, id: "671fa3c2b19e4d12c831f204" },
+    { type: 'person', name: 'Mason', city: 'Denver', lat: 39.7392, lng: -104.9903, id: "671fa3c2b19e4d12c831f205" },
+    { type: 'person', name: 'Amelia', city: 'Zurich', lat: 47.3769, lng: 8.5417, id: "671fa3c2b19e4d12c831f206" },
+    { type: 'person', name: 'Evan', city: 'Montreal', lat: 45.5017, lng: -73.5673, id: "671fa3c2b19e4d12c831f207" },
+    { type: 'person', name: 'Clara', city: 'Luxembourg', lat: 49.6117, lng: 6.1319, id: "671fa3c2b19e4d12c831f208" },
+    { type: 'person', name: 'Omar', city: 'Doha', lat: 25.2854, lng: 51.531, id: "671fa3c2b19e4d12c831f209" },
+    { type: 'person', name: 'Fatima', city: 'Muscat', lat: 23.588, lng: 58.3829, id: "671fa3c2b19e4d12c831f20a" },
+    { type: 'person', name: 'Rami', city: 'Baghdad', lat: 33.3152, lng: 44.3661, id: "671fa3c2b19e4d12c831f20b" }
   ]
+
 }
 
 // 🌀 Smooth spin ramp-up and slowdown animation
