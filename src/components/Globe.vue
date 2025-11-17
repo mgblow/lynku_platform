@@ -54,7 +54,8 @@ const props = defineProps({
   },
   autoRotateSpeed: { type: Number, default: 0.5 },
   imageUrl: { type: String, default: '#000000' },
-  data: { type: Array, default: () => [] }
+  data: { type: Array, default: () => [] },
+  person: { type: Object, default: () => null }
 })
 
 function generateRandomAvatar() {
@@ -296,7 +297,7 @@ async function initGlobe() {
 
   const container = document.getElementById('globe-container')
   if (!container) return console.error('Container not found')
-  const globeImageUrl = (props.imageUrl)? props.imageUrl : window.location.origin + '/globe/images/earth-dark.jpg';
+  const globeImageUrl = props.imageUrl ? props.imageUrl : window.location.origin + '/globe/images/earth-dark.jpg'
   try {
     globe.value = Globe()(container)
       .globeImageUrl(globeImageUrl)
@@ -376,8 +377,23 @@ watch(
     if (globe.value) globe.value.globeImageUrl(url)
   }
 )
+watch(
+  () => props.person,
+  (person) => {
+    selectedData.value = person
+  }
+)
 
-onMounted(initGlobe)
+onMounted(() => {
+  initGlobe()
+  if (props.person) {
+    selectedData.value = {
+      ...props.person,
+      avatarUrl: generateRandomAvatar()
+    }
+  }
+})
+
 onBeforeUnmount(() => {
   selectedData.value = null
   globeReady.value = false

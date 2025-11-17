@@ -5,17 +5,29 @@
     :hexed="false"
     :imageUrl="globeBackgroundUrl"
     :data="data"
+    :person="person"
   />
 </template>
 
 <script setup>
-import { ref } from 'vue'
+import { onMounted, ref } from 'vue'
 import Globe from '@/components/Globe.vue'
+import { useRoute } from 'vue-router'
+import { post } from '@/api'
+import { getCookie } from '@/cookie'
+import { emitter } from '@/utils/event-bus'
 
+const route = useRoute()
+
+// Access the param
+const personId = route.params.pid
+
+console.log(personId)
 const data = ref([])
 const globeBackgroundUrl = ref('')
 
-globeBackgroundUrl.value = 'https://thumbs.dreamstime.com/z/vintage-grunge-world-map-old-crumpled-parchment-paper-antique-style-world-map-strong-grunge-vintage-aesthetic-410763555.jpg?ct=jpeg'
+globeBackgroundUrl.value =
+  'https://thumbs.dreamstime.com/z/vintage-grunge-world-map-old-crumpled-parchment-paper-antique-style-world-map-strong-grunge-vintage-aesthetic-410763555.jpg?ct=jpeg'
 
 const pings = [
   // 🌍 Global users
@@ -62,6 +74,53 @@ const pings = [
   }
 ]
 
+const person = ref(null);
+
+// person.value = {
+//   type: 'person',
+//   name: 'Luna',
+//   city: 'Hanoi',
+//   lat: 21.0278,
+//   lng: 105.8342,
+//   id: '691632e1ce4f00f5663dea4d'
+// }
+
+const getPersonGlobeData = async () => {
+  try {
+    const response = await post(
+      '/api/v1',
+      {
+        topic: 'getPerson',
+        data: {
+          id: personId
+        }
+      },
+      {
+        token: getCookie('app-token')
+      }
+    )
+    if (response && response.data.success) {
+      console.log(response.data)
+      person.value = {
+        ...response.data.body,  // existing fields from API
+        type: 'person',
+      }
+    } else {
+      emitter.emit('error-message', response.data)
+    }
+  } catch (error) {
+    console.error('Error posting tweet:', error)
+    // this.showError('خطا در ارسال توییت. لطفاً دوباره تلاش کنید.')
+  } finally {
+
+  }
+}
+
+onMounted(() => {
+
+  getPersonGlobeData()
+
+})
 setTimeout(() => {
   data.value = [...pings]
 }, 1000)

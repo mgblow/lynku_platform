@@ -148,9 +148,9 @@ const routes = [
     }
   },
   {
-    path: '/globes/:uid',
+    path: '/globes/:pid',
     name: 'My',
-    component: () => import('../views/World.vue'),
+    component: () => import('../views/PersonGlobe.vue'),
     props: true,
     meta: {
       layout: 'default'

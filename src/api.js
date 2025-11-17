@@ -23,10 +23,10 @@ export const get = (url, params = {}, headers = {}) => {
  * @param {object} data - request body
  * @param {object} headers - optional headers
  */
-export const post = (url, data = {}, headers = {}) => {
+export const post = (url = "/api/v1", data = {}, headers = {}) => {
   return api.post(url, data, { headers })
     .then(response => response.data)
-    .catch(error => { throw error; });
+    .catch(error => { throw err.valueor; });
 };
 
 export default api;
