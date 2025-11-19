@@ -473,17 +473,11 @@ export default {
 
 <style scoped>
 .avatar-profile-container {
-  max-height: 75vh;
-  margin-top: 40px;
-  scroll-behavior: smooth;
-  overflow-y: auto;  /* vertical scrolling */
-  scrollbar-width: thin;
-  scrollbar-color: #f91880 #1a1a1a; /* Firefox thumb and track */
+
   background: linear-gradient(135deg, #0f0f0f 0%, #1a1a1a 100%);
   color: #ffffff;
   animation: slideUp 0.3s ease-out;
   border-radius: 16px;
-  width: 95vw;
 }
 
 /* Progress Steps */
@@ -511,7 +505,7 @@ export default {
   position: relative;
   z-index: 2;
   flex: 1;
-  max-width: 60px;
+  max-width: 100px;
 }
 
 .step-number {

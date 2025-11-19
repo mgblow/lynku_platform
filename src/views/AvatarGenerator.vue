@@ -554,7 +554,6 @@ export default {
           return null
         }
       } catch (error) {
-        console.error('Error posting tweet:', error)
         // this.showError('خطا در ارسال توییت. لطفاً دوباره تلاش کنید.')
       } finally {
         this.isLoading = false
@@ -617,13 +616,11 @@ export default {
             emitter.emit('error-message', response.data.message)
           }
         } catch (error) {
-          console.error('Error posting tweet:', error)
           // this.showError('خطا در ارسال توییت. لطفاً دوباره تلاش کنید.')
         } finally {
           this.isLoading = false
         }
       } catch (error) {
-        console.error('Error saving avatar:', error)
         this.showError('خطا در ذخیره‌سازی آواتار')
       }
     },
@@ -641,7 +638,6 @@ export default {
         document.body.removeChild(link)
         window.URL.revokeObjectURL(url)
       } catch (error) {
-        console.error('Error downloading avatar:', error)
         this.showError('خطا در دانلود آواتار')
       }
     },
@@ -657,19 +653,15 @@ export default {
     }
   },
   async mounted() {
-    console.log('Component mounted::::')
 
     try {
       const response = await this.getAvatarPickConfig()
-      console.log('Avatar Config begin:', this.avatarConfig)
 
-      console.log('Config response:', response)
 
       // Extract config safely
       const body = response?.data?.body || response
       const newAvatarConfig = body?.avatarPicks || response.avatarPicks
 
-      console.log('=========', newAvatarConfig)
 
       // Use Vue.set() (for Vue 2) or spread assignment (for Vue 3)
       this.avatarStyles = { ...newAvatarConfig.avatarStyles }
@@ -691,9 +683,7 @@ export default {
         this.avatarConfig = JSON.parse(savedConfig)
       }
 
-      console.log('Avatar Config Loaded:', this.avatarConfig)
     } catch (error) {
-      console.error('Error loading avatar config:', error)
     }
   }
 }
@@ -701,12 +691,6 @@ export default {
 
 <style scoped>
 .avatar-generator-container {
-  max-height: 80vh;
-  margin-top: 40px;
-  scroll-behavior: smooth;
-  overflow-y: auto;  /* vertical scrolling */
-  scrollbar-width: thin;
-  scrollbar-color: #f91880 #1a1a1a; /* Firefox thumb and track */
   background: linear-gradient(135deg, #0f0f0f 0%, #1a1a1a 100%);
   color: #ffffff;
   padding: 20px;

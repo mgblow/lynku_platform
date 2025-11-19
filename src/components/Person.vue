@@ -75,7 +75,7 @@ const generateAvatarUrl = (person) => {
       </div>
     </div>
 
-    <button v-if="appId == null ||  person._id != appId" class="cosmic-btn pb-2">
+    <button v-if="appId == null ||  person._id != appId" class="futuristic-button pb-2">
       <svg width="54" height="54" viewBox="0 0 68 68" fill="none" xmlns="http://www.w3.org/2000/svg">
         <circle cx="34" cy="34" r="20" stroke="#fff" stroke-width="3">
           <animate attributeName="r" values="20;24;20" dur="2s" repeatCount="indefinite"/>
@@ -92,69 +92,109 @@ const generateAvatarUrl = (person) => {
 
     <div class="genz-actions" v-if="appId != null && appId == person._id">
       <!-- پروفایل من -->
-      <button class="cosmic-btn" @click="emitter.emit('drawer:avatarConfig', {show: true})">
-        <svg width="50" height="50" viewBox="0 0 68 68" fill="none">
-          <circle cx="34" cy="34" r="22" stroke="#fff" stroke-width="3" stroke-opacity="0.7">
-            <animate attributeName="r" values="22;26;22" dur="2.2s" repeatCount="indefinite" />
-            <animate attributeName="stroke-opacity" values="0.7;0.3;0.7" dur="2.2s" repeatCount="indefinite" />
+      <button class="futuristic-button" @click="router.push('/avatar')">
+        <svg width="50" height="50" viewBox="0 0 50 50" xmlns="http://www.w3.org/2000/svg">
+          <defs>
+            <filter id="neonGlow" x="-50%" y="-50%" width="200%" height="200%">
+              <feGaussianBlur stdDeviation="1.5" result="blur"/>
+              <feMerge>
+                <feMergeNode in="blur"/>
+                <feMergeNode in="SourceGraphic"/>
+              </feMerge>
+            </filter>
+          </defs>
+
+          <!-- Head -->
+          <circle cx="25" cy="18" r="8" fill="#ff33ff" filter="url(#neonGlow)">
+            <animate attributeName="r" values="8;9;8" dur="1.5s" repeatCount="indefinite"/>
           </circle>
-          <circle cx="34" cy="28" r="8" fill="#fff">
-            <animate attributeName="r" values="8;10;8" dur="3s" repeatCount="indefinite" />
+
+          <!-- Hair (stylized top) -->
+          <path d="M17,17 Q25,10 33,17 Q25,14 17,17 Z" fill="#ffcc00" filter="url(#neonGlow)">
+            <animateTransform attributeName="transform" type="scale" values="1;1.02;1" dur="2s" repeatCount="indefinite" additive="sum"/>
+          </path>
+
+          <!-- Neck -->
+          <rect x="22" y="25" width="6" height="6" fill="#33ccff" rx="2" ry="2" filter="url(#neonGlow)">
+            <animate attributeName="y" values="25;24;25" dur="1.5s" repeatCount="indefinite"/>
+          </rect>
+
+          <!-- Shoulders / Torso -->
+          <path d="M15,35 Q25,25 35,35 L35,40 Q25,35 15,40 Z" fill="#33ccff" filter="url(#neonGlow)">
+            <animateTransform attributeName="transform" type="scale" values="1;1.03;1" dur="2s" repeatCount="indefinite" additive="sum"/>
+          </path>
+
+          <!-- Eyes -->
+          <circle cx="22" cy="17" r="1.2" fill="#0ff" filter="url(#neonGlow)">
+            <animate attributeName="r" values="1.2;1.5;1.2" dur="1s" repeatCount="indefinite"/>
           </circle>
-          <path d="M22 46c2-8 10-10 12-10s10 2 12 10" stroke="#fff" stroke-width="3" stroke-linecap="round"/>
+          <circle cx="28" cy="17" r="1.2" fill="#0ff" filter="url(#neonGlow)">
+            <animate attributeName="r" values="1.2;1.5;1.2" dur="1s" repeatCount="indefinite"/>
+          </circle>
+
+          <!-- Mouth -->
+          <path d="M21,21 Q25,23 29,21" stroke="#ff33ff" stroke-width="1" fill="none" filter="url(#neonGlow)">
+            <animateTransform attributeName="transform" type="translate" values="0 0;0 0.5;0 0" dur="2s" repeatCount="indefinite"/>
+          </path>
+
+          <!-- Neon Halo / Outline -->
+          <circle cx="25" cy="18" r="12" stroke="#0ff" stroke-width="1" fill="none" filter="url(#neonGlow)">
+            <animateTransform attributeName="transform" type="rotate" from="0 25 18" to="360 25 18" dur="4s" repeatCount="indefinite"/>
+          </circle>
         </svg>
+
       </button>
 
       <!-- تنظیمات -->
-      <button class="cosmic-btn" @click="emitter.emit('drawer:settings', {show: true})">
-        <svg width="50" height="50" viewBox="0 0 68 68" fill="none">
-          <g transform="translate(34 34)">
-            <g>
-              <circle r="20" stroke="#fff" stroke-width="3" stroke-opacity="0.6"/>
-              <animateTransform
-                attributeName="transform"
-                type="rotate"
-                from="0" to="360"
-                dur="4s"
-                repeatCount="indefinite"
-              />
-            </g>
-            <g stroke="#fff" stroke-width="3" stroke-linecap="round">
-              <line y1="-26" y2="-20" />
-              <line y1="26" y2="20" />
-              <line x1="-26" x2="-20" />
-              <line x1="26" x2="20" />
-              <line x1="-18" y1="-18" x2="-14" y2="-14" />
-              <line x1="18" y1="-18" x2="14" y2="-14" />
-              <line x1="-18" y1="18" x2="-14" y2="14" />
-              <line x1="18" y1="18" x2="14" y2="14" />
-            </g>
-          </g>
-        </svg>
-      </button>
+      <button class="futuristic-button" @click="this.router.push('/gems')">
+        <svg width="50" height="50" viewBox="0 0 50 50" xmlns="http://www.w3.org/2000/svg">
+          <defs>
+            <filter id="neonGlow" x="-50%" y="-50%" width="200%" height="200%">
+              <feGaussianBlur stdDeviation="1.2" result="blur"/>
+              <feMerge>
+                <feMergeNode in="blur"/>
+                <feMergeNode in="SourceGraphic"/>
+              </feMerge>
+            </filter>
+          </defs>
 
-      <!-- آیتم‌هام -->
-      <button class="cosmic-btn">
-        <svg width="50" height="50" viewBox="0 0 68 68" fill="none">
-          <circle cx="34" cy="34" r="22" stroke="#fff" stroke-width="3" stroke-opacity="0.5">
-            <animate attributeName="stroke-opacity" values="0.5;0.2;0.5" dur="2.5s" repeatCount="indefinite"/>
-            <animate attributeName="r" values="22;25;22" dur="2.5s" repeatCount="indefinite"/>
+          <!-- Avatar Head -->
+          <circle cx="25" cy="25" r="8" fill="#ff00ff" filter="url(#neonGlow)">
+            <animate attributeName="r" values="8;9;8" dur="1.5s" repeatCount="indefinite"/>
           </circle>
-          <g transform="translate(34 34)">
-            <polygon points="-10,-10 10,-10 10,10 -10,10" stroke="#fff" stroke-width="2" fill="none">
-              <animate
-                attributeName="points"
-                dur="3s"
-                repeatCount="indefinite"
-                values="
-              -10,-10 10,-10 10,10 -10,10;
-              -12,-8 12,-8 12,12 -12,12;
-              -10,-10 10,-10 10,10 -10,10
-            "
-              />
-            </polygon>
-          </g>
+
+          <!-- Hair icon -->
+          <path d="M17,20 Q25,10 33,20" stroke="#0ff" stroke-width="2" fill="none" filter="url(#neonGlow)">
+            <animateTransform attributeName="transform" type="rotate" from="0 25 25" to="360 25 25" dur="3s" repeatCount="indefinite"/>
+          </path>
+
+          <!-- Eyes icon -->
+          <circle cx="21" cy="25" r="1.5" fill="#0f0" filter="url(#neonGlow)">
+            <animateTransform attributeName="transform" type="rotate" from="0 25 25" to="-360 25 25" dur="2.5s" repeatCount="indefinite"/>
+          </circle>
+          <circle cx="29" cy="25" r="1.5" fill="#0f0" filter="url(#neonGlow)">
+            <animateTransform attributeName="transform" type="rotate" from="0 25 25" to="-360 25 25" dur="2.5s" repeatCount="indefinite"/>
+          </circle>
+
+          <!-- Clothes icon (shirt) -->
+          <rect x="22" y="32" width="6" height="5" fill="#00f" filter="url(#neonGlow)">
+            <animateTransform attributeName="transform" type="rotate" from="0 25 25" to="360 25 25" dur="4s" repeatCount="indefinite"/>
+          </rect>
+
+          <!-- Accessory icon (tiny circle) -->
+          <circle cx="25" cy="15" r="1.5" fill="#ff0" filter="url(#neonGlow)">
+            <animateTransform attributeName="transform" type="translate" values="0,0;5,-5;0,0" dur="1.2s" repeatCount="indefinite"/>
+          </circle>
+
+          <!-- Small decorative orbiting dots -->
+          <circle cx="10" cy="25" r="1" fill="#0ff">
+            <animateTransform attributeName="transform" type="rotate" from="0 25 25" to="360 25 25" dur="3.5s" repeatCount="indefinite"/>
+          </circle>
+          <circle cx="40" cy="25" r="1" fill="#0ff">
+            <animateTransform attributeName="transform" type="rotate" from="0 25 25" to="-360 25 25" dur="3.5s" repeatCount="indefinite"/>
+          </circle>
         </svg>
+
       </button>
 
     </div>
@@ -172,7 +212,8 @@ const generateAvatarUrl = (person) => {
   text-align: center;
   box-shadow: 0 0 30px rgba(0, 0, 40, 0.6), inset 0 0 20px rgba(255, 255, 255, 0.1);
   transition: all 0.3s ease;
-  width: 80%;
+  width: 100%;
+  margin-top: 35px;
   height: fit-content;
   background: rgba(0, 0, 20, 0.55);
   border: 1px solid rgba(100, 100, 255, 0.25);
@@ -291,6 +332,66 @@ const generateAvatarUrl = (person) => {
 .hobby-pill:hover {
   background-color: #dbe3ff;
   cursor: default;
+}
+
+
+.futuristic-button {
+  padding: 6px 14px;
+  border-radius: 16px;
+  font-size: 13px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.8px;
+  color: #fff;
+  background: linear-gradient(135deg, #0d0d0d 0%, #1a0a2a 60%, #6a00ff 100%);
+  border: 1px solid rgba(255, 255, 255, 0.15);
+  cursor: pointer;
+  width: fit-content;
+  margin: 15px 8px;
+  box-shadow:
+    0 0 8px rgba(106, 90, 255, 0.6),
+    0 0 16px rgba(106, 90, 255, 0.4),
+    inset 0 0 6px rgba(255, 0, 255, 0.2);
+  backdrop-filter: blur(6px);
+  transition: all 0.3s ease;
+  position: relative;
+  overflow: hidden;
+}
+
+/* Neon pulse on hover */
+.futuristic-button::before {
+  content: '';
+  position: absolute;
+  top: -50%;
+  left: -50%;
+  width: 200%;
+  height: 200%;
+  background: radial-gradient(circle, rgba(106,90,255,0.4) 0%, transparent 60%);
+  opacity: 0;
+  transition: opacity 0.4s ease;
+  border-radius: 50%;
+  pointer-events: none;
+}
+
+.futuristic-button:hover::before {
+  opacity: 1;
+}
+
+.futuristic-button:hover {
+  transform: translateY(-2px) scale(1.05);
+  box-shadow:
+    0 0 12px rgba(106, 90, 255, 0.8),
+    0 0 28px rgba(106, 90, 255, 0.6),
+    inset 0 0 10px rgba(255, 0, 255, 0.25);
+}
+
+/* Optional active click effect */
+.futuristic-button:active {
+  transform: translateY(1px) scale(0.98);
+  box-shadow:
+    0 0 6px rgba(106, 90, 255, 0.5),
+    0 0 12px rgba(106, 90, 255, 0.3),
+    inset 0 0 5px rgba(255, 0, 255, 0.15);
 }
 
 </style>
