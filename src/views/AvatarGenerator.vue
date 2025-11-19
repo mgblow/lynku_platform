@@ -1,5 +1,5 @@
 <template>
-  <div class="avatar-generator-container" style="margin-top: 70px">
+  <div class="avatar-generator-container">
     <!-- Header -->
     <div class="generator-header">
       <div class="header-content">
@@ -611,8 +611,8 @@ export default {
           )
           if (response && response.data.success) {
             emitter.emit('success-message', 'آواتارت با موفقیت ساخته شد')
-            console.log(response);
-            this.$router.push('/born')
+            emitter.emit("drawer:settings", { show: true })
+            // emitter.emit("drawer:close", { close: true })
           } else {
             emitter.emit('error-message', response.data.message)
           }
@@ -701,11 +701,17 @@ export default {
 
 <style scoped>
 .avatar-generator-container {
-  min-height: 100vh;
+  max-height: 80vh;
+  margin-top: 40px;
+  scroll-behavior: smooth;
+  overflow-y: auto;  /* vertical scrolling */
+  scrollbar-width: thin;
+  scrollbar-color: #f91880 #1a1a1a; /* Firefox thumb and track */
   background: linear-gradient(135deg, #0f0f0f 0%, #1a1a1a 100%);
   color: #ffffff;
   padding: 20px;
   animation: slideUp 0.3s ease-out;
+  border-radius: 16px;
 }
 
 .generator-header {
@@ -1313,4 +1319,6 @@ export default {
     height: 50px;
   }
 }
+
+
 </style>

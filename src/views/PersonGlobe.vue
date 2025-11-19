@@ -6,12 +6,11 @@
     :palette="simpleDark"
     :imageUrl="'//cdn.jsdelivr.net/npm/three-globe/example/img/earth-dark.jpg'"
     :data="data"
-    :person="person"
     :location-picker="true"
   />
 </template>
 <script setup>
-import { onMounted, ref } from 'vue'
+import { computed, onMounted, ref } from 'vue'
 import Globe from '@/components/Globe.vue'
 import { useRoute } from 'vue-router'
 import { post } from '@/api'
@@ -25,7 +24,6 @@ const personId = route.params.pid
 
 console.log(personId)
 const data = ref([])
-const globeBackgroundUrl = ref('')
 
 const pings = [
   // 🌍 Global users
@@ -72,17 +70,6 @@ const pings = [
   }
 ]
 
-const person = ref(null);
-
-// person.value = {
-//   type: 'person',
-//   name: 'Luna',
-//   city: 'Hanoi',
-//   lat: 21.0278,
-//   lng: 105.8342,
-//   id: '691632e1ce4f00f5663dea4d'
-// }
-
 const getPerson = async () => {
   try {
     const response = await post(
@@ -98,11 +85,7 @@ const getPerson = async () => {
       }
     )
     if (response && response.data.success) {
-      console.log(response.data)
-      person.value = {
-        ...response.data.body,  // existing fields from API
-        type: 'person',
-      }
+      emitter.emit("drawer:person", response.data.body)
     } else {
       emitter.emit('error-message', response.data)
     }
@@ -147,11 +130,11 @@ const getPublishes = async () => {
 
 
 onMounted(() => {
-
   getPerson()
   getPublishes()
-
 })
+
+
 setTimeout(() => {
   data.value = [...pings]
 }, 1000)

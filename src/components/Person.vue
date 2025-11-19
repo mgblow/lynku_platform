@@ -2,6 +2,7 @@
 import { computed, onMounted, reactive, ref, watch } from 'vue'
 import { useRouter } from 'vue-router'
 import { getCookie } from '@/cookie'
+import { emitter } from '@/utils/event-bus'
 
 const person = ref(null)
 
@@ -91,7 +92,7 @@ const generateAvatarUrl = (person) => {
 
     <div class="genz-actions" v-if="appId != null && appId == person._id">
       <!-- پروفایل من -->
-      <button class="cosmic-btn">
+      <button class="cosmic-btn" @click="emitter.emit('drawer:avatarConfig', {show: true})">
         <svg width="50" height="50" viewBox="0 0 68 68" fill="none">
           <circle cx="34" cy="34" r="22" stroke="#fff" stroke-width="3" stroke-opacity="0.7">
             <animate attributeName="r" values="22;26;22" dur="2.2s" repeatCount="indefinite" />
@@ -105,7 +106,7 @@ const generateAvatarUrl = (person) => {
       </button>
 
       <!-- تنظیمات -->
-      <button class="cosmic-btn">
+      <button class="cosmic-btn" @click="emitter.emit('drawer:settings', {show: true})">
         <svg width="50" height="50" viewBox="0 0 68 68" fill="none">
           <g transform="translate(34 34)">
             <g>

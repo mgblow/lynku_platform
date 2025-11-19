@@ -1,16 +1,10 @@
-import { emitter } from './../utils/event-bus'
 import { createRouter, createWebHashHistory } from 'vue-router'
-import Box from '../views/Box.vue'
-import Profile from '../views/Profile.vue'
 import Publish from '../views/Publish.vue'
 import Login from '../views/Login.vue'
-import Others from '../views/Others.vue'
 import Mail from '../views/Mail.vue'
 import Chat from '../views/Chat.vue'
-import Feed from '../views/Feed.vue'
-import Ping from '../components/Ping.vue'
 import AvatarGenerator from '../views/AvatarGenerator.vue'
-import Born from '@/views/Born.vue'
+import Settings from '@/views/Settings.vue'
 
 const history = createWebHashHistory()
 const routes = [
@@ -39,33 +33,9 @@ const routes = [
         }
     },
     {
-        path: '/others',
-        name: 'Others',
-        component: Others,
-        meta: {
-            layout: 'default'
-        }
-    },
-    {
         path: '/login',
         name: 'Login',
         component: Login,
-        meta: {
-            layout: 'default'
-        }
-    },
-    {
-        path: '/profile',
-        name: 'Profile',
-        component: Profile,
-        meta: {
-            layout: 'default'
-        }
-    },
-    {
-        path: '/topic',
-        name: 'Feed',
-        component: Feed,
         meta: {
             layout: 'default'
         }
@@ -78,26 +48,10 @@ const routes = [
             layout: 'default'
         }
     },
-    {
-        path: '/post/:id',
-        name: 'Tweet',
-        component: Ping,
-        meta: {
-            layout: 'default'
-        }
-    },
-    {
-        path: '/boxes',
-        name: 'Boxes',
-        component: Box,
-        meta: {
-            layout: 'default'
-        }
-    },
   {
-    path: '/born',
-    name: 'Born',
-    component: Born,
+    path: '/settings',
+    name: 'Settings',
+    component: Settings,
     meta: {
       layout: 'default'
     }
@@ -115,17 +69,6 @@ const routes = [
         }
     },
   {
-    path: '/live',
-    name: 'LivePingGlobe',
-    // route level code-splitting
-    // this generates a separate chunk (about.[hash].js) for this route
-    // which is lazy-loaded when the route is visited.
-    component: () => import( '../views/Universe.vue'),
-    meta: {
-      layout: 'default'
-    }
-  },
-  {
     path: '/match',
     name: 'Adventure',
     // route level code-splitting
@@ -137,19 +80,8 @@ const routes = [
     }
   },
   {
-    path: '/my',
-    name: 'My',
-    // route level code-splitting
-    // this generates a separate chunk (about.[hash].js) for this route
-    // which is lazy-loaded when the route is visited.
-    component: () => import( '../views/My.vue'),
-    meta: {
-      layout: 'default'
-    }
-  },
-  {
     path: '/globes/:pid',
-    name: 'My',
+    name: 'globes',
     component: () => import('../views/PersonGlobe.vue'),
     props: true,
     meta: {

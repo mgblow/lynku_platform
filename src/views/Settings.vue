@@ -1,17 +1,17 @@
 <template>
-  <div class="avatar-profile-container" style="margin-top: 70px">
+  <div class="avatar-profile-container nt-5">
     <!-- Progress Steps -->
     <div class="progress-steps">
       <div class="step" :class="{ active: currentStep === 1, completed: currentStep > 1 }">
-        <div class="step-number">2</div>
+        <div class="step-number">1</div>
         <div class="step-label">اطلاعات شخصی</div>
       </div>
       <div class="step" :class="{ active: currentStep === 2, completed: currentStep > 2 }">
-        <div class="step-number">3</div>
+        <div class="step-number">2</div>
         <div class="step-label">علایق و کسب‌وکار</div>
       </div>
       <div class="step" :class="{ active: currentStep === 3 }">
-        <div class="step-number">4</div>
+        <div class="step-number">3</div>
         <div class="step-label">مرور و ثبت</div>
       </div>
     </div>
@@ -473,19 +473,24 @@ export default {
 
 <style scoped>
 .avatar-profile-container {
-  min-height: 100vh;
+  max-height: 75vh;
+  margin-top: 40px;
+  scroll-behavior: smooth;
+  overflow-y: auto;  /* vertical scrolling */
+  scrollbar-width: thin;
+  scrollbar-color: #f91880 #1a1a1a; /* Firefox thumb and track */
   background: linear-gradient(135deg, #0f0f0f 0%, #1a1a1a 100%);
   color: #ffffff;
-  padding: 20px;
   animation: slideUp 0.3s ease-out;
+  border-radius: 16px;
+  width: 95vw;
 }
 
 /* Progress Steps */
 .progress-steps {
   display: flex;
   justify-content: center;
-  margin-bottom: 40px;
-  position: relative;
+  margin: 40px 0;
 }
 
 .progress-steps::before {
@@ -506,7 +511,7 @@ export default {
   position: relative;
   z-index: 2;
   flex: 1;
-  max-width: 120px;
+  max-width: 60px;
 }
 
 .step-number {

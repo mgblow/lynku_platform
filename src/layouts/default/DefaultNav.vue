@@ -5,11 +5,30 @@
       <div v-if="this.loading" class="hologram-effect"></div>
       <div class="nav-brand">
         <div class="logo-hologram">
-          <div class="hologram-circle" @click="toggleNotifications"></div>
+          <img :src="this.avatarUrl()" alt="Avatar Preview" class="preview-image" style="display: inline-block; max-width: 25px;margin-left:-38.5px;" />
+          <div class="hologram-circle" style="opacity: 0.8" @click="toggleNotifications">
+            <svg width="35" height="40" viewBox="0 0 120 40" xmlns="http://www.w3.org/2000/svg">
+              <defs>
+                <filter id="glow" x="-50%" y="-50%" width="200%" height="200%">
+                  <feGaussianBlur stdDeviation="2" result="blur"/>
+                  <feMerge>
+                    <feMergeNode in="blur"/>
+                    <feMergeNode in="SourceGraphic"/>
+                  </feMerge>
+                </filter>
+              </defs>
+              <!-- First bar -->
+              <rect x="5" y="15" width="30" height="10" rx="5" ry="5" fill="#0ff" filter="url(#glow)"/>
+              <!-- Second bar -->
+              <rect x="45" y="15" width="30" height="10" rx="5" ry="5" fill="#0ff" filter="url(#glow)"/>
+              <!-- Third bar -->
+              <rect x="85" y="15" width="30" height="10" rx="5" ry="5" fill="#0ff" filter="url(#glow)"/>
+            </svg>
+
+          </div>
         </div>
         <span class="brand-text" @click="this.$router.push('/')">lynku</span>
       </div>
-
       <div class="universal-search">
         <div class="search-orb" @click="toggleSearch">
           <svg viewBox="0 0 24 24" fill="currentColor">
@@ -252,7 +271,6 @@ export default {
     this.buildQuickActions()
 
     emitter.on('refresh-navigation-state', () => {
-      console.log('refresh-navigation-state received, rebuilding quick actions')
       this.buildQuickActions()
     })
 
@@ -265,6 +283,13 @@ export default {
     emitter.off('refresh-navigation-state') // cleanup
   },
   methods: {
+    avatarUrl() {
+      this.avatarConfig = Object.assign(JSON.parse(localStorage.getItem('userAvatarConfig')), this.avatarConfig)
+      const baseUrl = process.env.VUE_APP_AVATAR_APP_URL + '/avatars'
+      const params = new URLSearchParams(this.avatarConfig)
+      const url = `${baseUrl}?${params.toString()}`
+      return url
+    },
     buildQuickActions() {
       this.$data.quickActions = quickActionsOriginalList.filter((action) => {
         if (action.requireAuth && !this.isLoggedIn()) return false
@@ -402,8 +427,7 @@ export default {
 }
 
 .brand-text {
-  color: #ffffff;
-  font-weight: 700;
+
   font-size: 28px;
   font-family: 'Honk', system-ui;
   font-optical-sizing: auto;

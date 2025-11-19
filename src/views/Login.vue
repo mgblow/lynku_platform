@@ -193,10 +193,10 @@ export default {
             emitter.emit('refresh-navigation-state');
 
             if(response.firstLogin){
-              this.$router.push('/avatar');
-            } else {
-              this.$router.push('/');
+              emitter.emit('drawer:avatarConfig', {show: true});
             }
+            this.$router.push('/');
+
           } else {
             alert('کد تأیید اشتباه است.');
           }

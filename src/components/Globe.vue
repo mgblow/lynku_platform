@@ -10,21 +10,11 @@
         </svg>
       </div>
     </div>
-
-    <Teleport to="body">
-      <div v-if="selectedData" class="user-popup">
-        <button class="close-btn" @click="closePanel()">×</button>
-        <Ping v-if="selectedData.type === 'ping'"></Ping>
-        <Person v-if="selectedData.type === 'person'" :selectedData="selectedData"></Person>
-        <Gift v-if="selectedData.type === 'gift'" :selectedData="selectedData"></Gift>
-        <Publish v-if="selectedData.type === 'publish'"></Publish>
-      </div>
-    </Teleport>
   </div>
 </template>
 
 <script setup>
-import { nextTick, onBeforeUnmount, onMounted, ref, watch } from 'vue'
+import { createApp, nextTick, onBeforeUnmount, onMounted, ref, watch } from 'vue'
 import Globe from 'globe.gl'
 import { emitter } from '@/utils/event-bus'
 import Person from '@/components/Person.vue'
@@ -33,12 +23,25 @@ import wires from '@/data/wire-data'
 import countries from '@/data/countries'
 import Gift from '@/components/Gift.vue'
 import Publish from '@/views/Publish.vue'
+import GiftCard from '@/components/globe/GiftCard.vue'
+import PingCard from '@/components/globe/PingCard.vue'
 
 const globeContainer = ref(true)
 const globe = ref(null)
 const globeReady = ref(false)
 const selectedData = ref(null)
 
+// constants
+const majorCities = [
+  { lat: 35.6892, lng: 51.389, name: 'Tehran', color: '#ffcc00' },
+  { lat: 40.7128, lng: -74.006, name: 'NewYork', color: '#00aaff' },
+  { lat: 51.5074, lng: -0.1278, name: 'London', color: '#ff6699' },
+  { lat: 48.8566, lng: 2.3522, name: 'Paris', color: '#66ff66' },
+  { lat: 35.6762, lng: 139.6503, name: 'Tokyo', color: '#ff6600' },
+  { lat: 55.7558, lng: 37.6173, name: 'Mosscow', color: '#00ffff' },
+  { lat: 24.7136, lng: 46.6753, name: 'Riaz', color: '#ffaa00' },
+  { lat: 30.0444, lng: 31.2357, name: 'Qahere', color: '#ff3300' }
+]
 const avatarStyles = ['ShortHairShortFlat', 'LongHairFro', 'Hat', 'Hijab', 'WinterHat1', 'Turban', 'LongHairStraight']
 const clothes = ['Hoodie', 'ShirtCrewNeck', 'BlazerSweater', 'Overall']
 const eyes = ['Happy', 'Close', 'Surprised', 'Squint']
@@ -47,6 +50,7 @@ const skins = ['Light', 'Tanned', 'Brown', 'DarkBrown']
 const marker = ref(null)
 const emit = defineEmits(['select-location'])
 
+// props
 
 const props = defineProps({
   hexed: {
@@ -71,18 +75,7 @@ const props = defineProps({
   person: { type: Object, default: () => null }
 })
 
-
-const majorCities = [
-  { lat: 35.6892, lng: 51.389, name: 'Tehran', color: '#ffcc00' },
-  { lat: 40.7128, lng: -74.006, name: 'NewYork', color: '#00aaff' },
-  { lat: 51.5074, lng: -0.1278, name: 'London', color: '#ff6699' },
-  { lat: 48.8566, lng: 2.3522, name: 'Paris', color: '#66ff66' },
-  { lat: 35.6762, lng: 139.6503, name: 'Tokyo', color: '#ff6600' },
-  { lat: 55.7558, lng: 37.6173, name: 'Mosscow', color: '#00ffff' },
-  { lat: 24.7136, lng: 46.6753, name: 'Riaz', color: '#ffaa00' },
-  { lat: 30.0444, lng: 31.2357, name: 'Qahere', color: '#ff3300' }
-]
-
+// functions
 function generateRandomAvatar() {
   const params = new URLSearchParams({
     avatarStyle: 'Circle',
@@ -112,6 +105,7 @@ function pinData(newData = []) {
   // Points
   const pointAltitude = 0.6
   const pointRadius = 0.1
+
   globe.value
     .pointsData(newData.map((u) => ({ ...u, avatarUrl: generateRandomAvatar() })))
     .pointLat((d) => d.lat)
@@ -124,9 +118,7 @@ function pinData(newData = []) {
       <div style="background: rgba(0,0,0,0.9); padding: 8px 12px; border-radius: 8px; color: white;">
           <b style="color: #fff;">${d.city}</b>
           <br/>
-          <span style="color: #aaa;">
-              ${d.name}
-           </span>
+          <span style="color: #aaa;">${d._id}</span>
        </div>
         `
     )
@@ -175,117 +167,45 @@ function pinData(newData = []) {
       el.appendChild(img)
       el.appendChild(name)
 
-      // 🌌 If it's a ping
       if (data.type === 'ping') {
-        const card = document.createElement('div')
-        card.className = 'ping-card'
-        card.innerHTML = `
-      <p class="ping-text">${data.text}</p>
-      <div class="ping-meta">
-        <span>❤️ ${data.likes}</span>
-        <span>🔁 ${data.reping}</span>
-        <span>💬 ${data.comments}</span>
-      </div>
-    `
-        card.style.cssText = `
-      background: rgba(10,10,20,0.75);
-      backdrop-filter: blur(8px) saturate(1.3);
-      -webkit-backdrop-filter: blur(8px) saturate(1.3);
-      border: 1px solid rgba(255,255,255,0.05);
-      border-radius: 10px;
-      padding: 10px;
-      margin-top: 10px;
-      color: #fff;
-      text-align: left;
-      font-size: 11px;
-      width: 180px;
-      box-shadow: 0 4px 20px rgba(255,0,180,0.25);
-      animation: fadeIn 0.4s ease;
-      position: relative;
-      direction: rtl;
-      text-align: right;
-    `
-        // Ping text
-        const style = document.createElement('style')
-        style.textContent = `
-      .ping-card .ping-text {
-        line-height: 1.4;
-        margin-bottom: 6px;
-        font-weight: 400;
-        text-shadow: 0 0 2px rgba(0,0,0,0.4);
-        direction: ${/[آ-ی]/.test(data.text) ? 'rtl' : 'ltr'};
-      }
-      .ping-card .ping-meta {
-        display: flex;
-        justify-content: space-between;
-        font-size: 10px;
-        opacity: 0.8;
-      }
-      .globe-marker:hover .ping-card {
-        box-shadow: 0 6px 26px rgba(255,0,200,0.35);
-      }
-      @keyframes fadeIn {
-        from { opacity: 0; transform: translateY(10px); }
-        to { opacity: 1; transform: translateY(0); }
-      }
-    `
-        document.head.appendChild(style)
-        el.appendChild(card)
-      } else if (data.type === 'gift') {
-        const card = document.createElement('div')
-        card.className = 'gift-card'
-        card.innerHTML = `
-      <p class="gift-text">${data.text}</p>
-      <div class="gift-meta">
-          ${data.gift}
-      </div>
-    `
-        card.style.cssText = `
-      background: rgba(10,10,20,0.75);
-      backdrop-filter: blur(8px) saturate(1.3);
-      -webkit-backdrop-filter: blur(8px) saturate(1.3);
-      border: 1px solid rgba(255,255,255,0.05);
-      border-radius: 10px;
-      margin-top: 10px;
-      color: #fff;
-      font-size: 11px;
-      width: 180px;
-      box-shadow: 0 4px 20px rgba(255,0,180,0.25);
-      animation: fadeIn 0.4s ease;
-      position: relative;
-      direction: rtl;
-      text-align: center;
-      padding-top: 10px;
-    `
-        // Ping text
-        const style = document.createElement('style')
-        style.textContent = `
-      .ping-card .ping-text {
-        line-height: 1.4;
-        margin-bottom: 6px;
-        font-weight: 400;
-        text-shadow: 0 0 2px rgba(0,0,0,0.4);
-        direction: ${/[آ-ی]/.test(data.text) ? 'rtl' : 'ltr'};
-      }
-      .ping-card .ping-meta {
-        display: flex;
-        justify-content: space-between;
-        font-size: 10px;
-        opacity: 0.8;
-      }
-      .globe-marker:hover .ping-card {
-        box-shadow: 0 6px 26px rgba(255,0,200,0.35);
-      }
-      @keyframes fadeIn {
-        from { opacity: 0; transform: translateY(10px); }
-        to { opacity: 1; transform: translateY(0); }
-      }
-    `
-        document.head.appendChild(style)
-        el.appendChild(card)
+        const wrapper = document.createElement('div')
+        const mountPoint = document.createElement('div')
+        wrapper.appendChild(mountPoint)
+
+        const app = createApp(PingCard, {
+          text: data.text,
+          likes: data.likes,
+          reping: data.reping,
+          comments: data.comments
+        })
+
+        app.mount(mountPoint)
+
+        el.appendChild(wrapper)
       }
 
-      // 🌍 Hover behavior
+      if (data.type === 'gift') {
+        const wrapper = document.createElement('div')
+        wrapper.className = 'gift-card-wrapper'
+        wrapper.style.cssText = `
+                                  margin-top: 10px;
+                                  width: 180px;
+                                  position: relative;
+                                `
+
+        // Create mounting point
+        const mountPoint = document.createElement('div')
+        wrapper.appendChild(mountPoint)
+        // Mount Vue component programmatically
+        const app = createApp(GiftCard, {
+          text: data.text,
+          gift: data.gift
+        })
+        app.mount(mountPoint)
+
+        el.appendChild(wrapper)
+      }
+
       el.onmouseenter = () => {
         el.style.transform = 'scale(1.05)'
         img.style.boxShadow = '0 0 20px rgba(255,0,200,0.6)'
@@ -295,10 +215,9 @@ function pinData(newData = []) {
         img.style.boxShadow = '0 0 12px rgba(0,255,180,0.5)'
       }
 
-      // 📍 On click focus globe
       el.onclick = (e) => {
         e.stopPropagation()
-        selectedData.value = data
+        emitter.emit('drawer:' + data.type, data)
         globe.value?.pointOfView({ lat: data.lat, lng: data.lng, altitude: 1.5 }, 1500)
       }
 
@@ -309,12 +228,6 @@ function pinData(newData = []) {
     .htmlLng((d) => d.lng)
     .htmlAltitude(0.5)
 }
-
-function closePanel() {
-  selectedData.value = null
-  globe.value.pointOfView({ lat: 30, lng: 20, altitude: 3.5 }, 1500)
-}
-
 
 function createMarker(lat, lng) {
   return {
@@ -331,9 +244,9 @@ function updateMarkers() {
 
   globe.value
     .pointsData(allPoints)
-    .pointColor(d => d.color || '#ffffff')
-    .pointAltitude(d => (d === marker.value ? 0.05 : 0.015))
-    .pointRadius(d => (d === marker.value ? 0.8 : 0.25))
+    .pointColor((d) => d.color || '#ffffff')
+    .pointAltitude((d) => (d === marker.value ? 0.05 : 0.015))
+    .pointRadius((d) => (d === marker.value ? 0.8 : 0.25))
 }
 
 async function initGlobe() {
@@ -355,25 +268,19 @@ async function initGlobe() {
     if (props.locationPicker) {
       globe.value.onGlobeClick(({ lat, lng }) => {
         marker.value = createMarker(lat, lng)
-        selectedData.value = {
-          lat: lat,
-          lng: lng,
-          type: 'publish',
-        }
+        emitter.emit("drawer:publish", {lat: lat, lng: lng})
         updateMarkers()
         emit('select-location', { lat, lon: lng })
-        globe.value.pointOfView(
-          { lat: lat - 3, lng: lng, altitude: 1.3 },
-          1200
-        );
-      });
+        globe.value.pointOfView({ lat: lat - 3, lng: lng, altitude: 1.3 }, 1200)
+      })
 
-      globe.value.labelsData(majorCities)
+      globe.value
+        .labelsData(majorCities)
         .labelText('name')
         .labelSize(1)
         .labelColor(() => '#ffffff')
         .labelAltitude(0.01)
-        .onLabelClick(city => {
+        .onLabelClick((city) => {
           marker.value = createMarker(city.lat, city.lng)
           updateMarkers()
           emit('select-location', { lat: city.lat, lon: city.lng })
@@ -381,8 +288,9 @@ async function initGlobe() {
         })
 
       // Add base city points
-      globe.value.pointsData(majorCities)
-        .pointColor(d => d.color)
+      globe.value
+        .pointsData(majorCities)
+        .pointColor((d) => d.color)
         .pointAltitude(0.015)
         .pointRadius(0.25)
 
@@ -391,58 +299,37 @@ async function initGlobe() {
     }
 
     if (props.hexed) {
-      if (props.hexed) {
-        // Predefined palettes
-        const palettes = {
-          futuristic: [
-            'hsl(200, 100%, 55%)', // Electric Blue – vibrant & techy
-            'hsl(330, 100%, 60%)', // Neon Pink – bold & flashy
-            'hsl(50, 100%, 60%)',  // Bright Neon Yellow – high energy
-            'hsl(160, 100%, 55%)', // Vibrant Cyan-Green – futuristic glow
-            'hsl(280, 95%, 60%)'   // Neon Purple – intense & cyberpunk
-          ],
-          simpleDark: [
-            'hsl(0, 0%, 10%)',
-            'hsl(0, 0%, 20%)',
-            'hsl(0, 0%, 30%)',
-            'hsl(0, 0%, 40%)',
-            'hsl(0, 0%, 50%)'
-          ],
-          gray: [
-            'hsl(0, 0%, 20%)',
-            'hsl(0, 0%, 40%)',
-            'hsl(0, 0%, 60%)',
-            'hsl(0, 0%, 80%)',
-            'hsl(0, 0%, 90%)'
-          ],
-          whiteHollow: [
-            'rgba(255, 255, 255, 0.05)',
-            'rgba(255, 255, 255, 0.1)',
-            'rgba(255, 255, 255, 0.15)',
-            'rgba(255, 255, 255, 0.2)',
-            'rgba(255, 255, 255, 0.25)'
-          ],
-          blue: [
-            'hsl(210, 90%, 50%)',
-            'hsl(210, 80%, 60%)',
-            'hsl(210, 70%, 70%)',
-            'hsl(210, 60%, 80%)',
-            'hsl(210, 50%, 90%)'
-          ]
-        };
-
-        // Choose the palette you want (can be dynamic)
-        const selectedPalette = palettes[props.palette] || palettes.gray;
-
-        // hex polygon map configuration
-        globe.value
-          .hexPolygonsData(countries.features)
-          .hexPolygonResolution(3)
-          .hexPolygonMargin(0.3)
-          .hexPolygonUseDots(true)
-          .hexPolygonColor(() => selectedPalette[Math.floor(Math.random() * selectedPalette.length)]);
+      // Predefined palettes
+      const palettes = {
+        futuristic: [
+          'hsl(200, 100%, 55%)', // Electric Blue – vibrant & techy
+          'hsl(330, 100%, 60%)', // Neon Pink – bold & flashy
+          'hsl(50, 100%, 60%)', // Bright Neon Yellow – high energy
+          'hsl(160, 100%, 55%)', // Vibrant Cyan-Green – futuristic glow
+          'hsl(280, 95%, 60%)' // Neon Purple – intense & cyberpunk
+        ],
+        simpleDark: ['hsl(0, 0%, 10%)', 'hsl(0, 0%, 20%)', 'hsl(0, 0%, 30%)', 'hsl(0, 0%, 40%)', 'hsl(0, 0%, 50%)'],
+        gray: ['hsl(0, 0%, 20%)', 'hsl(0, 0%, 40%)', 'hsl(0, 0%, 60%)', 'hsl(0, 0%, 80%)', 'hsl(0, 0%, 90%)'],
+        whiteHollow: [
+          'rgba(255, 255, 255, 0.05)',
+          'rgba(255, 255, 255, 0.1)',
+          'rgba(255, 255, 255, 0.15)',
+          'rgba(255, 255, 255, 0.2)',
+          'rgba(255, 255, 255, 0.25)'
+        ],
+        blue: ['hsl(210, 90%, 50%)', 'hsl(210, 80%, 60%)', 'hsl(210, 70%, 70%)', 'hsl(210, 60%, 80%)', 'hsl(210, 50%, 90%)']
       }
 
+      // Choose the palette you want (can be dynamic)
+      const selectedPalette = palettes[props.palette] || palettes.gray
+
+      // hex polygon map configuration
+      globe.value
+        .hexPolygonsData(countries.features)
+        .hexPolygonResolution(3)
+        .hexPolygonMargin(0.3)
+        .hexPolygonUseDots(true)
+        .hexPolygonColor(() => selectedPalette[Math.floor(Math.random() * selectedPalette.length)])
     }
 
     if (props.wired) {
@@ -462,6 +349,7 @@ async function initGlobe() {
         .pathDashGap(0.008)
         .pathDashAnimateTime(14000)
     }
+
     const controls = globe.value.controls()
     controls.autoRotate = true
     controls.autoRotateSpeed = props.autoRotateSpeed
@@ -471,7 +359,7 @@ async function initGlobe() {
     controls.maxDistance = 800
 
     pinData(props.data)
-    globe.value.pointOfView({ lat: 30, lng: 20, altitude: 3.5 }, 0)
+    globe.value.pointOfView({ lat: 30, lng: 20, altitude: 3.5 }, 500)
     globeReady.value = true
 
     const handleResize = () => globe.value && (globe.value.width(window.innerWidth), globe.value.height(window.innerHeight))
@@ -483,7 +371,7 @@ async function initGlobe() {
   }
 }
 
-// Reactive watchers
+// watchers
 watch(
   () => props.data,
   (newPeople) => pinData(newPeople),
@@ -501,25 +389,18 @@ watch(
     if (globe.value) globe.value.globeImageUrl(url)
   }
 )
-watch(
-  () => props.person,
-  (person) => {
-    selectedData.value = person
-  }
-)
+
+// hooks
 
 onMounted(() => {
   initGlobe()
-  if (props.person) {
-    selectedData.value = {
-      ...props.person,
-      avatarUrl: generateRandomAvatar()
-    }
-  }
+  emitter.on('globe:pointOfView', (viewport) => {
+    if (globe.value)
+      globe.value.pointOfView({ lat: viewport.lat, lng: viewport.lng, altitude: viewport.altitude }, viewport.transition)
+  })
 })
 
 onBeforeUnmount(() => {
-  selectedData.value = null
   globeReady.value = false
   if (globe.value?._cleanupResize) globe.value._cleanupResize()
   globe.value?.pointsData([])
@@ -530,7 +411,6 @@ onBeforeUnmount(() => {
 </script>
 
 <style scoped>
-/* Base Globe Styles (Keep them mostly the same) */
 .globe-wrapper {
   width: 100vw;
   height: 100vh;
@@ -584,28 +464,6 @@ onBeforeUnmount(() => {
   }
 }
 
-/* 💫 Futuristic User Info Popup (Glass-morphism) */
-.user-popup {
-  position: fixed;
-  top: 50%;
-  right: 20px;
-  transform: translateY(-50%);
-  background: rgba(5, 5, 20, 0.7);
-  backdrop-filter: blur(12px);
-  -webkit-backdrop-filter: blur(12px);
-  border: 1px solid rgba(255, 255, 255, 0.08);
-  box-shadow: 0 0 25px rgba(0, 0, 0, 0.6);
-  padding: 60px 20px;
-  color: white;
-  width: 280px;
-  z-index: 10000;
-  animation: slideIn 0.4s cubic-bezier(0.25, 0.8, 0.25, 1);
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  text-align: center;
-}
-
 @keyframes slideIn {
   from {
     opacity: 0;
@@ -617,64 +475,6 @@ onBeforeUnmount(() => {
   }
 }
 
-.close-btn {
-  position: absolute;
-  top: 15px;
-  right: 15px;
-  background: rgba(255, 255, 255, 0.1);
-  border: none;
-  color: #e0f7fa;
-  font-size: 20px;
-  cursor: pointer;
-  padding: 0;
-  width: 35px;
-  height: 35px;
-  border-radius: 50%;
-  transition: background 0.3s, transform 0.3s;
-  line-height: 1;
-}
-
-.close-btn:hover {
-  background: rgba(255, 255, 255, 0.2);
-  transform: rotate(90deg);
-}
-
-.popup-avatar {
-  width: 90px;
-  height: 90px;
-  border-radius: 50%;
-  border: 4px solid #00ff88; /* Green accent */
-  margin-bottom: 20px;
-  display: block;
-  box-shadow: 0 0 15px rgba(0, 255, 136, 0.7), 0 0 25px rgba(74, 144, 226, 0.4);
-  background: #fff;
-  object-fit: cover;
-}
-
-.user-popup h3 {
-  margin: 0 0 5px 0;
-  font-size: 1.5rem;
-  color: #4a90e2; /* Primary blue */
-  text-shadow: 0 0 5px rgba(74, 144, 226, 0.5);
-}
-
-.city {
-  margin: 5px 0 10px 0;
-  font-size: 1.1rem;
-  color: #00ff88; /* Secondary green */
-  font-weight: 500;
-}
-
-.coords {
-  margin-top: 15px;
-  padding-top: 10px;
-  border-top: 1px solid rgba(255, 255, 255, 0.1);
-  font-size: 0.9rem;
-  color: #aaa;
-  font-family: 'Roboto Mono', monospace;
-}
-
-/* 📱 Mobile Optimization */
 @media (max-width: 600px) {
   .user-popup {
     top: auto;
@@ -703,16 +503,6 @@ onBeforeUnmount(() => {
     top: 10px;
     right: 10px;
   }
-}
-
-:deep(.scene-tooltip) {
-  padding: 0 !important;
-  background: transparent !important;
-  border: none !important;
-}
-
-:deep(.avatar-marker) {
-  pointer-events: auto !important;
 }
 
 .loading {

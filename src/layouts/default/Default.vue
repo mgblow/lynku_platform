@@ -4,6 +4,7 @@
 
   <!-- Main App -->
   <div v-else class="col default-page-wrapper">
+    <Drawer></Drawer>
     <default-nav />
     <slot />
 
@@ -24,10 +25,11 @@ import mqtt from 'mqtt'
 import { post } from '@/api'
 import { getCookie } from '@/cookie'
 import { emitter } from '@/utils/event-bus'
+import Drawer from '@/components/Drawer.vue'
 
 export default {
   name: 'LayoutDefault',
-  components: { DefaultNav, SplashScreen },
+  components: { Drawer, DefaultNav, SplashScreen },
   setup() {
     const emitter = inject('emitter') // inject mitt instance
     const showSnackbar = ref(false)
@@ -40,9 +42,9 @@ export default {
       const token = getCookie('app-token')
       if (token) {
         showSplash.value = false
-        return true;
+        return true
       }
-      return false;
+      return false
     }
 
     const handleLogin = () => {
@@ -83,7 +85,7 @@ export default {
 
       mqttClient.on('connect', () => {
         console.log('MQTT connected!')
-        emitter.emit('success-message', "آنلاین شدی!")
+        emitter.emit('success-message', 'آنلاین شدی!')
 
         // SUBSCRIBE TO TOPIC
         mqttClient.subscribe(getCookie('app-id') + '/client/#', (err) => {
@@ -130,9 +132,9 @@ export default {
           }
         )
         if (response && response.data.success) {
-          const person  = {
-            ...response.data.body,  // existing fields from API
-            type: 'person',
+          const person = {
+            ...response.data.body, // existing fields from API
+            type: 'person'
           }
           localStorage.setItem('me', JSON.stringify(person))
           localStorage.setItem('userAvatarConfig', JSON.stringify(response.data.body.avatarConfig))
@@ -143,14 +145,13 @@ export default {
         console.error('Error posting tweet:', error)
         // this.showError('خطا در ارسال توییت. لطفاً دوباره تلاش کنید.')
       } finally {
-
       }
     }
 
     onMounted(() => {
-      if(getCookie('app-token') && mqttClient === null) handleBrokerConnection()
-      if(checkAuthStatus() && !localStorage.getItem('me')){
-          getMe()
+      if (getCookie('app-token') && mqttClient === null) handleBrokerConnection()
+      if (checkAuthStatus() && !localStorage.getItem('me')) {
+        getMe()
       }
       setInterval(() => (showSplash.value = false), 3000)
 
@@ -161,7 +162,6 @@ export default {
         emitter.on('brokerCredentials', () => handleBrokerConnection())
         emitter.on('mqtt:notification', (msg) => showMessage(msg))
         emitter.on('reload-me', () => getMe()())
-
       }
     })
 

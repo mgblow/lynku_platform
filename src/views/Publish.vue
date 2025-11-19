@@ -89,14 +89,13 @@
 <script>
 import { post } from '../api'
 import { getCookie } from '@/cookie'
-import GlobePicker from '@/views/GlobePicker.vue'
 import { emitter } from '@/utils/event-bus'
 import Globe from '@/components/Globe.vue'
 
 export default {
   name: 'Publish',
   avatarConfig: {},
-  components: { Globe, GlobePicker },
+  components: { Globe },
   data() {
     return {
       showGlobe: false,
@@ -116,7 +115,6 @@ export default {
     },
     avatarUrl() {
       this.avatarConfig = Object.assign(JSON.parse(localStorage.getItem('userAvatarConfig')), this.avatarConfig)
-      console.log(this.avatarConfig)
       const baseUrl = process.env.VUE_APP_AVATAR_APP_URL + '/avatars'
       const params = new URLSearchParams(this.avatarConfig)
       return `${baseUrl}?${params.toString()}`
