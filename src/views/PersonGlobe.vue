@@ -1,14 +1,15 @@
 <template>
   <Globe
     style="height: 100vh; width: 100%"
-    :autoRotateSpeed="0.5"
-    :hexed="false"
-    :imageUrl="globeBackgroundUrl"
+    :autoRotateSpeed="0"
+    :hexed="true"
+    :palette="simpleDark"
+    :imageUrl="'//cdn.jsdelivr.net/npm/three-globe/example/img/earth-dark.jpg'"
     :data="data"
     :person="person"
+    :location-picker="true"
   />
 </template>
-
 <script setup>
 import { onMounted, ref } from 'vue'
 import Globe from '@/components/Globe.vue'
@@ -25,9 +26,6 @@ const personId = route.params.pid
 console.log(personId)
 const data = ref([])
 const globeBackgroundUrl = ref('')
-
-globeBackgroundUrl.value =
-  'https://thumbs.dreamstime.com/z/vintage-grunge-world-map-old-crumpled-parchment-paper-antique-style-world-map-strong-grunge-vintage-aesthetic-410763555.jpg?ct=jpeg'
 
 const pings = [
   // 🌍 Global users
@@ -85,7 +83,7 @@ const person = ref(null);
 //   id: '691632e1ce4f00f5663dea4d'
 // }
 
-const getPersonGlobeData = async () => {
+const getPerson = async () => {
   try {
     const response = await post(
       '/api/v1',
@@ -116,9 +114,42 @@ const getPersonGlobeData = async () => {
   }
 }
 
+const getPublishes = async () => {
+  try {
+    const response = await post(
+      '/api/v1',
+      {
+        topic: 'getPublishes',
+        data: {
+          personId: personId,
+          fromDate: Date,
+          toDate: new Date(),
+          isPublic: true,
+          limit: 10
+        }
+      },
+      {
+        token: getCookie('app-token')
+      }
+    )
+    if (response && response.data.success) {
+
+    } else {
+      emitter.emit('error-message', response.data)
+    }
+  } catch (error) {
+    console.error('Error posting tweet:', error)
+    // this.showError('خطا در ارسال توییت. لطفاً دوباره تلاش کنید.')
+  } finally {
+
+  }
+}
+
+
 onMounted(() => {
 
-  getPersonGlobeData()
+  getPerson()
+  getPublishes()
 
 })
 setTimeout(() => {

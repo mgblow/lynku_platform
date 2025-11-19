@@ -1,11 +1,14 @@
 <template>
+<div class="globe">
   <Globe
-    style="height: 100vh; width: 100%;"
-    :autoRotateSpeed="0"
-    :hexed="false"
-    :imageUrl="'//globe/images/earth-dark.jpg'"
+    style="height: 100vh;width: 100%"
+    :autoRotate="true"
+    :auto-rotate-speed="0.3"
+    :imageUrl="'//cdn.jsdelivr.net/npm/three-globe/example/img/earth-dark.jpg'"
     :data="data"
+    :hexed="true"
   />
+</div>
 </template>
 
 <script setup>

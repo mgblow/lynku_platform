@@ -3,6 +3,7 @@
     style="height: 100vh; width: 100%;"
     :autoRotateSpeed="0.35"
     :hexed="true"
+    palette="futuristic"
     :imageUrl="'//cdn.jsdelivr.net/npm/three-globe/example/img/earth-dark.jpg'"
     :data="data"
   />

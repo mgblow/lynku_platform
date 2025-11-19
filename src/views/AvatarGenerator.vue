@@ -729,9 +729,58 @@ export default {
   height: 220px;
   border-radius: 50%;
   overflow: hidden;
-  border: 3px solid #ff00ff;
-  box-shadow: 0 8px 25px rgba(29, 161, 242, 0.3);
+
+  box-shadow: 0 0 8px #6a5af9, 0 0 16px #6a5af9 inset;
+
+
+  /* Glass effect */
+  background: rgba(255, 255, 255, 0.03);
+  backdrop-filter: blur(10px);
+
+  transition: transform 0.3s ease, box-shadow 0.3s ease, border-color 0.3s ease;
 }
+
+/* Hover interaction */
+.avatar-preview-large:hover {
+  transform: translateY(-6px) scale(1.04);
+
+  box-shadow:
+    0 0 20px rgba(255, 0, 255, 0.55),
+    0 0 40px rgba(255, 0, 255, 0.35),
+    inset 0 0 18px rgba(255, 0, 255, 0.25);
+
+  border-color: #ff33ff;
+}
+
+/* 🔥 Subtle breathing glow animation */
+.avatar-preview-large.glowing {
+  animation: avatarPulse 3s ease-in-out infinite;
+}
+
+@keyframes avatarPulse {
+  0% {
+    box-shadow:
+      0 0 14px rgba(255, 0, 255, 0.35),
+      0 0 28px rgba(255, 0, 255, 0.20),
+      inset 0 0 12px rgba(255, 0, 255, 0.15);
+    border-color: rgba(255, 0, 255, 0.9);
+  }
+  50% {
+    box-shadow:
+      0 0 24px rgba(255, 0, 255, 0.6),
+      0 0 48px rgba(255, 0, 255, 0.35),
+      inset 0 0 18px rgba(255, 0, 255, 0.25);
+    border-color: #ff55ff;
+  }
+  100% {
+    box-shadow:
+      0 0 14px rgba(255, 0, 255, 0.35),
+      0 0 28px rgba(255, 0, 255, 0.20),
+      inset 0 0 12px rgba(255, 0, 255, 0.15);
+    border-color: rgba(255, 0, 255, 0.9);
+  }
+}
+
 
 .preview-image {
   width: 100%;
@@ -809,6 +858,7 @@ export default {
   display: flex;
   gap: 10px;
   margin-bottom: 30px;
+  padding-top: 30px;
   overflow-x: auto;
   padding-bottom: 10px;
   text-align: center;
@@ -835,8 +885,12 @@ export default {
 }
 
 .category-btn.active {
-  background: linear-gradient(180deg, #000000 20%, #1a0a2a 30%, #cc00ff 100%);
-  border-color: #1da1f2;
+  background: rgba(214, 0, 255, 0.08);
+  box-shadow:
+    0 0 8px rgba(214, 0, 255, 0.4),
+    0 0 16px rgba(214, 0, 255, 0.25),
+    inset 0 0 10px rgba(214, 0, 255, 0.15);
+  transform: translateY(-4px) scale(1.02);  border-color: #1da1f2;
   color: white;
 }
 
@@ -900,11 +954,58 @@ export default {
   border-color: #333;
 }
 
-.option-card.selected {
-  border-color: #cc00ff;
-  background: rgba(29, 161, 242, 0.1);
-  box-shadow: 0 4px 15px rgba(29, 161, 242, 0.2);
+.option-card {
+  padding: 16px;
+  border-radius: 14px;
+  border: 2px solid transparent;
+  background: rgba(255, 255, 255, 0.05);
+  backdrop-filter: blur(12px);
+  transition: 0.25s ease;
+  cursor: pointer;
+  margin-top: 10px;
 }
+
+.option-card:hover {
+  transform: translateY(-3px);
+  background: rgba(255, 255, 255, 0.08);
+}
+
+/* ⭐ Selected (Premium Neon Glow) */
+.option-card.selected {
+  background: rgba(214, 0, 255, 0.08);
+  box-shadow:
+    0 0 8px rgba(214, 0, 255, 0.4),
+    0 0 16px rgba(214, 0, 255, 0.25),
+    inset 0 0 10px rgba(214, 0, 255, 0.15);
+  transform: translateY(-4px) scale(1.02);
+}
+
+/* Soft breathing glow animation */
+.option-card.selected {
+  animation: neonPulse 2.4s ease-in-out infinite;
+}
+
+@keyframes neonPulse {
+  0% {
+    box-shadow:
+      0 0 8px rgba(214, 0, 255, 0.35),
+      0 0 16px rgba(214, 0, 255, 0.20),
+      inset 0 0 8px rgba(214, 0, 255, 0.12);
+  }
+  50% {
+    box-shadow:
+      0 0 14px rgba(214, 0, 255, 0.55),
+      0 0 28px rgba(214, 0, 255, 0.30),
+      inset 0 0 14px rgba(214, 0, 255, 0.18);
+  }
+  100% {
+    box-shadow:
+      0 0 8px rgba(214, 0, 255, 0.35),
+      0 0 16px rgba(214, 0, 255, 0.20),
+      inset 0 0 8px rgba(214, 0, 255, 0.12);
+  }
+}
+
 
 .option-preview {
   width: 60px;
@@ -975,15 +1076,53 @@ export default {
 }
 
 .action-btn.primary {
-  background: linear-gradient(180deg, #000000 50%, #ffcc00 90%, #ff9500 30%);
-  color: white;
+  position: relative;
+  padding: 12px 28px;
+  font-size: 16px;
+  font-weight: 600;
+  color: #fff;
+  border: none;
+  cursor: pointer;
+  border-radius: 10px;
+  background: #0d0d0d;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  transition: 0.3s ease;
+  box-shadow: 0 0 8px #6a5af9, 0 0 16px #6a5af9 inset;
 }
 
+/* ✨ Neon Glow on Hover */
 .action-btn.primary:hover {
-  background: linear-gradient(180deg, #ff9500 0%, #ffcc00 50%, #ffaa00 100%);
-  transform: translateY(-2px);
-  box-shadow: 0 6px 20px rgba(29, 161, 242, 0.4);
+  box-shadow:
+    0 0 14px #6a5af9,
+    0 0 28px #6a5af9,
+    0 0 42px #6a5af9,
+    0 0 60px #6a5af9;
+  transform: translateY(-3px) scale(1.05);
 }
+
+/* 💡 Animated outer glow */
+.action-btn.primary::after {
+  content: "";
+  position: absolute;
+  top: -3px;
+  left: -3px;
+  right: -3px;
+  bottom: -3px;
+  border-radius: 12px;
+  background: linear-gradient(45deg, #6a5af9, #00eaff, #ff00ff);
+  z-index: -1;
+  filter: blur(12px);
+  opacity: 0.6;
+  transition: 0.4s ease;
+}
+
+/* Stronger glow when hover */
+.action-btn.primary:hover::after {
+  filter: blur(20px);
+  opacity: 1;
+}
+
 
 .action-btn.secondary {
   background: rgba(255, 255, 255, 0.1);

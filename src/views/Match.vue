@@ -6,6 +6,8 @@
       :autoRotateSpeed="rotateSpeed"
       :imageUrl="'//cdn.jsdelivr.net/npm/three-globe/example/img/earth-dark.jpg'"
       :data="people"
+      :hexed="true"
+      :palette="globePlatte"
     />
 
     <transition name="fade">
@@ -54,6 +56,9 @@ const globeRef = ref(null)
 const rotateSpeed = ref(0.0)
 const people = ref([])
 const started = ref(false)
+const globePlatte = ref('futuristic')
+
+
 
 const addPeople = () => {
   people.value = [
@@ -98,6 +103,7 @@ const startAdventure = () => {
       requestAnimationFrame(animate)
     } else {
       rotateSpeed.value = 0.2
+      globePlatte.value = 'futuristic'
       addPeople()
     }
   }
@@ -130,6 +136,7 @@ const startAdventure = () => {
   backdrop-filter: blur(8px);
   transition: all 0.4s ease;
   border:0;
+  padding-top: 25px;
 }
 
 

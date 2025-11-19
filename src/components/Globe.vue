@@ -17,6 +17,7 @@
         <Ping v-if="selectedData.type === 'ping'"></Ping>
         <Person v-if="selectedData.type === 'person'" :selectedData="selectedData"></Person>
         <Gift v-if="selectedData.type === 'gift'" :selectedData="selectedData"></Gift>
+        <Publish v-if="selectedData.type === 'publish'"></Publish>
       </div>
     </Teleport>
   </div>
@@ -31,6 +32,7 @@ import Ping from '@/components/Ping.vue'
 import wires from '@/data/wire-data'
 import countries from '@/data/countries'
 import Gift from '@/components/Gift.vue'
+import Publish from '@/views/Publish.vue'
 
 const globeContainer = ref(true)
 const globe = ref(null)
@@ -42,13 +44,24 @@ const clothes = ['Hoodie', 'ShirtCrewNeck', 'BlazerSweater', 'Overall']
 const eyes = ['Happy', 'Close', 'Surprised', 'Squint']
 const mouths = ['Smile', 'Default', 'Serious', 'Disbelief']
 const skins = ['Light', 'Tanned', 'Brown', 'DarkBrown']
+const marker = ref(null)
+const emit = defineEmits(['select-location'])
+
 
 const props = defineProps({
   hexed: {
     type: Boolean,
     default: true
   },
+  palette: {
+    type: String,
+    default: 'gray' // default palette
+  },
   wired: {
+    type: Boolean,
+    default: false
+  },
+  locationPicker: {
     type: Boolean,
     default: false
   },
@@ -57,6 +70,18 @@ const props = defineProps({
   data: { type: Array, default: () => [] },
   person: { type: Object, default: () => null }
 })
+
+
+const majorCities = [
+  { lat: 35.6892, lng: 51.389, name: 'Tehran', color: '#ffcc00' },
+  { lat: 40.7128, lng: -74.006, name: 'NewYork', color: '#00aaff' },
+  { lat: 51.5074, lng: -0.1278, name: 'London', color: '#ff6699' },
+  { lat: 48.8566, lng: 2.3522, name: 'Paris', color: '#66ff66' },
+  { lat: 35.6762, lng: 139.6503, name: 'Tokyo', color: '#ff6600' },
+  { lat: 55.7558, lng: 37.6173, name: 'Mosscow', color: '#00ffff' },
+  { lat: 24.7136, lng: 46.6753, name: 'Riaz', color: '#ffaa00' },
+  { lat: 30.0444, lng: 31.2357, name: 'Qahere', color: '#ff3300' }
+]
 
 function generateRandomAvatar() {
   const params = new URLSearchParams({
@@ -290,6 +315,27 @@ function closePanel() {
   globe.value.pointOfView({ lat: 30, lng: 20, altitude: 3.5 }, 1500)
 }
 
+
+function createMarker(lat, lng) {
+  return {
+    lat,
+    lng,
+    size: 0.8,
+    color: '#FF4444'
+  }
+}
+
+function updateMarkers() {
+  if (!globe.value) return
+  const allPoints = [...majorCities, ...(marker.value ? [marker.value] : [])]
+
+  globe.value
+    .pointsData(allPoints)
+    .pointColor(d => d.color || '#ffffff')
+    .pointAltitude(d => (d === marker.value ? 0.05 : 0.015))
+    .pointRadius(d => (d === marker.value ? 0.8 : 0.25))
+}
+
 async function initGlobe() {
   await nextTick()
   emitter.emit('loading', true)
@@ -306,19 +352,97 @@ async function initGlobe() {
       .width(window.innerWidth)
       .height(window.innerHeight)
 
+    if (props.locationPicker) {
+      globe.value.onGlobeClick(({ lat, lng }) => {
+        marker.value = createMarker(lat, lng)
+        selectedData.value = {
+          lat: lat,
+          lng: lng,
+          type: 'publish',
+        }
+        updateMarkers()
+        emit('select-location', { lat, lon: lng })
+        globe.value.pointOfView(
+          { lat: lat - 3, lng: lng, altitude: 1.3 },
+          1200
+        );
+      });
+
+      globe.value.labelsData(majorCities)
+        .labelText('name')
+        .labelSize(1)
+        .labelColor(() => '#ffffff')
+        .labelAltitude(0.01)
+        .onLabelClick(city => {
+          marker.value = createMarker(city.lat, city.lng)
+          updateMarkers()
+          emit('select-location', { lat: city.lat, lon: city.lng })
+          globe.value.pointOfView({ lat: city.lat, lng: city.lng, altitude: 1.8 }, 800)
+        })
+
+      // Add base city points
+      globe.value.pointsData(majorCities)
+        .pointColor(d => d.color)
+        .pointAltitude(0.015)
+        .pointRadius(0.25)
+
+      marker.value = createMarker(35.6892, 51.389)
+      updateMarkers()
+    }
+
     if (props.hexed) {
-      // hex polygon map configuration
-      globe.value
-        .hexPolygonsData(countries.features)
-        .hexPolygonResolution(3)
-        .hexPolygonMargin(0.3)
-        .hexPolygonUseDots(true)
-        .hexPolygonColor(
-          () =>
-            `#${Math.floor(Math.random() * 16777215)
-              .toString(16)
-              .padStart(6, '0')}`
-        )
+      if (props.hexed) {
+        // Predefined palettes
+        const palettes = {
+          futuristic: [
+            'hsl(200, 100%, 55%)', // Electric Blue – vibrant & techy
+            'hsl(330, 100%, 60%)', // Neon Pink – bold & flashy
+            'hsl(50, 100%, 60%)',  // Bright Neon Yellow – high energy
+            'hsl(160, 100%, 55%)', // Vibrant Cyan-Green – futuristic glow
+            'hsl(280, 95%, 60%)'   // Neon Purple – intense & cyberpunk
+          ],
+          simpleDark: [
+            'hsl(0, 0%, 10%)',
+            'hsl(0, 0%, 20%)',
+            'hsl(0, 0%, 30%)',
+            'hsl(0, 0%, 40%)',
+            'hsl(0, 0%, 50%)'
+          ],
+          gray: [
+            'hsl(0, 0%, 20%)',
+            'hsl(0, 0%, 40%)',
+            'hsl(0, 0%, 60%)',
+            'hsl(0, 0%, 80%)',
+            'hsl(0, 0%, 90%)'
+          ],
+          whiteHollow: [
+            'rgba(255, 255, 255, 0.05)',
+            'rgba(255, 255, 255, 0.1)',
+            'rgba(255, 255, 255, 0.15)',
+            'rgba(255, 255, 255, 0.2)',
+            'rgba(255, 255, 255, 0.25)'
+          ],
+          blue: [
+            'hsl(210, 90%, 50%)',
+            'hsl(210, 80%, 60%)',
+            'hsl(210, 70%, 70%)',
+            'hsl(210, 60%, 80%)',
+            'hsl(210, 50%, 90%)'
+          ]
+        };
+
+        // Choose the palette you want (can be dynamic)
+        const selectedPalette = palettes[props.palette] || palettes.gray;
+
+        // hex polygon map configuration
+        globe.value
+          .hexPolygonsData(countries.features)
+          .hexPolygonResolution(3)
+          .hexPolygonMargin(0.3)
+          .hexPolygonUseDots(true)
+          .hexPolygonColor(() => selectedPalette[Math.floor(Math.random() * selectedPalette.length)]);
+      }
+
     }
 
     if (props.wired) {

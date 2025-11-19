@@ -28,21 +28,19 @@ const goToGlobe = () => {
 
 
 onMounted(() => {
-  console.log("person.value......", person)
+
 })
 
 watch(
   () => props.selectedData,
   (newVal) => {
     person.value = newVal;
-    console.log("UPDATED PERSON", person.value);
   },
   { immediate: true }
 );
 
 
 const generateRandomAvatar = (person) => {
-  console.log('===========', person)
   const params = new URLSearchParams({
     avatarStyle: person.avatarConfig.avatarStyle,
     topType: person.avatarConfig.topType,
@@ -72,7 +70,7 @@ const generateRandomAvatar = (person) => {
       </div>
     </div>
     <button class="cosmic-btn">
-      <svg width="68" height="68" viewBox="0 0 68 68" fill="none" xmlns="http://www.w3.org/2000/svg">
+      <svg width="54" height="54" viewBox="0 0 68 68" fill="none" xmlns="http://www.w3.org/2000/svg">
         <circle cx="34" cy="34" r="20" stroke="#fff" stroke-width="3">
           <animate attributeName="r" values="20;24;20" dur="2s" repeatCount="indefinite"/>
           <animate attributeName="stroke-opacity" values="1;0.5;1" dur="2s" repeatCount="indefinite"/>
@@ -127,7 +125,7 @@ const generateRandomAvatar = (person) => {
   width: 90%;
   padding: 0;
   border-radius: 12px;
-  font-size: 16px;
+  font-size: 13px;
   font-weight: bold;
   background: linear-gradient(135deg, #3a1c71, #d76d77, #ffaf7b);
   color: white;

@@ -28,36 +28,29 @@
       <div class="form-container">
         <div class="form-group">
           <label for="username">نام کاربری</label>
-          <input type="text" id="username" v-model="userProfile.username" placeholder="نام کاربری خود را وارد کنید" required />
+          <input type="text" id="username" v-model="userProfile.username" placeholder="یه اسم برای خودت انتخاب کن" required />
         </div>
 
         <div class="form-group">
-          <label for="gender">نام کاربری</label>
-          <input type="text" id="gender" v-model="userProfile.gender" placeholder="جنسیا خودت رو تعیین کن" required />
+          <label for="gender">جنسیت</label>
+          <select id="gender" v-model="userProfile.gender" required style="background: #000">
+            <option value="">جنسیت خود را انتخاب کنید</option>
+            <option value="male">مرد</option>
+            <option value="female">زن</option>
+            <option value="unspecified">بدون تعیین</option>
+            <option value="nonbinary">غیر دودویی</option>
+            <option value="trans_male">ترنس مرد</option>
+            <option value="trans_female">ترنس زن</option>
+            <option value="other">سایر</option>
+          </select>
         </div>
+
 
         <div class="form-row">
           <div class="form-group">
             <label for="age">سن</label>
             <input type="number" id="age" v-model="userProfile.age" min="1" max="120" placeholder="سن خود را وارد کنید" />
           </div>
-
-          <div class="form-group">
-            <label for="weight">وزن (کیلوگرم)</label>
-            <input
-              type="number"
-              id="weight"
-              v-model="userProfile.weight"
-              min="1"
-              max="300"
-              placeholder="وزن خود را وارد کنید"
-            />
-          </div>
-        </div>
-
-        <div class="form-group">
-          <label for="bio">درباره من</label>
-          <textarea id="bio" v-model="userProfile.bio" rows="4" placeholder="درباره خودتان بنویسید..."></textarea>
         </div>
 
         <div class="form-actions">
@@ -109,16 +102,6 @@
             <option value="" disabled selected>لطفا انتخاب کنید</option>
             <option v-for="biz in businessTypes" :key="biz.id" :value="biz.id">{{ biz.name }}</option>
           </select>
-        </div>
-
-        <div class="form-group">
-          <label for="customInterests">علایق دیگر (با کاما جدا کنید)</label>
-          <input
-            type="text"
-            id="customInterests"
-            v-model="userProfile.customInterests"
-            placeholder="مثلا: برنامه‌نویسی، عکاسی، سفر"
-          />
         </div>
 
         <div class="form-actions">
@@ -539,9 +522,18 @@ export default {
 }
 
 .step.active .step-number {
-  background: linear-gradient(135deg, #1da1f2 0%, #1a91da 100%);
-  color: white;
-  box-shadow: 0 4px 15px rgba(29, 161, 242, 0.3);
+  padding: 12px 28px;
+  font-size: 16px;
+  font-weight: 600;
+  color: #fff;
+  border: none;
+  cursor: pointer;
+  border-radius: 10px;
+  background: #0d0d0d;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  transition: 0.3s ease;
+  box-shadow: 0 0 8px #6a5af9, 0 0 16px #6a5af9 inset;
 }
 
 .step.completed .step-number {
@@ -809,8 +801,18 @@ textarea {
 }
 
 .action-btn.primary {
-  background: linear-gradient(135deg, #1da1f2 0%, #1a91da 100%);
-  color: white;
+  padding: 12px 28px;
+  font-size: 16px;
+  font-weight: 600;
+  color: #fff;
+  border: none;
+  cursor: pointer;
+  border-radius: 10px;
+  background: #0d0d0d;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  transition: 0.3s ease;
+  box-shadow: 0 0 8px #6a5af9, 0 0 16px #6a5af9 inset;
 }
 
 .action-btn.primary:hover:not(:disabled) {

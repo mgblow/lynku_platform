@@ -39,7 +39,7 @@ function createMarker(lat, lng) {
 onMounted(() => {
   // Initialize the globe
   const g = Globe()(globeContainer.value)
-    .globeImageUrl('//cdn.jsdelivr.net/npm/three-globe/example/img/earth-dark.jpg')
+    .globeImageUrl(window.location.origin + '/globe/images/earth-dark.jpg')
     .hexPolygonsData(countries.features)
     .hexPolygonResolution(3)
     .hexPolygonMargin(0.4)

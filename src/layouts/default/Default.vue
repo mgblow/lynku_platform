@@ -21,6 +21,9 @@ import { inject, onBeforeUnmount, onMounted, ref } from 'vue'
 import DefaultNav from './DefaultNav.vue'
 import SplashScreen from './SplashScreen.vue'
 import mqtt from 'mqtt'
+import { post } from '@/api'
+import { getCookie } from '@/cookie'
+import { emitter } from '@/utils/event-bus'
 
 export default {
   name: 'LayoutDefault',
@@ -113,8 +116,12 @@ export default {
       showSnackbar.value = true
       setTimeout(() => (showSnackbar.value = false), 3000)
     }
+
     onMounted(() => {
       if(getCookie('app-token') && mqttClient === null) handleBrokerConnection()
+      if(checkAuthStatus()){
+          // getPerson();
+      }
       setInterval(() => (showSplash.value = false), 4000)
 
       // Listen for mitt events

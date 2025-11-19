@@ -1,5 +1,5 @@
 <template>
-  <div style="margin-top: 70px; margin-bottom: 100px">
+  <div class="mt-3">
     <div class="tweet-box p-3">
       <!-- Header -->
       <div class="tweet-header">
@@ -23,11 +23,6 @@
           style="font-family: inherit"
           @input="updateCharacterCount"
         ></textarea>
-        <transition name="fade" style="max-height: 50vh; max-width: 100%">
-          <div v-if="showGlobe" class="globe-overlay" style="height: 50vh">
-            <GlobePicker @close="showGlobe = false" @select-location="handleLocationSelect" />
-          </div>
-        </transition>
         <div class="textarea-actions">
           <span class="character-count" :class="{ warning: characterCount > 250, danger: characterCount > 270 }">
             {{ characterCount }}/280
@@ -96,11 +91,12 @@ import { post } from '../api'
 import { getCookie } from '@/cookie'
 import GlobePicker from '@/views/GlobePicker.vue'
 import { emitter } from '@/utils/event-bus'
+import Globe from '@/components/Globe.vue'
 
 export default {
   name: 'Publish',
   avatarConfig: {},
-  components: { GlobePicker },
+  components: { Globe, GlobePicker },
   data() {
     return {
       showGlobe: false,
@@ -119,12 +115,9 @@ export default {
       return this.publishText.trim().length > 0 && this.publishText.trim().length <= 280 && !this.isLoading
     },
     avatarUrl() {
-      this.avatarConfig = Object.assign(
-        JSON.parse(localStorage.getItem('userAvatarConfig')),
-        this.avatarConfig
-      )
+      this.avatarConfig = Object.assign(JSON.parse(localStorage.getItem('userAvatarConfig')), this.avatarConfig)
       console.log(this.avatarConfig)
-      const baseUrl = 'http://31.57.109.158:5000/avatars'
+      const baseUrl = process.env.VUE_APP_AVATAR_APP_URL + '/avatars'
       const params = new URLSearchParams(this.avatarConfig)
       return `${baseUrl}?${params.toString()}`
     }
@@ -133,8 +126,25 @@ export default {
     this.scrollToTop()
   },
   methods: {
-    handleLocationSelect(coords) {
-      this.location = `Lat: ${coords.lat.toFixed(4)}, Lon: ${coords.lon.toFixed(4)}`
+    async handleLocationSelect(coords) {
+      try {
+        this.location = `Lat: ${coords.lat.toFixed(4)}, Lon: ${coords.lon.toFixed(4)}`;
+
+        // Free: No API key needed for reverse geocoding
+        const response = await fetch(
+          `https://api.bigdatacloud.net/data/reverse-geocode-client?latitude=${coords.lat}&longitude=${coords.lon}&localityLanguage=en`
+        );
+
+        const data = await response.json();
+
+        if (data.city) {
+          this.location = `Lat: ${coords.lat.toFixed(4)}, Lon: ${coords.lon.toFixed(4)}, ${data.city}, ${data.countryName}`;
+        }
+
+      } catch (error) {
+        console.error('Error:', error);
+        this.location = `Lat: ${coords.lat.toFixed(4)}, Lon: ${coords.lon.toFixed(4)}`;
+      }
     },
     updateCharacterCount() {
       this.characterCount = this.publishText.length
@@ -166,7 +176,7 @@ export default {
       if (!this.canPublish) return
 
       this.isLoading = true
-      emitter.emit("http-start", true);
+      emitter.emit('http-start', true)
       try {
         const response = await post(
           '/api/v1',
@@ -199,7 +209,7 @@ export default {
         console.error('Error posting tweet:', error)
         emitter.emit('error-message', 'تو پینگ کردنت مشکلی به وجود اومده! دوباره تلاش کن.')
       } finally {
-        emitter.emit("http-stop", true);
+        emitter.emit('http-stop', true)
       }
     },
 
@@ -221,20 +231,53 @@ export default {
     },
     async getUserLocation() {
       return new Promise((resolve, reject) => {
-        if (!navigator.geolocation) {
-          reject(new Error('Geolocation is not supported by this browser.'))
-        } else {
-          navigator.geolocation.getCurrentPosition(
-            (position) => {
-              resolve({
-                lat: position.coords.latitude,
-                lng: position.coords.longitude
-              })
-            },
-            (err) => reject(err),
-            { enableHighAccuracy: true }
-          )
+        // Check HTTPS (Chrome blocks on HTTP)
+        if (location.protocol !== 'https:' && location.hostname !== 'localhost') {
+          console.warn('⚠️ Geolocation requires HTTPS on mobile browsers.')
+          return reject(new Error('Geolocation requires HTTPS to work.'))
         }
+
+        if (!navigator.geolocation) {
+          return reject(new Error('Geolocation is not supported by this browser.'))
+        }
+
+        const options = {
+          enableHighAccuracy: true,
+          timeout: 7000, // avoid waiting forever
+          maximumAge: 0
+        }
+
+        navigator.geolocation.getCurrentPosition(
+          (pos) => {
+            resolve({
+              lat: pos.coords.latitude,
+              lng: pos.coords.longitude
+            })
+          },
+
+          (err) => {
+            let msg = ''
+
+            switch (err.code) {
+              case 1:
+                msg = 'User denied permission.'
+                break
+              case 2:
+                msg = 'Position unavailable (mobile network issue).'
+                break
+              case 3:
+                msg = 'Location request timed out.'
+                break
+              default:
+                msg = 'Unknown geolocation error.'
+            }
+
+            console.error('❌ Geolocation error:', msg, err)
+            reject(new Error(msg))
+          },
+
+          options
+        )
       })
     }
   }
@@ -242,16 +285,15 @@ export default {
 </script>
 
 <style scoped>
-.page {
-  animation: slideUp 0.3s ease-out;
-  background: linear-gradient(135deg, #0f0f0f 0%, #1a1a1a 100%);
-}
 
 .tweet-box {
-  background: #000000;
   margin-bottom: 5px;
   box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
   transition: all 0.3s ease;
+  border-radius: 16px;
+  width: 100vw;
+  height: 50vh;
+  height: fit-content;
 }
 
 .tweet-box:hover {
@@ -367,19 +409,19 @@ export default {
 }
 
 .tweet-btn {
-  background: linear-gradient(135deg, #1da1f2 0%, #1a91da 100%);
+  position: relative;
+  padding: 12px 28px;
+  font-size: 16px;
+  font-weight: 600;
+  color: #fff;
   border: none;
-  color: white;
-  padding: 12px 24px;
-  border-radius: 25px;
-  font-weight: 700;
   cursor: pointer;
-  transition: all 0.3s ease;
-  display: flex;
-  align-items: center;
-  gap: 8px;
-  min-width: 100px;
-  justify-content: center;
+  border-radius: 10px;
+  background: #0d0d0d;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  transition: 0.3s ease;
+  box-shadow: 0 0 8px #6a5af9, 0 0 16px #6a5af9 inset;
 }
 
 .tweet-btn:disabled {
