@@ -133,8 +133,8 @@ import { getCookie } from '@/cookie'
 import { ref } from 'vue'
 const me = ref({})
 
-if(getCookie('app-token')){
-  me.value = JSON.parse(localStorage.getItem('person'));
+if(getCookie('app-token') && localStorage.getItem('me') != null){
+  me.value = JSON.parse(localStorage.getItem('me'));
 }
 
 const quickActionsOriginalList = [

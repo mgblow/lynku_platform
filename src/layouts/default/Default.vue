@@ -117,12 +117,42 @@ export default {
       setTimeout(() => (showSnackbar.value = false), 3000)
     }
 
+    const getMe = async () => {
+      try {
+        const response = await post(
+          '/api/v1',
+          {
+            topic: 'getMe',
+            data: {}
+          },
+          {
+            token: getCookie('app-token')
+          }
+        )
+        if (response && response.data.success) {
+          const person  = {
+            ...response.data.body,  // existing fields from API
+            type: 'person',
+          }
+          localStorage.setItem('me', JSON.stringify(person))
+          localStorage.setItem('userAvatarConfig', JSON.stringify(response.data.body.avatarConfig))
+        } else {
+          emitter.emit('error-message', response.data)
+        }
+      } catch (error) {
+        console.error('Error posting tweet:', error)
+        // this.showError('خطا در ارسال توییت. لطفاً دوباره تلاش کنید.')
+      } finally {
+
+      }
+    }
+
     onMounted(() => {
       if(getCookie('app-token') && mqttClient === null) handleBrokerConnection()
-      if(checkAuthStatus()){
-          // getPerson();
+      if(checkAuthStatus() && !localStorage.getItem('me')){
+          getMe()
       }
-      setInterval(() => (showSplash.value = false), 4000)
+      setInterval(() => (showSplash.value = false), 3000)
 
       // Listen for mitt events
       if (emitter) {
@@ -130,6 +160,8 @@ export default {
         emitter.on('error-message', (msg) => showMessage(msg, 'error'))
         emitter.on('brokerCredentials', () => handleBrokerConnection())
         emitter.on('mqtt:notification', (msg) => showMessage(msg))
+        emitter.on('reload-me', () => getMe()())
+
       }
     })
 

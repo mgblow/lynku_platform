@@ -427,6 +427,8 @@ export default {
           }
         )
         if (response && response.data.success) {
+          emitter.emit('reload-me', true)
+          emitter.emit('success-message', 'به لینکو دنیای متا خوش آمدید.')
           this.$router.push('/')
         } else {
           emitter.emit('error-message', response.data.message)

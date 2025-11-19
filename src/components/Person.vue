@@ -1,6 +1,7 @@
 <script setup>
 import { computed, onMounted, reactive, ref, watch } from 'vue'
 import { useRouter } from 'vue-router'
+import { getCookie } from '@/cookie'
 
 const person = ref(null)
 
@@ -26,6 +27,9 @@ const goToGlobe = () => {
   router.push('/globes/' + person.value._id)
 }
 
+const appId = ref(null)
+appId.value = getCookie('app-id')
+
 
 onMounted(() => {
 
@@ -40,7 +44,7 @@ watch(
 );
 
 
-const generateRandomAvatar = (person) => {
+const generateAvatarUrl = (person) => {
   const params = new URLSearchParams({
     avatarStyle: person.avatarConfig.avatarStyle,
     topType: person.avatarConfig.topType,
@@ -59,7 +63,7 @@ const generateRandomAvatar = (person) => {
 
 <template>
   <div class="user-popup-content" :style="popupStyle">
-    <img v-if="person" :src="generateRandomAvatar(person)" alt="Avatar" class="popup-avatar" @click="goToGlobe()" />
+    <img v-if="person" :src="generateAvatarUrl(person)" alt="Avatar" class="popup-avatar" @click="goToGlobe()" />
     <h3 v-if="person">{{ person._id }}</h3>
     <h3 v-if="person">{{ person.username }}</h3>
     <div class="person-hobbies" v-if="person.hobbies && person.hobbies.length">
@@ -69,7 +73,8 @@ const generateRandomAvatar = (person) => {
       </span>
       </div>
     </div>
-    <button class="cosmic-btn">
+
+    <button v-if="appId == null ||  person._id != appId" class="cosmic-btn pb-2">
       <svg width="54" height="54" viewBox="0 0 68 68" fill="none" xmlns="http://www.w3.org/2000/svg">
         <circle cx="34" cy="34" r="20" stroke="#fff" stroke-width="3">
           <animate attributeName="r" values="20;24;20" dur="2s" repeatCount="indefinite"/>
@@ -80,8 +85,80 @@ const generateRandomAvatar = (person) => {
           <animate attributeName="r" values="10;14;10" dur="2.5s" repeatCount="indefinite"/>
         </circle>
       </svg>
-      درخواست لینک
+      <br>
+      لینک
     </button>
+
+    <div class="genz-actions" v-if="appId != null && appId == person._id">
+      <!-- پروفایل من -->
+      <button class="cosmic-btn">
+        <svg width="50" height="50" viewBox="0 0 68 68" fill="none">
+          <circle cx="34" cy="34" r="22" stroke="#fff" stroke-width="3" stroke-opacity="0.7">
+            <animate attributeName="r" values="22;26;22" dur="2.2s" repeatCount="indefinite" />
+            <animate attributeName="stroke-opacity" values="0.7;0.3;0.7" dur="2.2s" repeatCount="indefinite" />
+          </circle>
+          <circle cx="34" cy="28" r="8" fill="#fff">
+            <animate attributeName="r" values="8;10;8" dur="3s" repeatCount="indefinite" />
+          </circle>
+          <path d="M22 46c2-8 10-10 12-10s10 2 12 10" stroke="#fff" stroke-width="3" stroke-linecap="round"/>
+        </svg>
+      </button>
+
+      <!-- تنظیمات -->
+      <button class="cosmic-btn">
+        <svg width="50" height="50" viewBox="0 0 68 68" fill="none">
+          <g transform="translate(34 34)">
+            <g>
+              <circle r="20" stroke="#fff" stroke-width="3" stroke-opacity="0.6"/>
+              <animateTransform
+                attributeName="transform"
+                type="rotate"
+                from="0" to="360"
+                dur="4s"
+                repeatCount="indefinite"
+              />
+            </g>
+            <g stroke="#fff" stroke-width="3" stroke-linecap="round">
+              <line y1="-26" y2="-20" />
+              <line y1="26" y2="20" />
+              <line x1="-26" x2="-20" />
+              <line x1="26" x2="20" />
+              <line x1="-18" y1="-18" x2="-14" y2="-14" />
+              <line x1="18" y1="-18" x2="14" y2="-14" />
+              <line x1="-18" y1="18" x2="-14" y2="14" />
+              <line x1="18" y1="18" x2="14" y2="14" />
+            </g>
+          </g>
+        </svg>
+      </button>
+
+      <!-- آیتم‌هام -->
+      <button class="cosmic-btn">
+        <svg width="50" height="50" viewBox="0 0 68 68" fill="none">
+          <circle cx="34" cy="34" r="22" stroke="#fff" stroke-width="3" stroke-opacity="0.5">
+            <animate attributeName="stroke-opacity" values="0.5;0.2;0.5" dur="2.5s" repeatCount="indefinite"/>
+            <animate attributeName="r" values="22;25;22" dur="2.5s" repeatCount="indefinite"/>
+          </circle>
+          <g transform="translate(34 34)">
+            <polygon points="-10,-10 10,-10 10,10 -10,10" stroke="#fff" stroke-width="2" fill="none">
+              <animate
+                attributeName="points"
+                dur="3s"
+                repeatCount="indefinite"
+                values="
+              -10,-10 10,-10 10,10 -10,10;
+              -12,-8 12,-8 12,12 -12,12;
+              -10,-10 10,-10 10,10 -10,10
+            "
+              />
+            </polygon>
+          </g>
+        </svg>
+      </button>
+
+    </div>
+
+
   </div>
 </template>
 
@@ -102,7 +179,7 @@ const generateRandomAvatar = (person) => {
 }
 .user-popup-content h3{
     width: 100%;
-  font-size: 1.1rem;
+  font-size: 1rem;
   letter-spacing: 1px;
 }
 .popup-avatar {
@@ -121,9 +198,7 @@ const generateRandomAvatar = (person) => {
 
 /* 🌌 Cosmic Button */
 .cosmic-btn {
-  margin-top: 16px;
-  width: 90%;
-  padding: 0;
+  padding: 0 3px;
   border-radius: 12px;
   font-size: 13px;
   font-weight: bold;
@@ -136,6 +211,8 @@ const generateRandomAvatar = (person) => {
   transition: 0.25s ease;
   letter-spacing: 0.5px;
   backdrop-filter: blur(4px);
+  width: fit-content;
+  margin: 15px 8px;
 }
 
 .cosmic-btn:hover {
@@ -196,6 +273,7 @@ const generateRandomAvatar = (person) => {
   display: flex;
   flex-wrap: wrap;
   gap: 8px;
+  text-align: center;
 }
 
 .hobby-pill {
@@ -206,6 +284,7 @@ const generateRandomAvatar = (person) => {
   font-size: 12px;
   border: 1px solid #dbe3ff;
   transition: all 0.2s ease-in-out;
+  display: inline;
 }
 
 .hobby-pill:hover {

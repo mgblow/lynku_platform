@@ -175,7 +175,7 @@ const routes = [
             document.cookie.split(";").forEach((c) => {
                 document.cookie = c.replace(/^ +/, "").replace(/=.*/, `=;expires=${new Date().toUTCString()};path=/`);
             });
-            emitter.emit('refresh-navigation-state');
+            window.location.href = '/';
             // 4. Navigate to the root (Feed)
             next({ name: 'Feed', replace: true });
         },
