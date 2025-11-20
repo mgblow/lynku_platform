@@ -5,6 +5,7 @@ import Mail from '../views/Mail.vue'
 import Chat from '../views/Chat.vue'
 import AvatarGenerator from '../views/AvatarGenerator.vue'
 import Settings from '@/views/Settings.vue'
+import { emitter } from '@/utils/event-bus'
 
 const history = createWebHashHistory()
 const routes = [
@@ -48,15 +49,14 @@ const routes = [
             layout: 'default'
         }
     },
-  {
-    path: '/settings',
-    name: 'Settings',
-    component: Settings,
-    meta: {
-      layout: 'default'
-    }
-  }
-    ,
+    {
+      path: '/settings',
+      name: 'Settings',
+      component: Settings,
+      meta: {
+        layout: 'default'
+      }
+    },
     {
         path: '/',
         name: 'Home',
@@ -68,53 +68,53 @@ const routes = [
             layout: 'default'
         }
     },
-  {
-    path: '/match',
-    name: 'Adventure',
-    // route level code-splitting
-    // this generates a separate chunk (about.[hash].js) for this route
-    // which is lazy-loaded when the route is visited.
-    component: () => import( '../views/Match.vue'),
-    meta: {
-      layout: 'default'
-    }
-  },
-  {
-    path: '/globes/:pid',
-    name: 'globes',
-    component: () => import('../views/PersonGlobe.vue'),
-    props: true,
-    meta: {
-      layout: 'default'
-    }
-  },
-  {
-        path: '/logout',
-        name: 'Logout',
-        // No component needed as we're just redirecting after logic
-        beforeEnter: (to, from, next) => {
-            console.log('Logging out...');
-            // 1. Clear Local Storage
-            localStorage.clear();
-            // 2. Clear Session Storage
-            sessionStorage.clear();
-            // 3. Clear Cookies (You may need a utility function for all cookies)
-            // Example of clearing a single cookie named 'auth_token':
-            // document.cookie = "auth_token=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;";
-
-            // To clear all path-dependent cookies, you might need a more comprehensive solution 
-            // or iterate over known cookie names. For a basic setup, you can clear all:
-            document.cookie.split(";").forEach((c) => {
-                document.cookie = c.replace(/^ +/, "").replace(/=.*/, `=;expires=${new Date().toUTCString()};path=/`);
-            });
-            window.location.href = '/';
-            // 4. Navigate to the root (Feed)
-            next({ name: 'Feed', replace: true });
-        },
-        meta: {
-            layout: 'default'
-        }
+    {
+      path: '/match',
+      name: 'Adventure',
+      // route level code-splitting
+      // this generates a separate chunk (about.[hash].js) for this route
+      // which is lazy-loaded when the route is visited.
+      component: () => import( '../views/Match.vue'),
+      meta: {
+        layout: 'default'
+      }
     },
+    {
+      path: '/globes/:pid',
+      name: 'globes',
+      component: () => import('../views/PersonGlobe.vue'),
+      props: true,
+      meta: {
+        layout: 'default'
+      }
+    },
+    {
+          path: '/logout',
+          name: 'Logout',
+          // No component needed as we're just redirecting after logic
+          beforeEnter: (to, from, next) => {
+              console.log('Logging out...');
+              emitter.emit("refresh-navigation-state")
+              // 1. Clear Local Storage
+              localStorage.clear();
+              // 2. Clear Session Storage
+              sessionStorage.clear();
+              // 3. Clear Cookies (You may need a utility function for all cookies)
+              // Example of clearing a single cookie named 'auth_token':
+              // document.cookie = "auth_token=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;";
+
+              // To clear all path-dependent cookies, you might need a more comprehensive solution
+              // or iterate over known cookie names. For a basic setup, you can clear all:
+              document.cookie.split(";").forEach((c) => {
+                  document.cookie = c.replace(/^ +/, "").replace(/=.*/, `=;expires=${new Date().toUTCString()};path=/`);
+              });
+              // 4. Navigate to the root (Home)
+              next({ name: 'Home', replace: true });
+          },
+          meta: {
+              layout: 'default'
+          }
+      },
 
 
 ]

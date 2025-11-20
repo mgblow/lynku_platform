@@ -5,7 +5,6 @@
       <div v-if="this.loading" class="hologram-effect"></div>
       <div class="nav-brand">
         <div class="logo-hologram">
-          <img :src="this.avatarUrl()" alt="Avatar Preview" class="preview-image" style="display: inline-block; max-width: 25px;margin-left:-38.5px;" />
           <div class="hologram-circle" style="opacity: 0.8" @click="toggleNotifications">
             <svg width="35" height="40" viewBox="0 0 120 40" xmlns="http://www.w3.org/2000/svg">
               <defs>

@@ -312,7 +312,6 @@ const generateAvatarUrl = (person) => {
 }
 
 .hobby-list {
-  display: flex;
   flex-wrap: wrap;
   gap: 8px;
   text-align: center;
@@ -320,13 +319,14 @@ const generateAvatarUrl = (person) => {
 
 .hobby-pill {
   padding: 4px 9px;
-  background-color: #f0f4ff;
-  color: #3f51b5;
+  background-color: #0a0a0a;
+  color: #ffffff;
   border-radius: 20px;
   font-size: 12px;
   border: 1px solid #dbe3ff;
   transition: all 0.2s ease-in-out;
-  display: inline;
+  display: inline-block;
+  margin: 2px 5px;
 }
 
 .hobby-pill:hover {
@@ -336,14 +336,14 @@ const generateAvatarUrl = (person) => {
 
 
 .futuristic-button {
-  padding: 6px 14px;
+  padding: 7px 7px;
   border-radius: 16px;
   font-size: 13px;
   font-weight: 700;
   text-transform: uppercase;
   letter-spacing: 0.8px;
   color: #fff;
-  background: linear-gradient(135deg, #0d0d0d 0%, #1a0a2a 60%, #6a00ff 100%);
+  background: linear-gradient(135deg, #0d0d0d 0%, #1a0a2a 90%, #6a00ff 130%);
   border: 1px solid rgba(255, 255, 255, 0.15);
   cursor: pointer;
   width: fit-content;

@@ -133,8 +133,8 @@ import { setCookie, getCookie } from '@/cookie';
 import { emitter } from './../utils/event-bus';
 
 export default {
-  emits: ["loading-started", "loading-ended"],
-  name: 'LoginModern',
+  emits: ["loading"],
+  name: 'Login',
   data() {
     return {
       nextStep: false,
@@ -193,9 +193,10 @@ export default {
             emitter.emit('refresh-navigation-state');
 
             if(response.firstLogin){
-              emitter.emit('drawer:avatarConfig', {show: true});
+              this.$router.push('/avatar');
+            }else{
+              this.$router.push('/');
             }
-            this.$router.push('/');
 
           } else {
             alert('کد تأیید اشتباه است.');
@@ -455,6 +456,7 @@ export default {
   border: none;
   border-radius: 12px;
   padding: 20px 16px 8px;
+  padding-top: 35px;
   color: white;
   font-size: 16px;
   font-weight: 500;

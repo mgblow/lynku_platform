@@ -3,7 +3,7 @@ import mqtt from 'mqtt'
 
 let client = null
 
-const MQTT_URL = 'ws://10.62.63.166:8083/mqtt'
+const MQTT_URL = process.env.VUE_APP_EMQX_APP_URL
 const MQTT_OPTIONS = {
   clean: true,
   connectTimeout: 4000,

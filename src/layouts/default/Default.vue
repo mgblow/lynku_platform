@@ -36,7 +36,7 @@ export default {
     const snackbarMessage = ref('')
     const snackbarType = ref('') // success or error
     const showSplash = ref(true)
-    let mqttClient = null
+    const mqttClient = ref(null)
 
     const checkAuthStatus = () => {
       const token = getCookie('app-token')
@@ -68,14 +68,12 @@ export default {
       console.log('handle broker connection...')
       if (mqttClient) {
         try {
-          mqttClient.end()
+          mqttClient.value.end()
         } catch {}
       }
 
       const url = process.env.VUE_APP_EMQX_APP_URL || '/'
-      const clientId = '123' // fixed for now
-
-      mqttClient = mqtt.connect(url, {
+      mqttClient.value = mqtt.connect(url, {
         clientId: getCookie('app-id'),
         username: getCookie('app-id'),
         password: getCookie('app-token'),
@@ -83,18 +81,18 @@ export default {
         reconnectPeriod: 2000
       })
 
-      mqttClient.on('connect', () => {
+      mqttClient.value.on('connect', () => {
         console.log('MQTT connected!')
         emitter.emit('success-message', 'آنلاین شدی!')
 
         // SUBSCRIBE TO TOPIC
-        mqttClient.subscribe(getCookie('app-id') + '/client/#', (err) => {
+        mqttClient.value.subscribe(getCookie('app-id') + '/client/#', (err) => {
           if (err) console.error('Subscribe error:', err)
           else console.log('subscribed to ' + (getCookie('app-id') + '/#'))
         })
       })
 
-      mqttClient.on('message', (topic, payload) => {
+      mqttClient.value.on('message', (topic, payload) => {
         const msg = payload.toString()
         console.log('broker message:', topic, msg)
         // Emit through mitt
@@ -103,12 +101,11 @@ export default {
         }
       })
 
-      mqttClient.on('error', (err) => {
-        console.error('MQTT Error:', err)
+      mqttClient.value.on('error', (err) => {
         if (emitter) emitter.emit('error-message', 'Broker connection failed')
       })
 
-      mqttClient.on('reconnect', () => {})
+      mqttClient.value.on('reconnect', () => {})
     }
 
     const showMessage = (message, type = 'success') => {
@@ -149,7 +146,9 @@ export default {
     }
 
     onMounted(() => {
-      if (getCookie('app-token') && mqttClient === null) handleBrokerConnection()
+      if (getCookie('app-token') && mqttClient === null) {
+        handleBrokerConnection()
+      }
       if (checkAuthStatus() && !localStorage.getItem('me')) {
         getMe()
       }
