@@ -95,6 +95,7 @@ const routes = [
           beforeEnter: (to, from, next) => {
               console.log('Logging out...');
               emitter.emit("refresh-navigation-state")
+              emitter.emit("success-message", "با موفقیت خارج شدی. خدانگهدار!")
               // 1. Clear Local Storage
               localStorage.clear();
               // 2. Clear Session Storage

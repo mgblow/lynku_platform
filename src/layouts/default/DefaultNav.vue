@@ -286,6 +286,7 @@ const performSearch = () => {
 const navigateTo = (action) => {
   orbActive.value = false
   if(action.requireMe){
+    console.log(action.link.replace('{me}',me.value._id))
     router.push(action.link.replace('{me}',me.value._id))
   } else {
     router.push(action.link)
