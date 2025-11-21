@@ -127,124 +127,116 @@
   </div>
 </template>
 
-<script>
-import { post } from '@/api';
-import { setCookie, getCookie } from '@/cookie';
-import { emitter } from './../utils/event-bus';
+<script setup>
+import { ref, computed, onMounted } from 'vue'
+import { useRouter } from 'vue-router'
+import { post } from '@/api'
+import { setCookie, getCookie } from '@/cookie'
+import { emitter } from './../utils/event-bus'
 
-export default {
-  emits: ["loading"],
-  name: 'Login',
-  data() {
-    return {
-      nextStep: false,
-      phone: '',
-      code: '',
-      countdown: 60,
-      canResend: false
+const emit = defineEmits(["loading"])
+const router = useRouter()
+
+const nextStep = ref(false)
+const phone = ref('')
+const code = ref('')
+const countdown = ref(60)
+const canResend = ref(false)
+
+const isPhoneValid = computed(() => {
+  return phone.value.length === 11 && /^\d+$/.test(phone.value)
+})
+
+const isCodeValid = computed(() => {
+  return code.value.length >= 3
+})
+
+const formatPhone = (phone) => {
+  return phone.replace(/(\d{4})(\d{3})(\d{4})/, '$1 $2 $3')
+}
+
+const formatTime = (seconds) => {
+  const mins = Math.floor(seconds / 60)
+  const secs = seconds % 60
+  return `${mins}:${secs.toString().padStart(2, '0')}`
+}
+
+const startCountdown = () => {
+  countdown.value = 60
+  canResend.value = false
+
+  const timer = setInterval(() => {
+    countdown.value--
+    if (countdown.value <= 0) {
+      clearInterval(timer)
+      canResend.value = true
     }
-  },
-  computed: {
-    isPhoneValid() {
-      return this.phone.length === 11 && /^\d+$/.test(this.phone);
-    },
-    isCodeValid() {
-      return this.code.length >= 3;
+  }, 1000)
+}
+
+const verify = async () => {
+  if (!isCodeValid.value) return
+
+  emit("loading", true)
+  try {
+    const response = await post('/auth/verify', { phone: phone.value, code: code.value })
+    console.log(response)
+    emit("loading", false)
+
+    if (response.success) {
+      setCookie("app-token", response.token, 7)
+      setCookie("app-id", response._id, 7)
+      setCookie("app-channel", response.channel, 7)
+      emitter.emit('brokerCredentials')
+      emitter.emit('refresh-navigation-state')
+
+      if (response.firstLogin) {
+        router.push('/avatar')
+      } else {
+        router.push('/')
+      }
+    } else {
+      alert('کد تأیید اشتباه است.')
     }
-  },
-  methods: {
-    formatPhone(phone) {
-      return phone.replace(/(\d{4})(\d{3})(\d{4})/, '$1 $2 $3');
-    },
-
-    formatTime(seconds) {
-      const mins = Math.floor(seconds / 60);
-      const secs = seconds % 60;
-      return `${mins}:${secs.toString().padStart(2, '0')}`;
-    },
-
-    startCountdown() {
-      this.countdown = 60;
-      this.canResend = false;
-
-      const timer = setInterval(() => {
-        this.countdown--;
-        if (this.countdown <= 0) {
-          clearInterval(timer);
-          this.canResend = true;
-        }
-      }, 1000);
-    },
-
-    verify() {
-      if (!this.isCodeValid) return;
-
-      this.$emit("loading", true);
-      post('/auth/verify', { phone: this.phone, code: this.code })
-        .then(response => {
-          console.log(response);
-          this.$emit("loading", false);
-
-          if (response.success) {
-            setCookie("app-token", response.token, 7);
-            setCookie("app-id", response._id, 7);
-            setCookie("app-channel", response.channel, 7);
-            emitter.emit('brokerCredentials');
-            emitter.emit('refresh-navigation-state');
-
-            if(response.firstLogin){
-              this.$router.push('/avatar');
-            }else{
-              this.$router.push('/');
-            }
-
-          } else {
-            alert('کد تأیید اشتباه است.');
-          }
-        })
-        .catch(error => {
-          this.$emit("loading-ended", "true");
-          console.error(error);
-          alert('خطا در احراز هویت. لطفا دوباره تلاش کنید.');
-        });
-    },
-
-    login() {
-      if (!this.isPhoneValid) return;
-
-      this.$emit("loading", true);
-      post('/auth/entry', { phone: this.phone })
-        .then(response => {
-          this.$emit("loading", false);
-
-          if (response.success) {
-            this.nextStep = true;
-            this.startCountdown();
-          } else {
-            alert('خطا در ارسال کد تأیید. لطفا شماره را بررسی کنید.');
-          }
-        })
-        .catch(error => {
-          this.$emit("loading", false);
-          console.error(error);
-          alert('خطای شبکه. لطفا اتصال خود را بررسی کنید.');
-        });
-    },
-
-    resendCode() {
-      if (!this.canResend) return;
-
-      this.login();
-    }
-  },
-  mounted() {
-    if (getCookie('app-token')) {
-      this.$router.replace('/');
-    }
+  } catch (error) {
+    emit("loading-ended", "true")
+    console.error(error)
+    alert('خطا در احراز هویت. لطفا دوباره تلاش کنید.')
   }
 }
-</script>
 
+const login = async () => {
+  if (!isPhoneValid.value) return
+
+  emit("loading", true)
+  try {
+    const response = await post('/auth/entry', { phone: phone.value })
+    emit("loading", false)
+
+    if (response.success) {
+      nextStep.value = true
+      startCountdown()
+    } else {
+      alert('خطا در ارسال کد تأیید. لطفا شماره را بررسی کنید.')
+    }
+  } catch (error) {
+    emit("loading", false)
+    console.error(error)
+    alert('خطای شبکه. لطفا اتصال خود را بررسی کنید.')
+  }
+}
+
+const resendCode = () => {
+  if (!canResend.value) return
+  login()
+}
+
+onMounted(() => {
+  if (getCookie('app-token')) {
+    router.replace('/')
+  }
+})
+</script>
 <style scoped>
 /* Base Styles */
 .login-modern-page {
