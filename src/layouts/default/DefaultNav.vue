@@ -2,7 +2,7 @@
   <div class="metaverse-nav">
     <!-- Holographic Top Bar -->
     <div class="hologram-header">
-      <div v-if="this.loading" class="hologram-effect"></div>
+      <div v-if="loading.value" class="hologram-effect"></div>
       <div class="nav-brand">
         <div class="logo-hologram">
           <div class="hologram-circle" style="opacity: 0.8" @click="toggleNotifications">
@@ -26,7 +26,7 @@
 
           </div>
         </div>
-        <span class="brand-text" @click="this.$router.push('/')">lynku</span>
+        <span class="brand-text" @click="router.push('/')">lynku</span>
       </div>
       <div class="universal-search">
         <div class="search-orb" @click="toggleSearch">
@@ -57,33 +57,12 @@
       <!-- Orb Menu Items -->
       <div class="orb-menu" v-if="orbActive">
         <div class="ios-grid-item" v-for="action in quickActions" :key="action.id" @click="performAction(action)">
-          <div class="ios-icon-bg" :style="{ imageUrl: action.gradient }">
-            <svg viewBox="0 0 24 24" fill="currentColor" @click="navigateTo(action.link)">
+          <div class="ios-icon-bg" :style="{ imageUrl: action.gradient }" @click="navigateTo(action.link)">
+            <svg viewBox="0 0 24 24" fill="currentColor">
               <path :d="action.icon" />
             </svg>
           </div>
           <span class="ios-grid-label">{{ action.name }}</span>
-        </div>
-      </div>
-    </div>
-
-    <!-- Digital Universe Map -->
-    <div class="universe-map" v-if="showUniverseMap">
-      <div class="ios-glass-panel">
-        <div class="panel-header">
-          <h2 class="panel-title">نقشه جهان دیجیتال</h2>
-          <button class="ios-close-btn" @click="toggleUniverseMap">
-            <svg viewBox="0 0 24 24" fill="currentColor">
-              <path d="M19 6.41L17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z" />
-            </svg>
-          </button>
-        </div>
-        <div class="map-grid">
-          <div class="galaxy" v-for="galaxy in galaxies" :key="galaxy.id" :class="galaxy.type" @click="enterGalaxy(galaxy)">
-            <div class="galaxy-core"></div>
-            <div class="galaxy-stars"></div>
-            <span class="galaxy-name">{{ galaxy.name }}</span>
-          </div>
         </div>
       </div>
     </div>
@@ -105,12 +84,12 @@
             @click="performAction(action)"
             v-if="action.link == '/login' && getCookie('app-token') == null"
           >
-            <div class="ios-icon-bg" :style="{ imageUrl: action.gradient }">
+            <div @click="performAction(action)" class="ios-icon-bg" :style="{ imageUrl: action.gradient }">
               <svg viewBox="0 0 24 24" fill="currentColor">
                 <path :d="action.icon" />
               </svg>
             </div>
-            <span class="ios-grid-label">{{ action.name }}</span>
+            <span @click="performAction(action)" class="ios-grid-label">{{ action.name }}</span>
           </div>
         </div>
       </div>
@@ -145,39 +124,78 @@
     </div>
   </div>
 </template>
-<script>
+<script setup>
+import { ref, reactive, computed, onMounted, onUnmounted } from 'vue'
+import { useRouter } from 'vue-router'
 import { emitter } from './../../utils/event-bus'
 import { getCookie } from '@/cookie'
-import { ref } from 'vue'
+
+const router = useRouter()
+
+// Reactive state
+const loading = ref(false)
+const orbActive = ref(false)
+const showSearch = ref(false)
+const searchQuery = ref('')
+const showUniverseMap = ref(false)
+const showQuickActions = ref(false)
+const showNotifications = ref(false)
+const unreadNotifications = ref(3)
+const unreadMessages = ref(5)
+const quickActions = ref([])
 const me = ref({})
+const avatarConfig = ref({})
 
-if(getCookie('app-token') && localStorage.getItem('me') != null){
-  me.value = JSON.parse(localStorage.getItem('me'));
-}
+// Notifications data
+const notifications = ref([
+  {
+    id: 1,
+    title: 'پیام جدید',
+    message: 'شما یک پیام جدید دارید',
+    time: '5 دقیقه پیش',
+    icon: 'M20 2H4c-1.1 0-1.99.9-1.99 2L2 22l4-4h14c1.1 0 2-.9 2-2V4c0-1.1-.9-2-2-2zm-2 12H6v-2h12v2zm0-3H6V9h12v2zm0-3H6V6h12v2z',
+    color: '#334455'
+  },
+  {
+    id: 2,
+    title: 'دعوت به جهان',
+    message: 'شما به جهان جدید دعوت شده‌اید',
+    time: '1 ساعت پیش',
+    icon: 'M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-2 15l-5-5 1.41-1.41L10 14.17l7.59-7.59L19 8l-9 9z',
+    color: '#334455'
+  },
+  {
+    id: 3,
+    title: 'به‌روزرسانی',
+    message: 'نسخه جدید متاورس در دسترس است',
+    time: '2 ساعت پیش',
+    icon: 'M13 3c-4.97 0-9 4.03-9 9H1l3.89 3.89.07.14L9 12H6c0-3.87 3.13-7 7-7s7 3.13 7 7-3.13 7-7 7c-1.93 0-3.68-.79-4.94-2.06l-1.42 1.42C8.27 19.99 10.51 21 13 21c4.97 0 9-4.03 9-9s-4.03-9-9-9zm-1 5v5l4.28 2.54.72-1.21-3.5-2.08V8H12z',
+    color: '#334455'
+  }
+])
 
-const quickActionsOriginalList = [
+// Quick actions list
+const quickActionsOriginalList = ref([
   {
     id: 1,
     name: 'خانه',
-    icon: 'M10 20v-6h4v6h5v-8h3L12 3 2 12h3v8z', // Home
+    icon: 'M10 20v-6h4v6h5v-8h3L12 3 2 12h3v8z',
     gradient: 'linear-gradient(135deg, #111111 0%, #222233 50%, #334455 100%)',
     link: '/',
     requireAuth: false
   },
   {
     id: 10,
-    name: 'لینک', // Connection-oriented
-    icon: 'M10 14a2 2 0 0 1 0-2l4-4a2 2 0 0 1 2.83 2.83l-1.17 1.17M14 10a2 2 0 0 1 0 2l-4 4a2 2 0 0 1-2.83-2.83l1.17-1.17', // Minimal chain / link
+    name: 'لینک',
+    icon: 'M10 14a2 2 0 0 1 0-2l4-4a2 2 0 0 1 2.83 2.83l-1.17 1.17M14 10a2 2 0 0 1 0 2l-4 4a2 2 0 0 1-2.83-2.83l1.17-1.17',
     gradient: 'linear-gradient(135deg, #111111 0%, #222233 50%, #334455 100%)',
     link: '/match',
     requireAuth: true
-  }
-
-  ,
+  },
   {
     id: 4,
     name: 'پیام‌ها',
-    icon: 'M20 2H4c-1.1 0-2 .9-2 2v16l4-4h14a2 2 0 0 0 2-2V4c0-1.1-.9-2-2-2z', // Message bubble
+    icon: 'M20 2H4c-1.1 0-2 .9-2 2v16l4-4h14a2 2 0 0 0 2-2V4c0-1.1-.9-2-2-2z',
     gradient: 'linear-gradient(135deg, #111111 0%, #222233 50%, #334455 100%)',
     link: '/mail',
     requireAuth: true
@@ -187,13 +205,13 @@ const quickActionsOriginalList = [
     name: 'جهان من',
     icon: 'M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm0 18c-4.41 0-8-3.59-8-8s3.59-8 8-8 8 3.59 8 8-3.59 8-8 8zm0-14c-3.31 0-6 2.69-6 6s2.69 6 6 6 6-2.69 6-6-2.69-6-6-6zm0 10c-2.21 0-4-1.79-4-4s1.79-4 4-4 4 1.79 4 4-1.79 4-4 4z',
     gradient: 'linear-gradient(135deg, #111111 0%, #222233 50%, #334455 100%)',
-    link: '/globes/' + me.value._id ,
+    link: computed(() => '/globes/' + (me.value?._id || '')),
     requireAuth: true
   },
   {
     id: 5,
     name: 'تنظیمات',
-    icon: 'M12 8c-2.21 0-4 1.79-4 4s1.79 4 4 4 4-1.79 4-4-1.79-4-4-4zm7.43 3.34l2.12-1.23-1.06-1.84-2.12 1.22c-.26-.2-.55-.38-.85-.53l-.32-2.44h-2v2.44c-.3.15-.59.33-.85.53L6.51 4.27l-1.06 1.84 2.12 1.23c-.05.31-.08.63-.08.96s.03.65.08.96l-2.12 1.23 1.06 1.84 2.12-1.22c.26.2.55.38.85.53l.32 2.44h2v-2.44c.3-.15.59-.33.85-.53l2.12 1.22 1.06-1.84-2.12-1.23c.05-.31.08-.63.08-.96s-.03-.65-.08-.96z', // Settings gear
+    icon: 'M12 8c-2.21 0-4 1.79-4 4s1.79 4 4 4 4-1.79 4-4-1.79-4-4-4zm7.43 3.34l2.12-1.23-1.06-1.84-2.12 1.22c-.26-.2-.55-.38-.85-.53l-.32-2.44h-2v2.44c-.3.15-.59.33-.85.53L6.51 4.27l-1.06 1.84 2.12 1.23c-.05.31-.08.63-.08.96s.03.65.08.96l-2.12 1.23 1.06 1.84 2.12-1.22c.26.2.55.38.85.53l.32 2.44h2v-2.44c.3-.15.59-.33.85-.53l2.12 1.22 1.06-1.84-2.12-1.23c.05-.31.08-.63.08-.96s-.03-.65-.08-.96z',
     gradient: 'linear-gradient(135deg, #111111 0%, #222233 50%, #334455 100%)',
     link: '/settings',
     requireAuth: true
@@ -201,7 +219,7 @@ const quickActionsOriginalList = [
   {
     id: 6,
     name: 'خروج',
-    icon: 'M16 13v-2H7V8l-5 4 5 4v-3h9v-2zm4-11h-8v2h8v14h-8v2h8a2 2 0 0 0 2-2V4a2 2 0 0 0-2-2z', // Logout
+    icon: 'M16 13v-2H7V8l-5 4 5 4v-3h9v-2zm4-11h-8v2h8v14h-8v2h8a2 2 0 0 0 2-2V4a2 2 0 0 0-2-2z',
     gradient: 'linear-gradient(135deg, #111111 0%, #222233 50%, #334455 100%)',
     link: '/logout',
     requireAuth: true
@@ -209,158 +227,125 @@ const quickActionsOriginalList = [
   {
     id: 7,
     name: 'ورود',
-    icon: 'M10 17l5-5-5-5M15 12H3', // Arrow pointing right into a door-like line
+    icon: 'M10 17l5-5-5-5M15 12H3',
     gradient: 'linear-gradient(135deg, #111111 0%, #222233 50%, #334455 100%)',
     link: '/login',
     requireAuth: false
   },
-]
+])
 
-export default {
-  name: 'MetaverseNavigation',
-  data() {
-    return {
-      loading: false,
-      orbActive: false,
-      showSearch: false,
-      searchQuery: '',
-      showUniverseMap: false,
-      showQuickActions: false,
-      showNotifications: false,
-      unreadNotifications: 3,
-      unreadMessages: 5,
-      quickActions: [],
-      notifications: [
-        {
-          id: 1,
-          title: 'پیام جدید',
-          message: 'شما یک پیام جدید دارید',
-          time: '5 دقیقه پیش',
-          icon: 'M20 2H4c-1.1 0-1.99.9-1.99 2L2 22l4-4h14c1.1 0 2-.9 2-2V4c0-1.1-.9-2-2-2zm-2 12H6v-2h12v2zm0-3H6V9h12v2zm0-3H6V6h12v2z',
-          color: '#334455'
-        },
-        {
-          id: 2,
-          title: 'دعوت به جهان',
-          message: 'شما به جهان جدید دعوت شده‌اید',
-          time: '1 ساعت پیش',
-          icon: 'M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-2 15l-5-5 1.41-1.41L10 14.17l7.59-7.59L19 8l-9 9z',
-          color: '#334455'
-        },
-        {
-          id: 3,
-          title: 'به‌روزرسانی',
-          message: 'نسخه جدید متاورس در دسترس است',
-          time: '2 ساعت پیش',
-          icon: 'M13 3c-4.97 0-9 4.03-9 9H1l3.89 3.89.07.14L9 12H6c0-3.87 3.13-7 7-7s7 3.13 7 7-3.13 7-7 7c-1.93 0-3.68-.79-4.94-2.06l-1.42 1.42C8.27 19.99 10.51 21 13 21c4.97 0 9-4.03 9-9s-4.03-9-9-9zm-1 5v5l4.28 2.54.72-1.21-3.5-2.08V8H12z',
-          color: '#334455'
-        }
-      ]
-    }
-  },
-  created() {
-    this.buildQuickActions()
+// Computed properties
+const isLoggedIn = computed(() => {
+  return !!getCookie('app-token')
+})
 
-    emitter.on('refresh-navigation-state', () => {
-      this.buildQuickActions()
-    })
+const avatarUrl = computed(() => {
+  const savedConfig = localStorage.getItem('userAvatarConfig')
+  if (savedConfig) {
+    avatarConfig.value = Object.assign(JSON.parse(savedConfig), avatarConfig.value)
+  }
+  const baseUrl = process.env.VUE_APP_AVATAR_APP_URL + '/avatars'
+  const params = new URLSearchParams(avatarConfig.value)
+  return `${baseUrl}?${params.toString()}`
+})
 
-    emitter.on('loading', (l) => {
-      this.loading = l
-    })
+// Methods
+const buildQuickActions = () => {
+  quickActions.value = quickActionsOriginalList.value.filter((action) => {
+    if (action.requireAuth && !isLoggedIn.value) return false
+    if (!action.requireAuth && isLoggedIn.value && action.link === '/login') return false
+    return true
+  })
+}
 
-  },
-  unmounted() {
-    emitter.off('refresh-navigation-state') // cleanup
-  },
-  methods: {
-    avatarUrl() {
-      this.avatarConfig = Object.assign(JSON.parse(localStorage.getItem('userAvatarConfig')), this.avatarConfig)
-      const baseUrl = process.env.VUE_APP_AVATAR_APP_URL + '/avatars'
-      const params = new URLSearchParams(this.avatarConfig)
-      const url = `${baseUrl}?${params.toString()}`
-      return url
-    },
-    buildQuickActions() {
-      this.$data.quickActions = quickActionsOriginalList.filter((action) => {
-        if (action.requireAuth && !this.isLoggedIn()) return false
-        if (!action.requireAuth && this.isLoggedIn() && action.link === '/login') return false
-        return true
-      })
-    },
-    getCookie(name) {
-      const value = `; ${document.cookie}`
-      const parts = value.split(`; ${name}=`)
-      if (parts.length === 2) return parts.pop().split(';').shift()
-      return null
-    },
-    isLoggedIn() {
-      // Checks for existence of the 'app-token' cookie
-      // Assuming getCookie is available (either global or imported/defined)
-      return !!this.getCookie('app-token')
-    },
-    toggleOrb() {
-      this.orbActive = !this.orbActive
-    },
+const toggleOrb = () => {
+  orbActive.value = !orbActive.value
+}
 
-    toggleSearch() {
-      this.showSearch = !this.showSearch
-      if (this.showSearch) {
-        setTimeout(() => {
-          document.querySelector('.search-field input')?.focus()
-        }, 100)
-      }
-    },
-
-    performSearch() {
-      if (this.searchQuery.trim()) {
-        console.log('Searching for:', this.searchQuery)
-        // Implement search logic
-      }
-    },
-
-    navigateTo(route) {
-      this.orbActive = false
-      this.$router.push(route)
-    },
-
-    createPost() {
-      this.$router.push('/create')
-    },
-
-    toggleNotifications() {
-      this.showNotifications = !this.showNotifications
-      if (this.showNotifications) {
-        this.unreadNotifications = 0
-      }
-    },
-
-    toggleMessages() {
-      // Toggle messages panel
-      console.log('Toggle messages')
-    },
-
-    enterGalaxy(galaxy) {
-      if (galaxy.active) {
-        this.$router.push(`/galaxy/${galaxy.type}`)
-      }
-    },
-
-    toggleUniverseMap() {
-      this.showUniverseMap = !this.showUniverseMap
-    },
-
-    toggleQuickActions() {
-      this.showQuickActions = !this.showQuickActions
-    },
-
-    performAction(action) {
-      console.log('Performing action:', action.name)
-      this.showQuickActions = false
-      // Implement action logic
-    }
+const toggleSearch = () => {
+  showSearch.value = !showSearch.value
+  if (showSearch.value) {
+    setTimeout(() => {
+      document.querySelector('.search-field input')?.focus()
+    }, 100)
   }
 }
+
+const performSearch = () => {
+  if (searchQuery.value.trim()) {
+    console.log('Searching for:', searchQuery.value)
+    // Implement search logic
+  }
+}
+
+const navigateTo = (route) => {
+  orbActive.value = false
+  router.push(route)
+}
+
+const createPost = () => {
+  router.push('/create')
+}
+
+const toggleNotifications = () => {
+  showNotifications.value = !showNotifications.value
+  if (showNotifications.value) {
+    unreadNotifications.value = 0
+  }
+}
+
+const toggleMessages = () => {
+  console.log('Toggle messages')
+}
+
+const enterGalaxy = (galaxy) => {
+  if (galaxy.active) {
+    router.push(`/galaxy/${galaxy.type}`)
+  }
+}
+
+const toggleUniverseMap = () => {
+  showUniverseMap.value = !showUniverseMap.value
+}
+
+const toggleQuickActions = () => {
+  showQuickActions.value = !showQuickActions.value
+}
+
+const performAction = (action) => {
+  showQuickActions.value = false
+  orbActive.value = false
+  router.push(action.link)
+}
+
+// Event handlers
+const handleRefreshNavigationState = () => {
+  buildQuickActions()
+}
+
+const handleLoading = (l) => {
+  loading.value = l
+}
+
+// Lifecycle
+onMounted(() => {
+  // Initialize user data
+  if (getCookie('app-token') && localStorage.getItem('me') != null) {
+    me.value = JSON.parse(localStorage.getItem('me'))
+  }
+
+  buildQuickActions()
+
+  // Set up event listeners
+  emitter.on('refresh-navigation-state', handleRefreshNavigationState)
+  emitter.on('loading', handleLoading)
+})
+
+onUnmounted(() => {
+  // Clean up event listeners
+  emitter.off('refresh-navigation-state', handleRefreshNavigationState)
+  emitter.off('loading', handleLoading)
+})
 </script>
 
 <style scoped>

@@ -31,19 +31,6 @@
           <input type="text" id="username" v-model="userProfile.username" placeholder="یه اسم برای خودت انتخاب کن" required />
         </div>
 
-        <div class="form-group">
-          <label for="gender">جنسیت</label>
-          <select id="gender" v-model="userProfile.gender" required style="background: #000">
-            <option value="">جنسیت خود را انتخاب کنید</option>
-            <option value="male">مرد</option>
-            <option value="female">زن</option>
-            <option value="unspecified">بدون تعیین</option>
-            <option value="nonbinary">غیر دودویی</option>
-            <option value="trans_male">ترنس مرد</option>
-            <option value="trans_female">ترنس زن</option>
-            <option value="other">سایر</option>
-          </select>
-        </div>
 
 
         <div class="form-row">
@@ -96,14 +83,6 @@
           </div>
         </div>
 
-        <div class="form-group">
-          <label for="business">زمینه کسب‌وکار</label>
-          <select id="business" v-model="userProfile.business">
-            <option value="" disabled selected>لطفا انتخاب کنید</option>
-            <option v-for="biz in businessTypes" :key="biz.id" :value="biz.id">{{ biz.name }}</option>
-          </select>
-        </div>
-
         <div class="form-actions">
           <button class="action-btn secondary" @click="prevStep">
             <svg viewBox="0 0 24 24" fill="currentColor">
@@ -148,14 +127,6 @@
                 <span class="info-label">سن:</span>
                 <span class="info-value">{{ userProfile.age || 'ثبت نشده' }}</span>
               </div>
-              <div class="info-item">
-                <span class="info-label">وزن:</span>
-                <span class="info-value">{{ userProfile.weight ? userProfile.weight + ' کیلوگرم' : 'ثبت نشده' }}</span>
-              </div>
-              <div class="info-item full-width">
-                <span class="info-label">درباره من:</span>
-                <span class="info-value">{{ userProfile.bio || 'ثبت نشده' }}</span>
-              </div>
             </div>
           </div>
 
@@ -180,10 +151,6 @@
                     علاقه‌ای ثبت نشده
                   </span>
                 </div>
-              </div>
-              <div class="info-item full-width">
-                <span class="info-label">زمینه کسب‌وکار:</span>
-                <span class="info-value">{{ getBusinessName(userProfile.business) || 'ثبت نشده' }}</span>
               </div>
             </div>
           </div>
@@ -225,250 +192,175 @@
   </div>
 </template>
 
-<script>
+<script setup>
+import { ref, reactive, computed, onMounted } from 'vue'
+import { useRouter } from 'vue-router'
 import { post } from '@/api'
 import { getCookie } from '@/cookie'
 import { emitter } from '@/utils/event-bus'
 
-export default {
-  name: 'Born',
-  data() {
-    return {
-      currentStep: 1,
-      isSubmitting: false,
-      showSuccessModal: false,
+const router = useRouter()
 
-      // Avatar configuration (from your existing code)
-      activeCategory: 'style',
-      avatarConfig: {
-        avatarStyle: 'Circle',
-        topType: 'ShortHairShortFlat',
-        accessoriesType: 'Prescription02',
-        hairColor: 'BrownDark',
-        facialHairType: 'Blank',
-        facialHairColor: 'BrownDark',
-        clotheType: 'ShirtCrewNeck',
-        clotheColor: 'Blue02',
-        eyeType: 'Default',
-        eyebrowType: 'Default',
-        mouthType: 'Default',
-        skinColor: 'Light'
-      },
+// Reactive data
+const currentStep = ref(1)
+const isSubmitting = ref(false)
+const showSuccessModal = ref(false)
+const activeCategory = ref('style')
 
-      // User profile data
-      userProfile: {
-        username: '',
-        gender: 'زن',
-        age: null,
-        weight: null,
-        bio: '',
-        hobbies: [],
-        business: '',
-        customInterests: ''
-      },
+// Avatar configuration
+const avatarConfig = reactive({
+  avatarStyle: 'Circle',
+  topType: 'ShortHairShortFlat',
+  accessoriesType: 'Prescription02',
+  hairColor: 'BrownDark',
+  facialHairType: 'Blank',
+  facialHairColor: 'BrownDark',
+  clotheType: 'ShirtCrewNeck',
+  clotheColor: 'Blue02',
+  eyeType: 'Default',
+  eyebrowType: 'Default',
+  mouthType: 'Default',
+  skinColor: 'Light'
+})
 
-      // Hobbies list
-      hobbiesList: [
-        { id: 'sports', name: 'ورزش', icon: '⚽' },
-        { id: 'music', name: 'موسیقی', icon: '🎵' },
-        { id: 'reading', name: 'مطالعه', icon: '📚' },
-        { id: 'travel', name: 'سفر', icon: '✈️' },
-        { id: 'cooking', name: 'آشپزی', icon: '🍳' },
-        { id: 'gaming', name: 'بازی', icon: '🎮' },
-        { id: 'art', name: 'هنر', icon: '🎨' },
-        { id: 'photography', name: 'عکاسی', icon: '📷' },
-        { id: 'technology', name: 'تکنولوژی', icon: '💻' },
-        { id: 'nature', name: 'طبیعت', icon: '🌳' },
-        { id: 'movies', name: 'فیلم', icon: '🎬' },
-        { id: 'fitness', name: 'تناسب اندام', icon: '💪' }
-      ],
+// User profile data
+const userProfile = reactive({
+  username: '',
+  age: null,
+  hobbies: [],
+})
 
-      // Business types
-      businessTypes: [
-        { id: 'tech', name: 'تکنولوژی و فناوری' },
-        { id: 'health', name: 'سلامت و پزشکی' },
-        { id: 'education', name: 'آموزش' },
-        { id: 'finance', name: 'مالی و سرمایه‌گذاری' },
-        { id: 'retail', name: 'خرده‌فروشی' },
-        { id: 'manufacturing', name: 'تولید و صنعت' },
-        { id: 'arts', name: 'هنر و طراحی' },
-        { id: 'hospitality', name: 'مهمان‌نوازی' },
-        { id: 'other', name: 'سایر' }
-      ]
-    }
-  },
-  computed: {
-    avatarUrl() {
-      const baseUrl = 'https://avataaars.io/'
-      const params = new URLSearchParams(this.avatarConfig)
-      return `${baseUrl}?${params.toString()}`
-    }
-  },
-  methods: {
-    // Navigation methods
-    nextStep() {
-      if (this.currentStep < 4) {
-        this.currentStep++
-      }
-    },
+// Hobbies list
+const hobbiesList = ref([
+  { id: 'sports', name: 'ورزش', icon: '⚽' },
+  { id: 'music', name: 'موسیقی', icon: '🎵' },
+  { id: 'reading', name: 'مطالعه', icon: '📚' },
+  { id: 'travel', name: 'سفر', icon: '✈️' },
+  { id: 'cooking', name: 'آشپزی', icon: '🍳' },
+  { id: 'gaming', name: 'بازی', icon: '🎮' },
+  { id: 'art', name: 'هنر', icon: '🎨' },
+  { id: 'photography', name: 'عکاسی', icon: '📷' },
+  { id: 'technology', name: 'تکنولوژی', icon: '💻' },
+  { id: 'nature', name: 'طبیعت', icon: '🌳' },
+  { id: 'movies', name: 'فیلم', icon: '🎬' },
+  { id: 'fitness', name: 'تناسب اندام', icon: '💪' }
+])
 
-    prevStep() {
-      if (this.currentStep > 1) {
-        this.currentStep--
-      }
-    },
+// Computed properties
+const avatarUrl = computed(() => {
+  const baseUrl = process.env.VUE_APP_AVATAR_APP_URL + '/avatars'
+  const params = new URLSearchParams(avatarConfig)
+  return `${baseUrl}?${params.toString()}`
+})
 
-    // Avatar methods (from your existing code)
-    updateConfig(key, value) {
-      this.avatarConfig[key] = value
-    },
-
-    generatePreviewUrl(config) {
-      const baseUrl = 'https://avataaars.io/'
-      const params = new URLSearchParams(config)
-      return `${baseUrl}?${params.toString()}`
-    },
-
-    getCategoryTitle(categoryId) {
-      const category = this.categories.find((cat) => cat.id === categoryId)
-      return category ? category.name : 'گزینه‌ها'
-    },
-
-    resetAvatar() {
-      this.avatarConfig = {
-        avatarStyle: 'Circle',
-        topType: 'ShortHairShortFlat',
-        accessoriesType: 'Prescription02',
-        hairColor: 'BrownDark',
-        facialHairType: 'Blank',
-        facialHairColor: 'BrownDark',
-        clotheType: 'ShirtCrewNeck',
-        clotheColor: 'Blue02',
-        eyeType: 'Default',
-        eyebrowType: 'Default',
-        mouthType: 'Default',
-        skinColor: 'Light'
-      }
-    },
-
-    async downloadAvatar() {
-      try {
-        const response = await fetch(this.avatarUrl)
-        const blob = await response.blob()
-        const url = window.URL.createObjectURL(blob)
-        const link = document.createElement('a')
-        link.href = url
-        link.download = 'my-avatar.png'
-        document.body.appendChild(link)
-        link.click()
-        document.body.removeChild(link)
-        window.URL.revokeObjectURL(url)
-      } catch (error) {
-        console.error('Error downloading avatar:', error)
-        this.showError('خطا در دانلود آواتار')
-      }
-    },
-
-    // Profile methods
-    toggleHobby(hobbyId) {
-      const index = this.userProfile.hobbies.indexOf(hobbyId)
-      if (index > -1) {
-        this.userProfile.hobbies.splice(index, 1)
-      } else {
-        this.userProfile.hobbies.push(hobbyId)
-      }
-    },
-
-    getHobbyName(hobbyId) {
-      const hobby = this.hobbiesList.find((h) => h.id === hobbyId)
-      return hobby ? hobby.name : hobbyId
-    },
-
-    getBusinessName(businessId) {
-      const business = this.businessTypes.find((b) => b.id === businessId)
-      return business ? business.name : businessId
-    },
-
-    // Submit profile to API
-    async submitProfile() {
-      // Validation
-      if (!this.userProfile.username.trim()) {
-        this.showError('لطفا نام کاربری خود را وارد کنید')
-        return
-      }
-
-      this.isSubmitting = true
-
-      try {
-        // Prepare data for API
-        const profileData = {
-          username: this.userProfile.username,
-          age: this.userProfile.age,
-          weight: this.userProfile.weight,
-          bio: this.userProfile.bio,
-          avatar: this.avatarConfig,
-          avatarUrl: this.avatarUrl,
-          hobbies: this.userProfile.hobbies,
-          customInterests: this.userProfile.customInterests
-            ? this.userProfile.customInterests.split(',').map((i) => i.trim())
-            : [],
-          business: this.userProfile.business,
-          createdAt: new Date().toISOString()
-        }
-
-        const response = await post(
-          '/api/v1',
-          {
-            topic: 'updatePersonProfile',
-            data: profileData
-          },
-          {
-            token: getCookie('app-token')
-          }
-        )
-        if (response && response.data.success) {
-          emitter.emit('reload-me', true)
-          emitter.emit('success-message', 'به لینکو دنیای متا خوش آمدید.')
-          this.$router.push('/')
-        } else {
-          emitter.emit('error-message', response.data.message)
-        }
-
-      } catch (error) {
-        console.error('Error submitting profile:', error)
-        this.showError('خطا در ثبت اطلاعات. لطفا دوباره تلاش کنید.')
-      } finally {
-        this.isSubmitting = false
-      }
-    },
-
-    resetForm() {
-      this.currentStep = 1
-      this.resetAvatar()
-      this.userProfile = {
-        username: '',
-        age: null,
-        weight: null,
-        bio: '',
-        hobbies: [],
-        business: '',
-        customInterests: ''
-      }
-    },
-
-    showError(message) {
-      // You can replace this with a proper toast notification
-      emitter.emit('error-message', message);
-    }
-  },
-  mounted() {
-    // Load saved avatar configuration if exists
-    const savedConfig = localStorage.getItem('userAvatarConfig')
-    if (savedConfig) {
-      this.avatarConfig = JSON.parse(savedConfig)
-    }
+// Methods
+const nextStep = () => {
+  if (currentStep.value < 4) {
+    currentStep.value++
   }
 }
+
+const prevStep = () => {
+  if (currentStep.value > 1) {
+    currentStep.value--
+  }
+}
+
+const toggleHobby = (hobbyId) => {
+  const index = userProfile.hobbies.indexOf(hobbyId)
+  if (index > -1) {
+    userProfile.hobbies.splice(index, 1)
+  } else {
+    userProfile.hobbies.push(hobbyId)
+  }
+}
+
+const getHobbyName = (hobbyId) => {
+  const hobby = hobbiesList.value.find((h) => h.id === hobbyId)
+  return hobby ? hobby.name : hobbyId
+}
+
+const submitProfile = async () => {
+  // Validation
+  if (!userProfile.username.trim()) {
+    showError('لطفا نام کاربری خود را وارد کنید')
+    return
+  }
+
+  isSubmitting.value = true
+
+  try {
+    // Prepare data for API
+    const profileData = {
+      username: userProfile.username,
+      age: userProfile.age,
+      avatar: { ...avatarConfig },
+      avatarUrl: avatarUrl.value,
+      hobbies: [...userProfile.hobbies],
+      createdAt: new Date().toISOString()
+    }
+
+    const response = await post(
+      '/api/v1',
+      {
+        topic: 'updatePersonProfile',
+        data: profileData
+      },
+      {
+        token: getCookie('app-token')
+      }
+    )
+
+    if (response && response.data.success) {
+      emitter.emit('reload-me', true)
+      emitter.emit('success-message', 'به لینکو دنیای متا خوش آمدید.')
+      router.push('/')
+    } else {
+      emitter.emit('error-message', response.data.message)
+    }
+
+  } catch (error) {
+    console.error('Error submitting profile:', error)
+    showError('خطا در ثبت اطلاعات. لطفا دوباره تلاش کنید.')
+  } finally {
+    isSubmitting.value = false
+  }
+}
+
+const showError = (message) => {
+  emitter.emit('error-message', message)
+}
+
+// Avatar configuration methods (from previous component)
+const updateConfig = (key, value) => {
+  avatarConfig[key] = value
+}
+
+const resetAvatar = () => {
+  Object.assign(avatarConfig, {
+    avatarStyle: 'Circle',
+    topType: 'ShortHairShortFlat',
+    accessoriesType: 'Prescription02',
+    hairColor: 'BrownDark',
+    facialHairType: 'Blank',
+    facialHairColor: 'BrownDark',
+    clotheType: 'ShirtCrewNeck',
+    clotheColor: 'Blue02',
+    eyeType: 'Default',
+    eyebrowType: 'Default',
+    mouthType: 'Default',
+    skinColor: 'Light'
+  })
+}
+
+// Lifecycle
+onMounted(() => {
+  // Load saved avatar configuration if exists
+  const savedConfig = localStorage.getItem('userAvatarConfig')
+  if (savedConfig) {
+    Object.assign(avatarConfig, JSON.parse(savedConfig))
+  }
+})
 </script>
 
 <style scoped>

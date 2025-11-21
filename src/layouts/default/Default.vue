@@ -160,7 +160,7 @@ export default {
         emitter.on('error-message', (msg) => showMessage(msg, 'error'))
         emitter.on('brokerCredentials', () => handleBrokerConnection())
         emitter.on('mqtt:notification', (msg) => showMessage(msg))
-        emitter.on('reload-me', () => getMe()())
+        emitter.on('reload-me', () => getMe())
       }
     })
 

@@ -212,10 +212,10 @@ export default {
     login() {
       if (!this.isPhoneValid) return;
 
-      this.$emit("loading-started", "true");
+      this.$emit("loading", true);
       post('/auth/entry', { phone: this.phone })
         .then(response => {
-          this.$emit("loading-ended", "true");
+          this.$emit("loading", false);
 
           if (response.success) {
             this.nextStep = true;
@@ -225,7 +225,7 @@ export default {
           }
         })
         .catch(error => {
-          this.$emit("loading-ended", "true");
+          this.$emit("loading", false);
           console.error(error);
           alert('خطای شبکه. لطفا اتصال خود را بررسی کنید.');
         });
