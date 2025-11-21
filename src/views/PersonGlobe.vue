@@ -4,7 +4,6 @@
     :autoRotateSpeed="0"
     :hexed="true"
     :palette="simpleDark"
-    :imageUrl="'//cdn.jsdelivr.net/npm/three-globe/example/img/earth-dark.jpg'"
     :data="data"
     :location-picker="true"
   />

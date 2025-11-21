@@ -70,7 +70,7 @@ const props = defineProps({
     default: false
   },
   autoRotateSpeed: { type: Number, default: 0.5 },
-  imageUrl: { type: String, default: '#000000' },
+  imageUrl: { type: String, default: ''},
   data: { type: Array, default: () => [] },
   person: { type: Object, default: () => null }
 })
@@ -256,8 +256,15 @@ async function initGlobe() {
 
   const container = document.getElementById('globe-container')
   if (!container) return console.error('Container not found')
-  const globeImageUrl = props.imageUrl ? props.imageUrl : window.location.origin + '/globe/images/earth-dark.jpg'
+
   try {
+    let globeImageUrl = '';
+    if(props.imageUrl === ''){
+      globeImageUrl = window.location.origin + '/globe/images/earth-dark.jpg'
+    }else{
+      globeImageUrl = window.location.origin + props.imageUrl
+    }
+    console.log(globeImageUrl)
     globe.value = Globe()(container)
       .globeImageUrl(globeImageUrl)
       .bumpImageUrl(window.location.origin + '/globe/images/earth-topology.png')

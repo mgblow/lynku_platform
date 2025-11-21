@@ -4,7 +4,6 @@
       ref="globeRef"
       :autoRotate="true"
       :autoRotateSpeed="rotateSpeed"
-      :imageUrl="'//cdn.jsdelivr.net/npm/three-globe/example/img/earth-dark.jpg'"
       :data="people"
       :hexed="true"
       :palette="globePlatte"
