@@ -315,9 +315,9 @@ const submitProfile = async () => {
     )
 
     if (response && response.data.success) {
-      emitter.emit('reload-me', true)
       emitter.emit("refresh-navigation-state")
       emitter.emit('success-message', 'به لینکو دنیای متا خوش آمدید.')
+      emitter.emit('reload-me', true)
       router.push('/')
     } else {
       emitter.emit('error-message', response.data.message)

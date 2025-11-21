@@ -56,8 +56,8 @@
 
       <!-- Orb Menu Items -->
       <div class="orb-menu" v-if="orbActive">
-        <div class="ios-grid-item" v-for="action in quickActions" :key="action.id" @click="performAction(action)">
-          <div class="ios-icon-bg" :style="{ imageUrl: action.gradient }" @click="navigateTo(action.link)">
+        <div class="ios-grid-item" v-for="action in quickActions" :key="action.id" @click="navigateTo(action)">
+          <div class="ios-icon-bg" :style="{ imageUrl: action.gradient }" @click="navigateTo(action)">
             <svg viewBox="0 0 24 24" fill="currentColor">
               <path :d="action.icon" />
             </svg>
@@ -205,8 +205,9 @@ const quickActionsOriginalList = ref([
     name: 'جهان من',
     icon: 'M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm0 18c-4.41 0-8-3.59-8-8s3.59-8 8-8 8 3.59 8 8-3.59 8-8 8zm0-14c-3.31 0-6 2.69-6 6s2.69 6 6 6 6-2.69 6-6-2.69-6-6-6zm0 10c-2.21 0-4-1.79-4-4s1.79-4 4-4 4 1.79 4 4-1.79 4-4 4z',
     gradient: 'linear-gradient(135deg, #111111 0%, #222233 50%, #334455 100%)',
-    link: computed(() => '/globes/' + (me.value?._id || '')),
-    requireAuth: true
+    link: computed(() => '/globes/{me}'),
+    requireAuth: true,
+    requireMe: true
   },
   {
     id: 5,
@@ -282,13 +283,13 @@ const performSearch = () => {
   }
 }
 
-const navigateTo = (route) => {
+const navigateTo = (action) => {
   orbActive.value = false
-  router.push(route)
-}
-
-const createPost = () => {
-  router.push('/create')
+  if(action.requireMe){
+    router.push(action.link.replace('{me}',me.value._id))
+  } else {
+    router.push(action.link)
+  }
 }
 
 const toggleNotifications = () => {
@@ -298,29 +299,11 @@ const toggleNotifications = () => {
   }
 }
 
-const toggleMessages = () => {
-  console.log('Toggle messages')
-}
-
-const enterGalaxy = (galaxy) => {
-  if (galaxy.active) {
-    router.push(`/galaxy/${galaxy.type}`)
-  }
-}
-
-const toggleUniverseMap = () => {
-  showUniverseMap.value = !showUniverseMap.value
-}
 
 const toggleQuickActions = () => {
   showQuickActions.value = !showQuickActions.value
 }
 
-const performAction = (action) => {
-  showQuickActions.value = false
-  orbActive.value = false
-  router.push(action.link)
-}
 
 // Event handlers
 const handleRefreshNavigationState = () => {
