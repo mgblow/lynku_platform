@@ -32,6 +32,7 @@
 
       <!-- Tweet Actions -->
       <div class="tweet-actions">
+        <Sound></Sound>
         <div class="action-buttons">
           <!-- Emoji Picker Trigger -->
           <button class="action-btn" @click="toggleEmojiPicker">
@@ -63,6 +64,7 @@
         </button>
       </div>
 
+
       <!-- Emoji Picker -->
       <div v-if="showEmojiPicker" class="emoji-picker">
         <div class="emoji-grid">
@@ -91,11 +93,12 @@ import { post } from '../api'
 import { getCookie } from '@/cookie'
 import { emitter } from '@/utils/event-bus'
 import Globe from '@/components/Globe.vue'
+import Sound from '@/components/Sound.vue'
 
 export default {
   name: 'Publish',
   avatarConfig: {},
-  components: { Globe },
+  components: { Sound, Globe },
   data() {
     return {
       showGlobe: false,

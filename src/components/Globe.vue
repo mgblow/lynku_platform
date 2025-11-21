@@ -233,7 +233,7 @@ function createMarker(lat, lng) {
   return {
     lat,
     lng,
-    size: 0.8,
+    size: 0.9,
     color: '#FF4444'
   }
 }
@@ -278,7 +278,7 @@ async function initGlobe() {
         emitter.emit("drawer:publish", {lat: lat, lng: lng})
         updateMarkers()
         emit('select-location', { lat, lon: lng })
-        globe.value.pointOfView({ lat: lat - 3, lng: lng, altitude: 1.3 }, 1200)
+        globe.value.pointOfView({ lat: lat - 4, lng: lng, altitude: 1.3 }, 1200)
       })
 
       globe.value
