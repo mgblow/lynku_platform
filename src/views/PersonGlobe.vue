@@ -21,7 +21,6 @@ const route = useRoute()
 // Access the param
 const personId = route.params.pid
 
-console.log(personId)
 const data = ref([])
 
 const pings = [

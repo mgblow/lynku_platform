@@ -48,12 +48,10 @@ export default {
     }
 
     const handleLogin = () => {
-      console.log('Navigate to login')
       showSplash.value = false
     }
 
     const handleRegister = () => {
-      console.log('Navigate to register')
       showSplash.value = false
     }
 

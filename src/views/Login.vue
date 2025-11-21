@@ -180,7 +180,6 @@ const verify = async () => {
   emit("loading", true)
   try {
     const response = await post('/auth/verify', { phone: phone.value, code: code.value })
-    console.log(response)
     emit("loading", false)
 
     if (response.success) {

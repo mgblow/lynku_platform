@@ -264,7 +264,7 @@ async function initGlobe() {
     }else{
       globeImageUrl = window.location.origin + props.imageUrl
     }
-    console.log(globeImageUrl)
+
     globe.value = Globe()(container)
       .globeImageUrl(globeImageUrl)
       .bumpImageUrl(window.location.origin + '/globe/images/earth-topology.png')

@@ -316,6 +316,7 @@ const submitProfile = async () => {
 
     if (response && response.data.success) {
       emitter.emit('reload-me', true)
+      emitter.emit("refresh-navigation-state")
       emitter.emit('success-message', 'به لینکو دنیای متا خوش آمدید.')
       router.push('/')
     } else {
@@ -345,7 +346,6 @@ onMounted(() => {
 
   if (meJson) {
     Object.assign(me, JSON.parse(meJson))
-    console.log(me)
     Object.assign(userProfile, me)
   }
 })

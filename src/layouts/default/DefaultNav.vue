@@ -235,9 +235,13 @@ const quickActionsOriginalList = ref([
 ])
 
 // Computed properties
-const isLoggedIn = computed(() => {
-  return !!getCookie('app-token')
-})
+const isLoggedIn = () => {
+  if(getCookie('app-token') === null){
+    return false;
+  } else {
+    return true;
+  }
+}
 
 const avatarUrl = computed(() => {
   const savedConfig = localStorage.getItem('userAvatarConfig')
@@ -252,8 +256,8 @@ const avatarUrl = computed(() => {
 // Methods
 const buildQuickActions = () => {
   quickActions.value = quickActionsOriginalList.value.filter((action) => {
-    if (action.requireAuth && !isLoggedIn.value) return false
-    if (!action.requireAuth && isLoggedIn.value && action.link === '/login') return false
+    if (action.requireAuth && !isLoggedIn()) return false
+    if (!action.requireAuth && isLoggedIn() && action.link === '/login') return false
     return true
   })
 }
@@ -339,12 +343,6 @@ onMounted(() => {
   // Set up event listeners
   emitter.on('refresh-navigation-state', handleRefreshNavigationState)
   emitter.on('loading', handleLoading)
-})
-
-onUnmounted(() => {
-  // Clean up event listeners
-  emitter.off('refresh-navigation-state', handleRefreshNavigationState)
-  emitter.off('loading', handleLoading)
 })
 </script>
 

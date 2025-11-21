@@ -109,7 +109,7 @@ const routes = [
                   document.cookie = c.replace(/^ +/, "").replace(/=.*/, `=;expires=${new Date().toUTCString()};path=/`);
               });
               // 4. Navigate to the root (Home)
-              next({ name: 'Home', replace: true });
+              next({ name: 'Home', replace: true,  });
           },
           meta: {
               layout: 'default'
