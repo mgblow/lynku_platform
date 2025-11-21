@@ -223,6 +223,9 @@ const avatarConfig = reactive({
   skinColor: 'Light'
 })
 
+// me configuration
+const me = reactive({})
+
 // User profile data
 const userProfile = reactive({
   username: '',
@@ -331,34 +334,19 @@ const showError = (message) => {
   emitter.emit('error-message', message)
 }
 
-// Avatar configuration methods (from previous component)
-const updateConfig = (key, value) => {
-  avatarConfig[key] = value
-}
-
-const resetAvatar = () => {
-  Object.assign(avatarConfig, {
-    avatarStyle: 'Circle',
-    topType: 'ShortHairShortFlat',
-    accessoriesType: 'Prescription02',
-    hairColor: 'BrownDark',
-    facialHairType: 'Blank',
-    facialHairColor: 'BrownDark',
-    clotheType: 'ShirtCrewNeck',
-    clotheColor: 'Blue02',
-    eyeType: 'Default',
-    eyebrowType: 'Default',
-    mouthType: 'Default',
-    skinColor: 'Light'
-  })
-}
-
 // Lifecycle
 onMounted(() => {
   // Load saved avatar configuration if exists
   const savedConfig = localStorage.getItem('userAvatarConfig')
+  const meJson = localStorage.getItem('me')
   if (savedConfig) {
     Object.assign(avatarConfig, JSON.parse(savedConfig))
+  }
+
+  if (meJson) {
+    Object.assign(me, JSON.parse(meJson))
+    console.log(me)
+    Object.assign(userProfile, me)
   }
 })
 </script>
