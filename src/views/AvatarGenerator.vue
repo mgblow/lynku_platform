@@ -279,413 +279,287 @@
   </div>
 </template>
 
-<script>
+<script setup>
+import { ref, reactive, computed, onMounted } from 'vue'
 import { post } from '@/api'
 import { getCookie } from '@/cookie'
 import { emitter } from '@/utils/event-bus'
+import { useRouter } from 'vue-router'
+import { router } from '@/router'
+const route = useRouter()
 
-export default {
-  name: 'AvatarGenerator',
-  data() {
-    return {
-      activeCategory: 'style',
-      showPreview: false,
-      avatarConfig: {
-        avatarStyle: 'Circle',
-        topType: 'ShortHairShortFlat',
-        accessoriesType: 'Prescription02',
-        hairColor: 'BrownDark',
-        facialHairType: 'Blank',
-        facialHairColor: 'BrownDark',
-        clotheType: 'ShirtCrewNeck',
-        clotheColor: 'Blue02',
-        eyeType: 'Default',
-        eyebrowType: 'Default',
-        mouthType: 'Default',
-        skinColor: 'Light'
-      },
-      categories: [
-        {
-          id: 'style',
-          name: 'سبک',
-          icon: `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="13.5" cy="6.5" r=".5"/><circle cx="17.5" cy="10.5" r=".5"/><circle cx="8.5" cy="7.5" r=".5"/><circle cx="6.5" cy="12.5" r=".5"/><path d="M12 22c5.523 0 10-4.477 10-10S17.523 2 12 2a9.98 9.98 0 0 0-7.09 2.91L2 8l3.09 3.09A9.98 9.98 0 0 0 12 22Z"/></svg>`
-        },
-        {
-          id: 'top',
-          name: 'مو',
-          icon: `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="8" cy="8" r="7"/><path d="M21 21l-5.2-5.2"/></svg>`
-        },
-        {
-          id: 'accessories',
-          name: 'اکسسوری',
-          icon: `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="6" cy="15" r="4"/><circle cx="18" cy="15" r="4"/><path d="M10 15h4"/></svg>`
-        },
-        {
-          id: 'hairColor',
-          name: 'رنگ مو',
-          icon: `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2v10"/><path d="M4.93 10.93a10 10 0 0 0 14.14 0"/></svg>`
-        },
-        {
-          id: 'facialHair',
-          name: 'ریش',
-          icon: `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M2 14s2 4 10 4 10-4 10-4"/><path d="M2 14c0-4 2-8 10-8s10 4 10 8"/></svg>`
-        },
-        {
-          id: 'facialHairColor',
-          name: 'رنگ ریش',
-          icon: `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M2 12h20"/><path d="M12 2v20"/><path d="M19 19l-7-7-7 7"/></svg>`
-        },
-        {
-          id: 'clothes',
-          name: 'لباس',
-          icon: `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 4h16v16H4z"/><path d="M9 4v8l3-2 3 2V4"/></svg>`
-        },
-        {
-          id: 'clotheColor',
-          name: 'رنگ لباس',
-          icon: `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><path d="M4.93 4.93l14.14 14.14"/></svg>`
-        },
-        {
-          id: 'eyes',
-          name: 'چشم‌ها',
-          icon: `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M1 12s4-7 11-7 11 7 11 7-4 7-11 7S1 12 1 12z"/><circle cx="12" cy="12" r="3"/></svg>`
-        },
-        {
-          id: 'eyebrow',
-          name: 'ابرو',
-          icon: `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 9c3-3 15-3 18 0"/></svg>`
-        },
-        {
-          id: 'mouth',
-          name: 'دهان',
-          icon: `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M2 14s2 4 10 4 10-4 10-4"/></svg>`
-        },
-        {
-          id: 'skin',
-          name: 'پوست',
-          icon: `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><path d="M8 15s2 2 4 2 4-2 4-2"/></svg>`
-        }
-      ],
-      avatarStyles: [
-        { value: 'Circle', label: 'دایره' },
-        { value: 'Transparent', label: 'شفاف' }
-      ],
-      topTypes: [
-        { value: 'NoHair', label: 'بدون مو' },
-        { value: 'Eyepatch', label: 'چشم‌بند' },
-        { value: 'Hat', label: 'کلاه' },
-        { value: 'Hijab', label: 'حجاب' },
-        { value: 'Turban', label: 'عمامه' },
-        { value: 'WinterHat1', label: 'کلاه زمستانی ۱' },
-        { value: 'WinterHat2', label: 'کلاه زمستانی ۲' },
-        { value: 'WinterHat3', label: 'کلاه زمستانی ۳' },
-        { value: 'WinterHat4', label: 'کلاه زمستانی ۴' },
-        { value: 'LongHairBigHair', label: 'موی بلند حجیم' },
-        { value: 'LongHairBob', label: 'بوب' },
-        { value: 'LongHairBun', label: 'دم اسبی' },
-        { value: 'LongHairCurly', label: 'فر' },
-        { value: 'LongHairCurvy', label: 'موج دار' },
-        { value: 'LongHairDreads', label: 'رشته‌ای' },
-        { value: 'LongHairFrida', label: 'فریدا' },
-        { value: 'LongHairFro', label: 'افرو' },
-        { value: 'LongHairFroBand', label: 'افرو با باند' },
-        { value: 'LongHairNotTooLong', label: 'نیمه بلند' },
-        { value: 'LongHairShavedSides', label: 'طرفین تراشیده' },
-        { value: 'LongHairMiaWallace', label: 'میا والاس' },
-        { value: 'LongHairStraight', label: 'صاف' },
-        { value: 'LongHairStraight2', label: 'صاف ۲' },
-        { value: 'LongHairStraightStrand', label: 'رشته صاف' },
-        { value: 'ShortHairDreads01', label: 'رشته کوتاه ۱' },
-        { value: 'ShortHairDreads02', label: 'رشته کوتاه ۲' },
-        { value: 'ShortHairFrizzle', label: 'مجعد' },
-        { value: 'ShortHairShaggyMullet', label: 'شگی مولت' },
-        { value: 'ShortHairShortCurly', label: 'فر کوتاه' },
-        { value: 'ShortHairShortFlat', label: 'صاف کوتاه' },
-        { value: 'ShortHairShortRound', label: 'گرد کوتاه' },
-        { value: 'ShortHairShortWaved', label: 'موج کوتاه' },
-        { value: 'ShortHairSides', label: 'طرفین' },
-        { value: 'ShortHairTheCaesar', label: 'سزار' },
-        { value: 'ShortHairTheCaesarSidePart', label: 'سزار با خط' }
-      ],
-      accessoriesTypes: [
-        { value: 'Blank', label: 'هیچ‌کدام' },
-        { value: 'Kurt', label: 'کلاه کورت' },
-        { value: 'Prescription01', label: 'عینک ۱' },
-        { value: 'Prescription02', label: 'عینک ۲' },
-        { value: 'Round', label: 'عینک گرد' },
-        { value: 'Sunglasses', label: 'عینک آفتابی' },
-        { value: 'Wayfarers', label: 'عینک ویفرز' }
-      ],
-      hairColors: [
-        { value: 'Auburn', label: 'عنابی', hex: '#A55728' },
-        { value: 'Black', label: 'مشکی', hex: '#2C1B18' },
-        { value: 'Blonde', label: 'بلوند', hex: '#B58143' },
-        { value: 'BlondeGolden', label: 'بلوند طلایی', hex: '#D6B370' },
-        { value: 'Brown', label: 'قهوه‌ای', hex: '#724133' },
-        { value: 'BrownDark', label: 'قهوه‌ای تیره', hex: '#4A312C' },
-        { value: 'PastelPink', label: 'صورتی پاستلی', hex: '#F59797' },
-        { value: 'Platinum', label: 'پلاتینیوم', hex: '#ECDCBF' },
-        { value: 'Red', label: 'قرمز', hex: '#C93305' },
-        { value: 'SilverGray', label: 'نقره‌ای', hex: '#E8E1E1' }
-      ],
-      facialHairTypes: [
-        { value: 'Blank', label: 'هیچ‌کدام' },
-        { value: 'BeardMedium', label: 'ریش متوسط' },
-        { value: 'BeardLight', label: 'ریش کم' },
-        { value: 'BeardMajestic', label: 'ریش مجلل' },
-        { value: 'MoustacheFancy', label: 'سبیل فانتزی' },
-        { value: 'MoustacheMagnum', label: 'سبیل بزرگ' }
-      ],
-      facialHairColors: [
-        { value: 'Auburn', label: 'عنابی', hex: '#A55728' },
-        { value: 'Black', label: 'مشکی', hex: '#2C1B18' },
-        { value: 'Blonde', label: 'بلوند', hex: '#B58143' },
-        { value: 'BlondeGolden', label: 'بلوند طلایی', hex: '#D6B370' },
-        { value: 'Brown', label: 'قهوه‌ای', hex: '#724133' },
-        { value: 'BrownDark', label: 'قهوه‌ای تیره', hex: '#4A312C' },
-        { value: 'Platinum', label: 'پلاتینیوم', hex: '#ECDCBF' },
-        { value: 'Red', label: 'قرمز', hex: '#C93305' }
-      ],
-      clotheTypes: [
-        { value: 'BlazerShirt', label: 'بلزر و پیراهن' },
-        { value: 'BlazerSweater', label: 'بلزر و سوئیشرت' },
-        { value: 'CollarSweater', label: 'سوئیشرت یقه دار' },
-        { value: 'GraphicShirt', label: 'پیراهن گرافیکی' },
-        { value: 'Hoodie', label: 'هودی' },
-        { value: 'Overall', label: 'اورال' },
-        { value: 'ShirtCrewNeck', label: 'پیراهن یقه گرد' },
-        { value: 'ShirtScoopNeck', label: 'پیراهن یقه اسکوپ' },
-        { value: 'ShirtVNeck', label: 'پیراهن یقه وی' }
-      ],
-      clotheColors: [
-        { value: 'Black', label: 'مشکی', hex: '#262E33' },
-        { value: 'Blue01', label: 'آبی ۱', hex: '#65C9FF' },
-        { value: 'Blue02', label: 'آبی ۲', hex: '#5199E4' },
-        { value: 'Blue03', label: 'آبی ۳', hex: '#25557C' },
-        { value: 'Gray01', label: 'خاکستری ۱', hex: '#E6E6E6' },
-        { value: 'Gray02', label: 'خاکستری ۲', hex: '#929598' },
-        { value: 'Heather', label: 'هیثر', hex: '#3C4F5C' },
-        { value: 'PastelBlue', label: 'آبی پاستلی', hex: '#B1E2FF' },
-        { value: 'PastelGreen', label: 'سبز پاستلی', hex: '#A7FFC4' },
-        { value: 'PastelOrange', label: 'نارنجی پاستلی', hex: '#FFDEB5' },
-        { value: 'PastelRed', label: 'قرمز پاستلی', hex: '#FFAFB9' },
-        { value: 'PastelYellow', label: 'زرد پاستلی', hex: '#FFFFB1' },
-        { value: 'Pink', label: 'صورتی', hex: '#FF488E' },
-        { value: 'Red', label: 'قرمز', hex: '#FF5C5C' },
-        { value: 'White', label: 'سفید', hex: '#FFFFFF' }
-      ],
-      eyeTypes: [
-        { value: 'Close', label: 'بسته' },
-        { value: 'Cry', label: 'گریه' },
-        { value: 'Default', label: 'پیش‌فرض' },
-        { value: 'Dizzy', label: 'سرگیجه' },
-        { value: 'EyeRoll', label: 'چرخش چشم' },
-        { value: 'Happy', label: 'شاد' },
-        { value: 'Hearts', label: 'قلب' },
-        { value: 'Side', label: 'کناری' },
-        { value: 'Squint', label: 'نیمه بسته' },
-        { value: 'Surprised', label: 'متعجب' },
-        { value: 'Wink', label: 'چشمک' },
-        { value: 'WinkWacky', label: 'چشمک عجیب' }
-      ],
-      eyebrowTypes: [
-        { value: 'Angry', label: 'عصبی' },
-        { value: 'AngryNatural', label: 'عصبی طبیعی' },
-        { value: 'Default', label: 'پیش‌فرض' },
-        { value: 'DefaultNatural', label: 'طبیعی پیش‌فرض' },
-        { value: 'FlatNatural', label: 'صاف طبیعی' },
-        { value: 'RaisedExcited', label: 'بالا رفته هیجان‌زده' },
-        { value: 'RaisedExcitedNatural', label: 'بالا رفته هیجان‌زده طبیعی' },
-        { value: 'SadConcerned', label: 'ناراحت نگران' },
-        { value: 'SadConcernedNatural', label: 'ناراحت نگران طبیعی' },
-        { value: 'UnibrowNatural', label: 'اتصال ابرو طبیعی' },
-        { value: 'UpDown', label: 'بالا پایین' },
-        { value: 'UpDownNatural', label: 'بالا پایین طبیعی' }
-      ],
-      mouthTypes: [
-        { value: 'Concerned', label: 'نگران' },
-        { value: 'Default', label: 'پیش‌فرض' },
-        { value: 'Disbelief', label: 'ناباوری' },
-        { value: 'Eating', label: 'در حال غذا خوردن' },
-        { value: 'Grimace', label: 'اخم' },
-        { value: 'Sad', label: 'ناراحت' },
-        { value: 'ScreamOpen', label: 'فریاد باز' },
-        { value: 'Serious', label: 'جدی' },
-        { value: 'Smile', label: 'لبخند' },
-        { value: 'Tongue', label: 'زبان' },
-        { value: 'Twinkle', label: 'برق' },
-        { value: 'Vomit', label: 'استفراغ' }
-      ],
-      skinColors: [
-        { value: 'Tanned', label: 'برنزه', hex: '#FD9841' },
-        { value: 'Yellow', label: 'زرد', hex: '#F8D25C' },
-        { value: 'Pale', label: 'سفید', hex: '#FFDBB4' },
-        { value: 'Light', label: 'روشن', hex: '#EDB98A' },
-        { value: 'Brown', label: 'قهوه‌ای', hex: '#D08B5B' },
-        { value: 'DarkBrown', label: 'قهوه‌ای تیره', hex: '#AE5D29' },
-        { value: 'Black', label: 'مشکی', hex: '#614335' }
-      ],
-      avatarPickConfig: null
-    }
+// Reactive data
+const activeCategory = ref('style')
+const showPreview = ref(false)
+const isLoading = ref(false)
+
+const avatarConfig = reactive({
+  avatarStyle: 'Circle',
+  topType: 'ShortHairShortFlat',
+  accessoriesType: 'Prescription02',
+  hairColor: 'BrownDark',
+  facialHairType: 'Blank',
+  facialHairColor: 'BrownDark',
+  clotheType: 'ShirtCrewNeck',
+  clotheColor: 'Blue02',
+  eyeType: 'Default',
+  eyebrowType: 'Default',
+  mouthType: 'Default',
+  skinColor: 'Light'
+})
+
+const categories = ref([
+  {
+    id: 'style',
+    name: 'سبک',
+    icon: `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="13.5" cy="6.5" r=".5"/><circle cx="17.5" cy="10.5" r=".5"/><circle cx="8.5" cy="7.5" r=".5"/><circle cx="6.5" cy="12.5" r=".5"/><path d="M12 22c5.523 0 10-4.477 10-10S17.523 2 12 2a9.98 9.98 0 0 0-7.09 2.91L2 8l3.09 3.09A9.98 9.98 0 0 0 12 22Z"/></svg>`
   },
-  computed: {
-    avatarUrl() {
-      const baseUrl = 'https://avataaars.io/'
-      const params = new URLSearchParams(this.avatarConfig)
-      return `${baseUrl}?${params.toString()}`
-    }
+  {
+    id: 'top',
+    name: 'مو',
+    icon: `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="8" cy="8" r="7"/><path d="M21 21l-5.2-5.2"/></svg>`
   },
-  methods: {
-    async getAvatarPickConfig() {
-      try {
-        const response = await post(
-          '/api/v1',
-          {
-            topic: 'getAvatarPickConfig',
-            data: {}
-          },
-          {
-            token: getCookie('app-token')
-          }
-        )
-        if (response && response.data.success) {
-          return response.data.body
-        } else {
-          return null
-        }
-      } catch (error) {
-        // this.showError('خطا در ارسال توییت. لطفاً دوباره تلاش کنید.')
-      } finally {
-        this.isLoading = false
-      }
-    },
-
-    updateConfig(key, value) {
-      this.avatarConfig[key] = value
-    },
-
-    generatePreviewUrl(config) {
-      const baseUrl = 'https://avataaars.io/'
-      const params = new URLSearchParams(config)
-      return `${baseUrl}?${params.toString()}`
-    },
-
-    getCategoryTitle(categoryId) {
-      const category = this.categories.find((cat) => cat.id === categoryId)
-      return category ? category.name : 'گزینه‌ها'
-    },
-
-    resetAvatar() {
-      this.avatarConfig = {
-        avatarStyle: 'Circle',
-        topType: 'ShortHairShortFlat',
-        accessoriesType: 'Prescription02',
-        hairColor: 'BrownDark',
-        facialHairType: 'Blank',
-        facialHairColor: 'BrownDark',
-        clotheType: 'ShirtCrewNeck',
-        clotheColor: 'Blue02',
-        eyeType: 'Default',
-        eyebrowType: 'Default',
-        mouthType: 'Default',
-        skinColor: 'Light'
-      }
-    },
-
-    async saveAvatar() {
-      try {
-        // Save avatar configuration to localStorage or send to backend
-        localStorage.setItem('userAvatarConfig', JSON.stringify(this.avatarConfig))
-        // also publish avatar change event
-        try {
-          const response = await post(
-            '/api/v1',
-            {
-              topic: 'updatePersonAvatar',
-              data: this.avatarConfig
-            },
-            {
-              token: getCookie('app-token')
-            }
-          )
-          if (response && response.data.success) {
-            emitter.emit('success-message', 'آواتارت با موفقیت ساخته شد')
-            emitter.emit("drawer:settings", { show: true })
-            // emitter.emit("drawer:close", { close: true })
-          } else {
-            emitter.emit('error-message', response.data.message)
-          }
-        } catch (error) {
-          // this.showError('خطا در ارسال توییت. لطفاً دوباره تلاش کنید.')
-        } finally {
-          this.isLoading = false
-        }
-      } catch (error) {
-        this.showError('خطا در ذخیره‌سازی آواتار')
-      }
-    },
-
-    async downloadAvatar() {
-      try {
-        const response = await fetch(this.avatarUrl)
-        const blob = await response.blob()
-        const url = window.URL.createObjectURL(blob)
-        const link = document.createElement('a')
-        link.href = url
-        link.download = 'my-avatar.png'
-        document.body.appendChild(link)
-        link.click()
-        document.body.removeChild(link)
-        window.URL.revokeObjectURL(url)
-      } catch (error) {
-        this.showError('خطا در دانلود آواتار')
-      }
-    },
-
-    showSuccess(message) {
-      // You can replace this with a proper toast notification
-      alert(message)
-    },
-
-    showError(message) {
-      // You can replace this with a proper toast notification
-      alert(message)
-    }
+  {
+    id: 'accessories',
+    name: 'اکسسوری',
+    icon: `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="6" cy="15" r="4"/><circle cx="18" cy="15" r="4"/><path d="M10 15h4"/></svg>`
   },
-  async mounted() {
-
-    try {
-      const response = await this.getAvatarPickConfig()
-
-
-      // Extract config safely
-      const body = response?.data?.body || response
-      const newAvatarConfig = body?.avatarPicks || response.avatarPicks
-
-
-      // Use Vue.set() (for Vue 2) or spread assignment (for Vue 3)
-      this.avatarStyles = { ...newAvatarConfig.avatarStyles }
-      this.topTypes = { ...newAvatarConfig.topTypes }
-      this.accessoriesTypes = { ...newAvatarConfig.accessoriesTypes }
-      this.hairColors = { ...newAvatarConfig.hairColors }
-      this.facialHairTypes = { ...newAvatarConfig.facialHairTypes }
-      this.facialHairColors = { ...newAvatarConfig.facialHairColors }
-      this.clotheTypes = { ...newAvatarConfig.clotheTypes }
-      this.clotheColors = { ...newAvatarConfig.clotheColors }
-      this.eyeTypes = { ...newAvatarConfig.eyeTypes }
-      this.eyebrowTypes = { ...newAvatarConfig.eyebrowTypes }
-      this.mouthTypes = { ...newAvatarConfig.mouthTypes }
-      this.skinColors = { ...newAvatarConfig.skinColors }
-
-      // Load saved avatar configuration if exists
-      const savedConfig = localStorage.getItem('userAvatarConfig')
-      if (savedConfig) {
-        this.avatarConfig = JSON.parse(savedConfig)
-      }
-
-    } catch (error) {
-    }
+  {
+    id: 'hairColor',
+    name: 'رنگ مو',
+    icon: `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2v10"/><path d="M4.93 10.93a10 10 0 0 0 14.14 0"/></svg>`
+  },
+  {
+    id: 'facialHair',
+    name: 'ریش',
+    icon: `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M2 14s2 4 10 4 10-4 10-4"/><path d="M2 14c0-4 2-8 10-8s10 4 10 8"/></svg>`
+  },
+  {
+    id: 'facialHairColor',
+    name: 'رنگ ریش',
+    icon: `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M2 12h20"/><path d="M12 2v20"/><path d="M19 19l-7-7-7 7"/></svg>`
+  },
+  {
+    id: 'clothes',
+    name: 'لباس',
+    icon: `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 4h16v16H4z"/><path d="M9 4v8l3-2 3 2V4"/></svg>`
+  },
+  {
+    id: 'clotheColor',
+    name: 'رنگ لباس',
+    icon: `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><path d="M4.93 4.93l14.14 14.14"/></svg>`
+  },
+  {
+    id: 'eyes',
+    name: 'چشم‌ها',
+    icon: `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M1 12s4-7 11-7 11 7 11 7-4 7-11 7S1 12 1 12z"/><circle cx="12" cy="12" r="3"/></svg>`
+  },
+  {
+    id: 'eyebrow',
+    name: 'ابرو',
+    icon: `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 9c3-3 15-3 18 0"/></svg>`
+  },
+  {
+    id: 'mouth',
+    name: 'دهان',
+    icon: `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M2 14s2 4 10 4 10-4 10-4"/></svg>`
+  },
+  {
+    id: 'skin',
+    name: 'پوست',
+    icon: `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><path d="M8 15s2 2 4 2 4-2 4-2"/></svg>`
   }
+])
+
+// Options data
+const avatarStyles = ref([])
+const topTypes = ref([])
+const accessoriesTypes = ref([])
+const hairColors = ref([])
+const facialHairTypes = ref([])
+const facialHairColors = ref([])
+const clotheTypes = ref([])
+const clotheColors = ref([])
+const eyeTypes = ref([])
+const eyebrowTypes = ref([])
+const mouthTypes = ref([])
+const skinColors = ref([])
+
+const avatarPickConfig = ref(null)
+
+// Computed properties
+const avatarUrl = computed(() => {
+  const baseUrl = 'https://avataaars.io/'
+  const params = new URLSearchParams(avatarConfig)
+  return `${baseUrl}?${params.toString()}`
+})
+
+// Methods
+const getAvatarPickConfig = async () => {
+  try {
+    const response = await post(
+      '/api/v1',
+      {
+        topic: 'getAvatarPickConfig',
+        data: {}
+      },
+      {
+        token: getCookie('app-token')
+      }
+    )
+    if (response && response.data.success) {
+      return response.data.body
+    } else {
+      return null
+    }
+  } catch (error) {
+    // showError('خطا در ارسال توییت. لطفاً دوباره تلاش کنید.')
+  } finally {
+    isLoading.value = false
+  }
+}
+
+const updateConfig = (key, value) => {
+  avatarConfig[key] = value
+}
+
+const generatePreviewUrl = (config) => {
+  const baseUrl = 'https://avataaars.io/'
+  const params = new URLSearchParams(config)
+  return `${baseUrl}?${params.toString()}`
+}
+
+const getCategoryTitle = (categoryId) => {
+  const category = categories.value.find((cat) => cat.id === categoryId)
+  return category ? category.name : 'گزینه‌ها'
+}
+
+const resetAvatar = () => {
+  Object.assign(avatarConfig, {
+    avatarStyle: 'Circle',
+    topType: 'ShortHairShortFlat',
+    accessoriesType: 'Prescription02',
+    hairColor: 'BrownDark',
+    facialHairType: 'Blank',
+    facialHairColor: 'BrownDark',
+    clotheType: 'ShirtCrewNeck',
+    clotheColor: 'Blue02',
+    eyeType: 'Default',
+    eyebrowType: 'Default',
+    mouthType: 'Default',
+    skinColor: 'Light'
+  })
+}
+
+const saveAvatar = async () => {
+  try {
+    // Save avatar configuration to localStorage or send to backend
+    localStorage.setItem('userAvatarConfig', JSON.stringify(avatarConfig))
+    // also publish avatar change event
+    try {
+      const response = await post(
+        '/api/v1',
+        {
+          topic: 'updatePersonAvatar',
+          data: avatarConfig
+        },
+        {
+          token: getCookie('app-token')
+        }
+      )
+      if (response && response.data.success) {
+        emitter.emit('success-message', 'آواتارت با موفقیت ساخته شد')
+        router.push({ path: '/settings' })
+        // emitter.emit("drawer:close", { close: true })
+      } else {
+        emitter.emit('error-message', response.data.message)
+      }
+    } catch (error) {
+      // showError('خطا در ارسال توییت. لطفاً دوباره تلاش کنید.')
+    } finally {
+      isLoading.value = false
+    }
+  } catch (error) {
+    showError('خطا در ذخیره‌سازی آواتار')
+  }
+}
+
+const downloadAvatar = async () => {
+  try {
+    const response = await fetch(avatarUrl.value)
+    const blob = await response.blob()
+    const url = window.URL.createObjectURL(blob)
+    const link = document.createElement('a')
+    link.href = url
+    link.download = 'my-avatar.png'
+    document.body.appendChild(link)
+    link.click()
+    document.body.removeChild(link)
+    window.URL.revokeObjectURL(url)
+  } catch (error) {
+    showError('خطا در دانلود آواتار')
+  }
+}
+
+const showSuccess = (message) => {
+  // You can replace this with a proper toast notification
+  alert(message)
+}
+
+const showError = (message) => {
+  // You can replace this with a proper toast notification
+  alert(message)
+}
+
+// Lifecycle
+onMounted(async () => {
+  try {
+    const response = await getAvatarPickConfig()
+
+    // Extract config safely
+    const body = response?.data?.body || response
+    const newAvatarConfig = body?.avatarPicks || response.avatarPicks
+
+    // Update options
+    if (newAvatarConfig) {
+      avatarStyles.value = [...(newAvatarConfig.avatarStyles || [])]
+      topTypes.value = [...(newAvatarConfig.topTypes || [])]
+      accessoriesTypes.value = [...(newAvatarConfig.accessoriesTypes || [])]
+      hairColors.value = [...(newAvatarConfig.hairColors || [])]
+      facialHairTypes.value = [...(newAvatarConfig.facialHairTypes || [])]
+      facialHairColors.value = [...(newAvatarConfig.facialHairColors || [])]
+      clotheTypes.value = [...(newAvatarConfig.clotheTypes || [])]
+      clotheColors.value = [...(newAvatarConfig.clotheColors || [])]
+      eyeTypes.value = [...(newAvatarConfig.eyeTypes || [])]
+      eyebrowTypes.value = [...(newAvatarConfig.eyebrowTypes || [])]
+      mouthTypes.value = [...(newAvatarConfig.mouthTypes || [])]
+      skinColors.value = [...(newAvatarConfig.skinColors || [])]
+    }
+
+    // Load saved avatar configuration if exists
+    const savedConfig = localStorage.getItem('userAvatarConfig')
+    if (savedConfig) {
+      Object.assign(avatarConfig, JSON.parse(savedConfig))
+    }
+  } catch (error) {
+    console.error('Error loading avatar config:', error)
+  }
+})
+
+// Initialize default options if API fails
+const initializeDefaultOptions = () => {
+  avatarStyles.value = [
+    { value: 'Circle', label: 'دایره' },
+    { value: 'Transparent', label: 'شفاف' }
+  ]
+
+  topTypes.value = [
+    { value: 'NoHair', label: 'بدون مو' },
+    { value: 'Eyepatch', label: 'چشم‌بند' },
+    // ... other default options
+  ]
+
+  // Initialize other default options similarly...
 }
 </script>
 
