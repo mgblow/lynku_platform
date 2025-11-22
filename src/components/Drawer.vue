@@ -74,7 +74,7 @@ onMounted(() => {
       <Ping v-if="drawerData.type === 'ping'"></Ping>
       <Person v-if="drawerData.type === 'person'" :selectedData="drawerData"></Person>
       <Gift v-if="drawerData.type === 'gift'" :selectedData="drawerData"></Gift>
-      <Publish v-if="drawerData.type === 'publish'"></Publish>
+      <Publish v-if="drawerData.type === 'publish'" :location="drawerData"></Publish>
     </div>
   </Teleport>
 </template>

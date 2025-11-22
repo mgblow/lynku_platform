@@ -42,6 +42,12 @@ const majorCities = [
   { lat: 24.7136, lng: 46.6753, name: 'Riaz', color: '#ffaa00' },
   { lat: 30.0444, lng: 31.2357, name: 'Qahere', color: '#ff3300' }
 ]
+
+
+
+
+
+
 const avatarStyles = ['ShortHairShortFlat', 'LongHairFro', 'Hat', 'Hijab', 'WinterHat1', 'Turban', 'LongHairStraight']
 const clothes = ['Hoodie', 'ShirtCrewNeck', 'BlazerSweater', 'Overall']
 const eyes = ['Happy', 'Close', 'Surprised', 'Squint']
@@ -233,20 +239,20 @@ function createMarker(lat, lng) {
   return {
     lat,
     lng,
-    size: 0.9,
+    size: 0.1,
     color: '#FF4444'
   }
 }
 
 function updateMarkers() {
   if (!globe.value) return
-  const allPoints = [...majorCities, ...(marker.value ? [marker.value] : [])]
+  const allPoints = [ ...(marker.value ? [marker.value] : [])]
 
   globe.value
     .pointsData(allPoints)
     .pointColor((d) => d.color || '#ffffff')
-    .pointAltitude((d) => (d === marker.value ? 0.05 : 0.015))
-    .pointRadius((d) => (d === marker.value ? 0.8 : 0.25))
+    .pointAltitude((d) => (d === marker.value ? 0.1 : 0.01))
+    .pointRadius((d) => (d === marker.value ? 0.2 : 0.25))
 }
 
 async function initGlobe() {

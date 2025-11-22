@@ -9,9 +9,13 @@
           </div>
         </div>
         <div class="header-text">
-          <h3>یه پینگ جدید ارسال کن</h3>
-          <p>افکارت رو با جهان به اشتراک بذار</p>
+          <h3>یه تکس جدید ارسال کن</h3>
+          <p style="text-align: right">
+            <small>📍 {{ props.location.lat.toFixed(4) }} , {{ props.location.lng.toFixed(4) }}</small>
+            <small>📍 {{locationText}}</small>
+          </p>
         </div>
+
       </div>
       <!-- Tweet Text Area -->
       <div class="tweet-textarea">
@@ -32,7 +36,6 @@
 
       <!-- Tweet Actions -->
       <div class="tweet-actions">
-        <Sound></Sound>
         <div class="action-buttons">
           <!-- Emoji Picker Trigger -->
           <button class="action-btn" @click="toggleEmojiPicker">
@@ -43,18 +46,11 @@
               />
             </svg>
           </button>
-
-          <!-- Add Location -->
-          <button class="action-btn" @click="addLocation">
-            <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" fill="currentColor" viewBox="0 0 16 16">
-              <path d="M8 16s6-5.686 6-10A6 6 0 0 0 2 6c0 4.314 6 10 6 10zm0-7a3 3 0 1 1 0-6 3 3 0 0 1 0 6z" />
-            </svg>
-          </button>
         </div>
 
         <!-- Tweet Button -->
         <button class="tweet-btn" :disabled="!canPublish" @click="postPublish">
-          <span class="btn-text">پینگ کن</span>
+          <span class="btn-text">تکس کن</span>
           <svg v-if="isLoading" class="spinner" width="20" height="20" viewBox="0 0 20 20">
             <circle cx="10" cy="10" r="8" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round">
               <animate attributeName="stroke-dasharray" values="1, 50; 50, 1; 1, 50" dur="1.5s" repeatCount="indefinite" />
@@ -64,7 +60,6 @@
         </button>
       </div>
 
-
       <!-- Emoji Picker -->
       <div v-if="showEmojiPicker" class="emoji-picker">
         <div class="emoji-grid">
@@ -73,219 +68,217 @@
           </span>
         </div>
       </div>
-
-      <!-- Location Tag -->
-      <div v-if="location" class="location-tag">
-        <span class="location-text">
-          <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" viewBox="0 0 16 16">
-            <path d="M8 16s6-5.686 6-10A6 6 0 0 0 2 6c0 4.314 6 10 6 10zm0-7a3 3 0 1 1 0-6 3 3 0 0 1 0 6z" />
-          </svg>
-          {{ location }}
-        </span>
-        <button class="remove-location" @click="removeLocation">×</button>
-      </div>
     </div>
   </div>
 </template>
 
-<script>
+<script setup>
+import { ref, reactive, computed, onMounted, watch } from 'vue'
+import { useRouter } from 'vue-router'
+
 import { post } from '../api'
 import { getCookie } from '@/cookie'
 import { emitter } from '@/utils/event-bus'
+
 import Globe from '@/components/Globe.vue'
-import Sound from '@/components/Sound.vue'
 
-export default {
-  name: 'Publish',
-  avatarConfig: {},
-  components: { Sound, Globe },
-  data() {
-    return {
-      showGlobe: false,
-      coords: null,
-      publishText: '',
-      location: '',
-      showEmojiPicker: false,
-      isLoading: false,
-      characterCount: 0,
-      imagePreview: null,
-      popularEmojis: ['😊', '😂', '❤️', '🔥', '👍', '👏', '🎉', '🙏', '😍', '😎', '🤔', '😢', '🙌', '💯', '✨', '🌟']
-    }
-  },
-  computed: {
-    canPublish() {
-      return this.publishText.trim().length > 0 && this.publishText.trim().length <= 280 && !this.isLoading
-    },
-    avatarUrl() {
-      this.avatarConfig = Object.assign(JSON.parse(localStorage.getItem('userAvatarConfig')), this.avatarConfig)
-      const baseUrl = process.env.VUE_APP_AVATAR_APP_URL + '/avatars'
-      const params = new URLSearchParams(this.avatarConfig)
-      return `${baseUrl}?${params.toString()}`
-    }
-  },
-  mounted() {
-    this.scrollToTop()
-  },
-  methods: {
-    async handleLocationSelect(coords) {
-      try {
-        this.location = `Lat: ${coords.lat.toFixed(4)}, Lon: ${coords.lon.toFixed(4)}`;
+// ========== STATE ==========
+const router = useRouter()
 
-        // Free: No API key needed for reverse geocoding
-        const response = await fetch(
-          `https://api.bigdatacloud.net/data/reverse-geocode-client?latitude=${coords.lat}&longitude=${coords.lon}&localityLanguage=en`
-        );
+const showSound = ref(false)
+const coords = ref(null)
+const publishText = ref('')
+const locationText = ref('')
+const showEmojiPicker = ref(false)
+const isLoading = ref(false)
+const characterCount = ref(0)
 
-        const data = await response.json();
-
-        if (data.city) {
-          this.location = `Lat: ${coords.lat.toFixed(4)}, Lon: ${coords.lon.toFixed(4)}, ${data.city}, ${data.countryName}`;
-        }
-
-      } catch (error) {
-        console.error('Error:', error);
-        this.location = `Lat: ${coords.lat.toFixed(4)}, Lon: ${coords.lon.toFixed(4)}`;
-      }
-    },
-    updateCharacterCount() {
-      this.characterCount = this.publishText.length
-    },
-
-    toggleEmojiPicker() {
-      this.showEmojiPicker = !this.showEmojiPicker
-    },
-
-    addEmoji(emoji) {
-      this.publishText += emoji
-      this.showEmojiPicker = false
-      this.updateCharacterCount()
-    },
-
-    async addLocation() {
-      // Simulate getting location (in real app, use geolocation API)
-      if (this.showGlobe) {
-        this.showGlobe = false
-        this.coords = null
-        this.location = ''
-      } else {
-        this.showGlobe = true
-        this.$data.coords = await this.getUserLocation()
-      }
-    },
-
-    async postPublish() {
-      if (!this.canPublish) return
-
-      this.isLoading = true
-      emitter.emit('http-start', true)
-      try {
-        const response = await post(
-          '/api/v1',
-          {
-            topic: 'createPublish',
-            data: {
-              text: this.publishText,
-              location: {
-                type: 'Point',
-                coordinates: [this.coords.lng, this.coords.lat] // notice: lng first!
-              }
-            }
-          },
-          {
-            token: getCookie('app-token')
-          }
-        )
-
-        if (response && response.data.success) {
-          // Reset form
-          this.publishText = ''
-          this.location = ''
-          this.characterCount = 0
-
-          // Show success message
-          emitter.emit('success-message', 'پینگت با موفقیت انجام شد!')
-          this.$router.push('/')
-        }
-      } catch (error) {
-        console.error('Error posting tweet:', error)
-        emitter.emit('error-message', 'تو پینگ کردنت مشکلی به وجود اومده! دوباره تلاش کن.')
-      } finally {
-        emitter.emit('http-stop', true)
-      }
-    },
-
-    showSuccess(message) {
-      // You can replace this with a proper toast notification
-      alert(message)
-    },
-
-    showError(message) {
-      // You can replace this with a proper toast notification
-      alert(message)
-    },
-
-    scrollToTop() {
-      window.scrollTo({
-        top: 0,
-        behavior: 'smooth'
-      })
-    },
-    async getUserLocation() {
-      return new Promise((resolve, reject) => {
-        // Check HTTPS (Chrome blocks on HTTP)
-        if (location.protocol !== 'https:' && location.hostname !== 'localhost') {
-          console.warn('⚠️ Geolocation requires HTTPS on mobile browsers.')
-          return reject(new Error('Geolocation requires HTTPS to work.'))
-        }
-
-        if (!navigator.geolocation) {
-          return reject(new Error('Geolocation is not supported by this browser.'))
-        }
-
-        const options = {
-          enableHighAccuracy: true,
-          timeout: 7000, // avoid waiting forever
-          maximumAge: 0
-        }
-
-        navigator.geolocation.getCurrentPosition(
-          (pos) => {
-            resolve({
-              lat: pos.coords.latitude,
-              lng: pos.coords.longitude
-            })
-          },
-
-          (err) => {
-            let msg = ''
-
-            switch (err.code) {
-              case 1:
-                msg = 'User denied permission.'
-                break
-              case 2:
-                msg = 'Position unavailable (mobile network issue).'
-                break
-              case 3:
-                msg = 'Location request timed out.'
-                break
-              default:
-                msg = 'Unknown geolocation error.'
-            }
-
-            console.error('❌ Geolocation error:', msg, err)
-            reject(new Error(msg))
-          },
-
-          options
-        )
-      })
-    }
+const props = defineProps({
+  location: {
+    type: Object,
+    required: true
   }
+})
+
+
+const popularEmojis = ref(['😊', '😂', '❤️', '🔥', '👍', '👏', '🎉', '🙏', '😍', '😎', '🤔', '😢', '🙌', '💯', '✨', '🌟'])
+
+// Avatar config (same behavior as original)
+const avatarConfig = reactive({})
+
+// ========== COMPUTED ==========
+const canPublish = computed(() => {
+  const len = publishText.value.trim().length
+  return len > 0 && len <= 280 && !isLoading.value
+})
+
+const avatarUrl = computed(() => {
+  Object.assign(avatarConfig, JSON.parse(localStorage.getItem('userAvatarConfig')))
+
+  const baseUrl = process.env.VUE_APP_AVATAR_APP_URL + '/avatars'
+  const params = new URLSearchParams(avatarConfig)
+  return `${baseUrl}?${params.toString()}`
+})
+
+// ========== LIFECYCLE ==========
+onMounted(() => {
+  scrollToTop()
+  handleLocationSelect(props.location)
+})
+
+// ========== METHODS ==========
+async function handleLocationSelect(c) {
+  try {
+    locationText.value = `Lat: ${c.lat.toFixed(4)}, Lon: ${c.lng.toFixed(4)}`
+
+    const response = await fetch(
+      `https://api.bigdatacloud.net/data/reverse-geocode-client?latitude=${c.lat}&longitude=${c.lng}&localityLanguage=en`
+    )
+    const data = await response.json()
+
+    if (data.city) {
+      locationText.value = `Lat: ${c.lat.toFixed(4)}, Lon: ${c.lng.toFixed(4)}, ${data.city}, ${data.countryName}`
+    }
+  } catch (e) {
+    console.error(e)
+    locationText.value = `Lat: ${c.lat.toFixed(4)}, Lon: ${c.lng.toFixed(4)}`
+  }
+}
+
+function updateCharacterCount() {
+  characterCount.value = publishText.value.length
+}
+
+function toggleEmojiPicker() {
+  showEmojiPicker.value = !showEmojiPicker.value
+}
+
+function addEmoji(emoji) {
+  publishText.value += emoji
+  showEmojiPicker.value = false
+  updateCharacterCount()
+}
+
+async function addSound() {
+  showSound.value = !showSound.value
+}
+
+async function postPublish() {
+  if (!canPublish.value) return
+
+  isLoading.value = true
+  emitter.emit('http-start', true)
+
+  try {
+    const response = await post(
+      '/api/v1',
+      {
+        topic: 'createPublish',
+        data: {
+          text: publishText.value,
+          location: {
+            type: 'Point',
+            coordinates: [props.lng, props.lat]
+          }
+        }
+      },
+      { token: getCookie('app-token') }
+    )
+
+    if (response?.data?.success) {
+      publishText.value = ''
+      locationText.value = ''
+      characterCount.value = 0
+
+      emitter.emit('success-message', 'پینگت با موفقیت انجام شد!')
+      router.push('/')
+    }
+  } catch (error) {
+    console.error('Error posting:', error)
+    emitter.emit('error-message', 'تو پینگ کردنت مشکلی به وجود اومده!')
+  } finally {
+    emitter.emit('http-stop', true)
+    isLoading.value = false
+  }
+}
+
+// Toast helpers
+function showSuccess(msg) {
+  alert(msg)
+}
+
+function showError(msg) {
+  alert(msg)
+}
+
+function scrollToTop() {
+  window.scrollTo({
+    top: 0,
+    behavior: 'smooth'
+  })
+}
+
+async function getUserLocation() {
+  return new Promise((resolve, reject) => {
+    if (location.protocol !== 'https:' && location.hostname !== 'localhost') {
+      return reject(new Error('Geolocation requires HTTPS.'))
+    }
+
+    if (!navigator.geolocation) {
+      return reject(new Error('Geolocation not supported.'))
+    }
+
+    const options = { enableHighAccuracy: true, timeout: 7000, maximumAge: 0 }
+
+    navigator.geolocation.getCurrentPosition(
+      (pos) =>
+        resolve({
+          lat: pos.coords.latitude,
+          lng: pos.coords.longitude
+        }),
+
+      (err) => {
+        let msg = ''
+        switch (err.code) {
+          case 1:
+            msg = 'User denied permission.'
+            break
+          case 2:
+            msg = 'Position unavailable.'
+            break
+          case 3:
+            msg = 'Location request timed out.'
+            break
+          default:
+            msg = 'Unknown geolocation error.'
+        }
+        reject(new Error(msg))
+      },
+      options
+    )
+  })
 }
 </script>
 
 <style scoped>
+.sound-glass-enter-from,
+.sound-glass-leave-to {
+  opacity: 0;
+  transform: translateY(25px);
+  filter: blur(10px);
+}
+
+.sound-glass-enter-active,
+.sound-glass-leave-active {
+  transition: all 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.sound-glass-enter-to,
+.sound-glass-leave-from {
+  opacity: 1;
+  transform: translateY(0);
+  filter: blur(0);
+}
 
 .tweet-box {
   margin-bottom: 5px;
