@@ -1,7 +1,7 @@
 <template>
   <Globe
     style="height: 100vh; width: 100%"
-    :autoRotateSpeed="0"
+    :autoRotateSpeed="0.3"
     :hexed="true"
     :palette="simpleDark"
     :data="data"

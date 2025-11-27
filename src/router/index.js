@@ -89,6 +89,15 @@ const routes = [
       }
     },
     {
+      path: '/lynks',
+      name: 'globes',
+      component: () => import('../views/Lynks.vue'),
+      props: true,
+      meta: {
+        layout: 'default'
+      }
+    },
+    {
           path: '/logout',
           name: 'Logout',
           // No component needed as we're just redirecting after logic

@@ -197,6 +197,65 @@ const generateAvatarUrl = (person) => {
 
       </button>
 
+      <button class="futuristic-button" @click="this.router.push('/lynks')">
+        <svg width="50" height="50" viewBox="0 0 50 50" xmlns="http://www.w3.org/2000/svg">
+          <defs>
+            <filter id="neonGlow" x="-50%" y="-50%" width="200%" height="200%">
+              <feGaussianBlur stdDeviation="1.2" result="blur"/>
+              <feMerge>
+                <feMergeNode in="blur"/>
+                <feMergeNode in="SourceGraphic"/>
+              </feMerge>
+            </filter>
+          </defs>
+
+          <!-- MAIN USER AVATAR -->
+          <circle cx="25" cy="25" r="7" fill="#ff00ff" filter="url(#neonGlow)">
+            <animate attributeName="r" values="7;8;7" dur="1.6s" repeatCount="indefinite"/>
+          </circle>
+
+          <!-- Orbit Line -->
+          <circle cx="25" cy="25" r="16" stroke="#0ff" stroke-width="0.5" fill="none" opacity="0.25">
+            <animateTransform attributeName="transform" type="rotate"
+                              from="0 25 25" to="360 25 25" dur="12s" repeatCount="indefinite"/>
+          </circle>
+
+          <!-- LYNK AVATAR 1 -->
+          <circle cx="25" cy="9" r="4" fill="#00ffff" filter="url(#neonGlow)">
+            <animateTransform attributeName="transform" type="rotate"
+                              from="0 25 25" to="360 25 25" dur="6s" repeatCount="indefinite"/>
+            <animate attributeName="r" values="4;5;4" dur="1.8s" repeatCount="indefinite"/>
+          </circle>
+
+          <!-- LYNK AVATAR 2 -->
+          <circle cx="39" cy="25" r="4" fill="#00ff88" filter="url(#neonGlow)">
+            <animateTransform attributeName="transform" type="rotate"
+                              from="0 25 25" to="-360 25 25" dur="7s" repeatCount="indefinite"/>
+            <animate attributeName="r" values="4;5;4" dur="2s" repeatCount="indefinite"/>
+          </circle>
+
+          <!-- LYNK AVATAR 3 -->
+          <circle cx="25" cy="41" r="4" fill="#ffaa00" filter="url(#neonGlow)">
+            <animateTransform attributeName="transform" type="rotate"
+                              from="0 25 25" to="360 25 25" dur="5s" repeatCount="indefinite"/>
+            <animate attributeName="r" values="4;5;4" dur="1.7s" repeatCount="indefinite"/>
+          </circle>
+
+          <!-- CONNECTING LINES -->
+          <line x1="25" y1="25" x2="25" y2="9" stroke="#0ff" stroke-width="0.8" opacity="0.6">
+            <animate attributeName="opacity" values="0.3;0.7;0.3" dur="2s" repeatCount="indefinite"/>
+          </line>
+          <line x1="25" y1="25" x2="39" y2="25" stroke="#0f0" stroke-width="0.8" opacity="0.6">
+            <animate attributeName="opacity" values="0.3;0.7;0.3" dur="2.2s" repeatCount="indefinite"/>
+          </line>
+          <line x1="25" y1="25" x2="25" y2="41" stroke="#ff0" stroke-width="0.8" opacity="0.6">
+            <animate attributeName="opacity" values="0.3;0.7;0.3" dur="1.9s" repeatCount="indefinite"/>
+          </line>
+
+        </svg>
+
+      </button>
+
     </div>
 
 
