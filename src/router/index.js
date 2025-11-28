@@ -90,7 +90,7 @@ const routes = [
     },
     {
       path: '/lynks',
-      name: 'globes',
+      name: 'lynks',
       component: () => import('../views/Lynks.vue'),
       props: true,
       meta: {

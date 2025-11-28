@@ -7,7 +7,7 @@
         v-model="search"
         type="text"
         class="form-control form-control-lg bg-dark text-white border-0 rounded-pill shadow-sm"
-        placeholder="Search Lynks..."
+        placeholder="جست و جو میان لینک ها ..."
         style="backdrop-filter: blur(12px); border: 1px solid rgba(255,255,255,0.15);"
       />
     </div>
@@ -44,7 +44,7 @@
           </div>
 
           <!-- Nickname -->
-          <div class="card-body p-2 mt-2">
+          <div class="card-body p-1 mt-2">
             <h6 class="text-white mb-1 text-truncate">{{ u.nickname }}</h6>
             <p class="text-secondary mb-2 small text-truncate" style="direction: ltr">{{ shortUuid(u.uuid) }}</p>
 
@@ -188,7 +188,7 @@ const unlink = (user) => console.log('Unlink', user.nickname);
 
 .hover-scale-neon:hover {
   transform: scale(1.05);
-  box-shadow: 0 0 15px rgba(0, 255, 255, 0.5), 0 0 25px rgba(0, 255, 255, 0.3);
+  box-shadow: 0 0 30px #ff44af, inset 0 0 30px rgba(255, 255, 255, 0.2);
   border-radius: 16px;
 }
 
@@ -198,7 +198,7 @@ const unlink = (user) => console.log('Unlink', user.nickname);
   width: 80px;
   height: 80px;
   border-radius: 50%;
-  background: rgba(0, 255, 255, 0.25);
+  background: radial-gradient(circle at 50% 90%, #ff40af, #000);
   filter: blur(12px);
   animation: pulse 2s infinite ease-in-out;
   top: 0;

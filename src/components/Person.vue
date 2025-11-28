@@ -146,7 +146,7 @@ const generateAvatarUrl = (person) => {
       </button>
 
       <!-- تنظیمات -->
-      <button class="futuristic-button" @click="this.router.push('/gems')">
+      <button class="futuristic-button" @click="router.push('/gems')">
         <svg width="50" height="50" viewBox="0 0 50 50" xmlns="http://www.w3.org/2000/svg">
           <defs>
             <filter id="neonGlow" x="-50%" y="-50%" width="200%" height="200%">
@@ -197,7 +197,7 @@ const generateAvatarUrl = (person) => {
 
       </button>
 
-      <button class="futuristic-button" @click="this.router.push('/lynks')">
+      <button class="futuristic-button" @click="router.push('/lynks')">
         <svg width="50" height="50" viewBox="0 0 50 50" xmlns="http://www.w3.org/2000/svg">
           <defs>
             <filter id="neonGlow" x="-50%" y="-50%" width="200%" height="200%">
