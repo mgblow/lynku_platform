@@ -150,7 +150,7 @@ export default {
       if (checkAuthStatus() && !localStorage.getItem('me')) {
         getMe()
       }
-      setInterval(() => (showSplash.value = false), 3000)
+      setInterval(() => (showSplash.value = false), 5000)
 
       // Listen for mitt events
       if (emitter) {
@@ -195,6 +195,7 @@ html {
 
 body {
   background: #000000;
+  max-height: 100vh;
 }
 
 .default-page-wrapper {

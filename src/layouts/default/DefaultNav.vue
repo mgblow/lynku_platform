@@ -44,7 +44,11 @@
     </div>
 
     <!-- Floating Navigation Orb -->
-    <div class="nav-orb-container">
+    <div class="nav-orb-container"
+         :style="{ top: orbPosition.y + 'px', left: orbPosition.x + 'px' }"
+         @mousedown="startDrag"
+         @touchstart="startDrag"
+    >
       <div class="nav-orb" :class="{ active: orbActive }" @click="toggleOrb">
         <div class="orb-core"></div>
         <div class="orb-rings">
@@ -62,7 +66,6 @@
               <path :d="action.icon" />
             </svg>
           </div>
-          <span class="ios-grid-label">{{ action.name }}</span>
         </div>
       </div>
     </div>
@@ -129,6 +132,7 @@ import { ref, reactive, computed, onMounted, onUnmounted } from 'vue'
 import { useRouter } from 'vue-router'
 import { emitter } from './../../utils/event-bus'
 import { getCookie } from '@/cookie'
+import Viberate from '@/components/Viberate.vue'
 
 const router = useRouter()
 
@@ -145,6 +149,42 @@ const unreadMessages = ref(5)
 const quickActions = ref([])
 const me = ref({})
 const avatarConfig = ref({})
+
+// Floating orb position
+const orbPosition = reactive({
+  x: window.innerWidth * 0.3,
+  y: window.innerHeight - 120
+})
+
+let dragging = false
+let offset = { x: 0, y: 0 }
+
+const startDrag = (event) => {
+  dragging = true
+  const e = event.type.includes('touch') ? event.touches[0] : event
+  offset.x = e.clientX - orbPosition.x
+  offset.y = e.clientY - orbPosition.y
+
+  window.addEventListener('mousemove', onDrag)
+  window.addEventListener('mouseup', endDrag)
+  window.addEventListener('touchmove', onDrag)
+  window.addEventListener('touchend', endDrag)
+}
+
+const onDrag = (event) => {
+  if (!dragging) return
+  const e = event.type.includes('touch') ? event.touches[0] : event
+  orbPosition.x = e.clientX - offset.x
+  orbPosition.y = e.clientY - offset.y
+}
+
+const endDrag = () => {
+  dragging = false
+  window.removeEventListener('mousemove', onDrag)
+  window.removeEventListener('mouseup', endDrag)
+  window.removeEventListener('touchmove', onDrag)
+  window.removeEventListener('touchend', endDrag)
+}
 
 // Notifications data
 const notifications = ref([
@@ -179,7 +219,7 @@ const quickActionsOriginalList = ref([
   {
     id: 1,
     name: 'خانه',
-    icon: 'M10 20v-6h4v6h5v-8h3L12 3 2 12h3v8z',
+    icon: 'M3 12l9-9 9 9v8a2 2 0 0 1-2 2h-4v-6h-6v6H5a2 2 0 0 1-2-2v-8z',
     gradient: 'linear-gradient(135deg, #111111 0%, #222233 50%, #334455 100%)',
     link: '/',
     requireAuth: false
@@ -220,8 +260,8 @@ const quickActionsOriginalList = ref([
   {
     id: 7,
     name: 'ورود',
-    icon: 'M10 17l5-5-5-5M15 12H3',
-    gradient: 'linear-gradient(135deg, #111111 0%, #222233 50%, #334455 100%)',
+    icon: 'M10 17l5-5-5-5v3H3v4h7v3zm9-12h-8v2h8v14h-8v2h8a2 2 0 0 0 2-2V5a2 2 0 0 0-2-2z',
+    gradient: 'linear-gradient(135deg, #111111 0%, #222233 50%, #556677 100%)',
     link: '/login',
     requireAuth: false
   },
@@ -256,6 +296,9 @@ const buildQuickActions = () => {
 }
 
 const toggleOrb = () => {
+  if (navigator.vibrate) {
+    navigator.vibrate([50, 30, 50]);
+  }
   orbActive.value = !orbActive.value
 }
 
@@ -491,14 +534,14 @@ onMounted(() => {
 /* Navigation Orb */
 .nav-orb-container {
   position: fixed;
-  bottom: 30px;
-  padding: 20px;
-  text-align: center;
-  left: 30%;
-  transform: translateX(-50%);
   z-index: 10001;
   pointer-events: all;
   opacity: 0.9;
+  cursor: grab;
+}
+
+.nav-orb-container:active {
+  cursor: grabbing;
 }
 
 .nav-orb {
@@ -511,9 +554,8 @@ onMounted(() => {
   position: relative;
   transition: all 0.5s cubic-bezier(0.68, -0.55, 0.265, 1.55);
   box-shadow: 0 0 20px rgba(29, 155, 240, 0.5), inset 0 0 20px rgba(255, 220, 97, 0.1);
-  transform: translateX(-50%) scale(1);
-  display: inline-block;
 }
+
 
 .nav-orb:hover {
   transform: scale(1.1) translateX(-50%);

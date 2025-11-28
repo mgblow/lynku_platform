@@ -23,8 +23,8 @@
 
             <!-- Tagline -->
             <div class="tagline" :class="{ 'fade-in': showTagline }">
-                <p>جهان دیجیتال شما</p>
-                <p>Your Digital Universe</p>
+                <p>جهش به دنیای متحرک و آرمانی بعدی شما</p>
+                <p>Launch Your Next Kinetic Utopia</p>
             </div>
 
             <!-- Loading Progress -->
