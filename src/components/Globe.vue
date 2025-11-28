@@ -1,5 +1,5 @@
 <template>
-  <div class="globe-wrapper" style="padding-top: 170px">
+  <div class="globe-wrapper">
     <div v-if="globeContainer" id="globe-container" ref="globeContainer" class="globe-container"></div>
     <div v-if="!globeReady" class="loading-container">
       <div class="loading">
@@ -426,7 +426,7 @@ onBeforeUnmount(() => {
 <style scoped>
 .globe-wrapper {
   width: 100vw;
-  height: 100vh;
+  height: 97vh;
   position: relative;
   direction: ltr;
   overflow: hidden;

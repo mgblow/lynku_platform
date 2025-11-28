@@ -1,6 +1,5 @@
 <template>
   <Globe
-    style="height: 100vh; width: 100%;"
     :autoRotateSpeed="0.35"
     :hexed="true"
     palette="futuristic"
