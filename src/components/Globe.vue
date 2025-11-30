@@ -268,9 +268,9 @@ async function initGlobe() {
     if(props.imageUrl === ''){
       globeImageUrl = window.location.origin + '/globe/images/earth-dark.jpg'
     }else{
-      globeImageUrl = window.location.origin + props.imageUrl
+      globeImageUrl = window.location.origin + '/globe/images/' + props.imageUrl
     }
-
+    console.log(globeImageUrl)
     globe.value = Globe()(container)
       .globeImageUrl(globeImageUrl)
       .bumpImageUrl(window.location.origin + '/globe/images/earth-topology.png')

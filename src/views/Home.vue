@@ -3,6 +3,7 @@
     :autoRotateSpeed="0.35"
     :hexed="true"
     palette="futuristic"
+    image-url="world.topo.200404.3x5400x2700.jpg"
     :data="data"
   />
 </template>

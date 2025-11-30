@@ -9,21 +9,20 @@
             <svg width="35" height="40" viewBox="0 0 120 40" xmlns="http://www.w3.org/2000/svg">
               <defs>
                 <filter id="glow" x="-50%" y="-50%" width="200%" height="200%">
-                  <feGaussianBlur stdDeviation="2" result="blur"/>
+                  <feGaussianBlur stdDeviation="2" result="blur" />
                   <feMerge>
-                    <feMergeNode in="blur"/>
-                    <feMergeNode in="SourceGraphic"/>
+                    <feMergeNode in="blur" />
+                    <feMergeNode in="SourceGraphic" />
                   </feMerge>
                 </filter>
               </defs>
               <!-- First bar -->
-              <rect x="5" y="15" width="30" height="10" rx="5" ry="5" fill="#0ff" filter="url(#glow)"/>
+              <rect x="5" y="15" width="30" height="10" rx="5" ry="5" fill="#0ff" filter="url(#glow)" />
               <!-- Second bar -->
-              <rect x="45" y="15" width="30" height="10" rx="5" ry="5" fill="#0ff" filter="url(#glow)"/>
+              <rect x="45" y="15" width="30" height="10" rx="5" ry="5" fill="#0ff" filter="url(#glow)" />
               <!-- Third bar -->
-              <rect x="85" y="15" width="30" height="10" rx="5" ry="5" fill="#0ff" filter="url(#glow)"/>
+              <rect x="85" y="15" width="30" height="10" rx="5" ry="5" fill="#0ff" filter="url(#glow)" />
             </svg>
-
           </div>
         </div>
         <span class="brand-text" @click="router.push('/')">lynku</span>
@@ -44,10 +43,11 @@
     </div>
 
     <!-- Floating Navigation Orb -->
-    <div class="nav-orb-container"
-         :style="{ top: orbPosition.y + 'px', left: orbPosition.x + 'px' }"
-         @mousedown="startDrag"
-         @touchstart="startDrag"
+    <div
+      class="nav-orb-container"
+      :style="{ top: orbPosition.y + 'px', left: orbPosition.x + 'px' }"
+      @mousedown="startDrag"
+      @touchstart="startDrag"
     >
       <div class="nav-orb" :class="{ active: orbActive }" @click="toggleOrb">
         <div class="orb-core"></div>
@@ -62,9 +62,7 @@
       <div class="orb-menu" v-if="orbActive">
         <div class="ios-grid-item" v-for="action in quickActions" :key="action.id" @click="navigateTo(action)">
           <div class="ios-icon-bg" :style="{ imageUrl: action.gradient }" @click="navigateTo(action)">
-            <svg viewBox="0 0 24 24" fill="currentColor">
-              <path :d="action.icon" />
-            </svg>
+            <div class="neon-svg-wrapper" v-html="action.svg"></div>
           </div>
         </div>
       </div>
@@ -216,55 +214,242 @@ const notifications = ref([
 
 // Quick actions list
 const quickActionsOriginalList = ref([
+  // 1) HOME — "Hub Base" (central avatar + orbit + minimal home chevron)
   {
     id: 1,
     name: 'خانه',
-    icon: 'M3 12l9-9 9 9v8a2 2 0 0 1-2 2h-4v-6h-6v6H5a2 2 0 0 1-2-2v-8z',
-    gradient: 'linear-gradient(135deg, #111111 0%, #222233 50%, #334455 100%)',
+    svg: `
+<svg width="50" height="50" viewBox="0 0 50 50" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <filter id="neonGlowHome" x="-50%" y="-50%" width="200%" height="200%">
+      <feGaussianBlur stdDeviation="1.2" result="blur"/>
+      <feMerge><feMergeNode in="blur"/><feMergeNode in="SourceGraphic"/></feMerge>
+    </filter>
+  </defs>
+
+  <!-- core avatar -->
+  <circle cx="25" cy="25" r="6" fill="#00f0ff" filter="url(#neonGlowHome)">
+    <animate attributeName="r" values="6;7;6" dur="1.6s" repeatCount="indefinite"/>
+  </circle>
+
+  <!-- orbit -->
+  <circle cx="25" cy="25" r="16" stroke="#00f0ff" stroke-width="0.7" fill="none" opacity="0.25">
+    <animateTransform attributeName="transform" type="rotate"
+                      from="0 25 25" to="360 25 25" dur="10s" repeatCount="indefinite"/>
+  </circle>
+
+  <!-- home chevron (flat) -->
+  <polyline points="19,29 25,23 31,29" fill="none" stroke="#afffff" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"
+            filter="url(#neonGlowHome)">
+    <animate attributeName="stroke-width" values="1.6;2.2;1.6" dur="1.8s" repeatCount="indefinite"/>
+  </polyline>
+  <line x1="22" y1="29" x2="28" y2="29" stroke="#cfffff" stroke-width="1.2" filter="url(#neonGlowHome)" opacity="0.85"/>
+
+  <!-- spokes -->
+  <line x1="25" y1="5" x2="25" y2="10" stroke="#00f0ff" stroke-width="0.8" opacity="0.35"/>
+  <line x1="25" y1="40" x2="25" y2="45" stroke="#00f0ff" stroke-width="0.8" opacity="0.35"/>
+  <line x1="5" y1="25" x2="10" y2="25" stroke="#00f0ff" stroke-width="0.8" opacity="0.35"/>
+  <line x1="40" y1="25" x2="45" y2="25" stroke="#00f0ff" stroke-width="0.8" opacity="0.35"/>
+</svg>
+    `,
+    gradient: 'transparent',
     link: '/',
     requireAuth: false
   },
+
+  // 2) RELATIONSHIP — "Dual Lynk" (two avatars + pulsing heart + flowing arc)
   {
     id: 10,
-    name: 'لینک',
-    icon: 'M12 2a3 3 0 1 0 0 6 3 3 0 0 0 0-6zm6 8a3 3 0 1 0 0 6 3 3 0 0 0 0-6zm-12 0a3 3 0 1 0 0 6 3 3 0 0 0 0-6zm6 8a3 3 0 1 0 0 6 3 3 0 0 0 0-6zm0-6v5m-6-2h12',
-    gradient: 'linear-gradient(135deg, #111111 0%, #222233 50%, #334455 100%)',
+    name: 'ارتباط',
+    svg: `
+<svg width="50" height="50" viewBox="0 0 50 50" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <filter id="neonGlowLink" x="-50%" y="-50%" width="200%" height="200%">
+      <feGaussianBlur stdDeviation="1.2" result="blur"/>
+      <feMerge><feMergeNode in="blur"/><feMergeNode in="SourceGraphic"/></feMerge>
+    </filter>
+    <path id="linkArc" d="M13 20 C25 10, 25 10, 37 20" />
+  </defs>
+
+  <!-- avatars -->
+  <circle cx="13" cy="20" r="4" fill="#00ffff" filter="url(#neonGlowLink)">
+    <animate attributeName="r" values="4;5;4" dur="1.8s" repeatCount="indefinite"/>
+  </circle>
+  <circle cx="37" cy="20" r="4" fill="#00ff88" filter="url(#neonGlowLink)">
+    <animate attributeName="r" values="4;5;4" dur="2s" repeatCount="indefinite"/>
+  </circle>
+
+  <!-- heart -->
+  <path d="M22 28 C22 25, 26 25, 26 28 C26 30, 24 31.5, 24 32 C24 31.5, 22 30, 22 28 Z"
+        fill="#ff39c8" filter="url(#neonGlowLink)">
+    <animateTransform attributeName="transform" type="scale" values="1;1.15;1" dur="1.6s" repeatCount="indefinite" additive="replace"
+                      origin="24 29"/>
+  </path>
+
+  <!-- glowing connection arc -->
+  <use href="#linkArc" fill="none" stroke="#ff79e3" stroke-width="1.2" opacity="0.9" filter="url(#neonGlowLink)"
+       stroke-dasharray="4 5">
+    <animate attributeName="stroke-dashoffset" values="0;-30" dur="2.2s" repeatCount="indefinite"/>
+  </use>
+
+  <!-- traveling spark along arc -->
+  <circle r="1.5" fill="#ff00cc" filter="url(#neonGlowLink)">
+    <animateMotion dur="2.2s" repeatCount="indefinite" rotate="auto">
+      <mpath href="#linkArc"/>
+    </animateMotion>
+  </circle>
+</svg>
+    `,
+    gradient: 'transparent',
     link: '/match',
     requireAuth: true
   },
+
+  // 3) MY WORLD — "Geosphere" (orbit ring + lat/long + comet)
   {
     id: 9,
     name: 'جهان من',
-    icon: 'M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm0 18c-4.41 0-8-3.59-8-8s3.59-8 8-8 8 3.59 8 8-3.59 8-8 8zm0-14c-3.31 0-6 2.69-6 6s2.69 6 6 6 6-2.69 6-6-2.69-6-6-6zm0 10c-2.21 0-4-1.79-4-4s1.79-4 4-4 4 1.79 4 4-1.79 4-4 4z',
-    gradient: 'linear-gradient(135deg, #111111 0%, #222233 50%, #334455 100%)',
+    svg: `
+<svg width="50" height="50" viewBox="0 0 50 50" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <filter id="neonGlowWorld" x="-50%" y="-50%" width="200%" height="200%">
+      <feGaussianBlur stdDeviation="1.2" result="blur"/>
+      <feMerge><feMergeNode in="blur"/><feMergeNode in="SourceGraphic"/></feMerge>
+    </filter>
+  </defs>
+
+  <!-- sphere rim -->
+  <circle cx="25" cy="25" r="16" stroke="#00e4c8" stroke-width="0.8" fill="none" filter="url(#neonGlowWorld)"/>
+
+  <!-- latitude / longitude -->
+  <ellipse cx="25" cy="25" rx="16" ry="6" stroke="#00ffd6" stroke-width="0.6" fill="none" opacity="0.6">
+    <animateTransform attributeName="transform" type="rotate"
+                      from="0 25 25" to="360 25 25" dur="8s" repeatCount="indefinite"/>
+  </ellipse>
+  <circle cx="25" cy="25" r="10" stroke="#00ffd6" stroke-width="0.6" fill="none" opacity="0.6"/>
+
+  <!-- pins -->
+  <circle cx="25" cy="9" r="2" fill="#aaffee" filter="url(#neonGlowWorld)">
+    <animate attributeName="r" values="2;3;2" dur="1.8s" repeatCount="indefinite"/>
+  </circle>
+  <circle cx="38" cy="25" r="2" fill="#aaffee" filter="url(#neonGlowWorld)">
+    <animate attributeName="r" values="2;3;2" dur="2s" repeatCount="indefinite"/>
+  </circle>
+
+  <!-- comet -->
+  <g filter="url(#neonGlowWorld)">
+    <circle cx="12" cy="38" r="1.6" fill="#ffffff">
+      <animateTransform attributeName="transform" type="translate"
+                        values="0 0; 12 -10; 24 -20" dur="2.2s" repeatCount="indefinite"/>
+    </circle>
+    <line x1="12" y1="38" x2="20" y2="34" stroke="#bfffb8" stroke-width="0.9" opacity="0.85"/>
+  </g>
+</svg>
+    `,
+    gradient: 'transparent',
     link: computed(() => '/globes/{me}'),
     requireAuth: true,
     requireMe: true
   },
+
+  // 4) SETTINGS — "Mod Grid Gear" (rotating ticks + pulsing core)
   {
     id: 5,
     name: 'تنظیمات',
-    icon: 'M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z',
-    gradient: 'linear-gradient(135deg, #111111 0%, #222233 50%, #445566 100%)',
+    svg: `
+<svg width="50" height="50" viewBox="0 0 50 50" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <filter id="neonGlowSet" x="-50%" y="-50%" width="200%" height="200%">
+      <feGaussianBlur stdDeviation="1.2" result="blur"/>
+      <feMerge><feMergeNode in="blur"/><feMergeNode in="SourceGraphic"/></feMerge>
+    </filter>
+  </defs>
+
+  <!-- core -->
+  <circle cx="25" cy="25" r="3" fill="#cfff6b" filter="url(#neonGlowSet)">
+    <animate attributeName="r" values="3;4;3" dur="1.7s" repeatCount="indefinite"/>
+  </circle>
+
+  <!-- grid modules -->
+  <rect x="12" y="12" width="8" height="8" rx="2" stroke="#cfff6b" stroke-width="1.2" fill="none" filter="url(#neonGlowSet)"/>
+  <rect x="30" y="12" width="8" height="8" rx="2" stroke="#cfff6b" stroke-width="1.2" fill="none" filter="url(#neonGlowSet)"/>
+  <rect x="12" y="30" width="8" height="8" rx="2" stroke="#cfff6b" stroke-width="1.2" fill="none" filter="url(#neonGlowSet)"/>
+  <rect x="30" y="30" width="8" height="8" rx="2" stroke="#cfff6b" stroke-width="1.2" fill="none" filter="url(#neonGlowSet)"/>
+
+  <!-- rotating ticks -->
+  <g stroke="#e9ffad" stroke-width="1.2" filter="url(#neonGlowSet)">
+    <g>
+      <line x1="25" y1="5" x2="25" y2="9"/>
+      <line x1="25" y1="41" x2="25" y2="45"/>
+      <line x1="5" y1="25" x2="9" y2="25"/>
+      <line x1="41" y1="25" x2="45" y2="25"/>
+    </g>
+    <g>
+      <g transform="rotate(45 25 25)">
+        <line x1="25" y1="5" x2="25" y2="9"/>
+        <line x1="25" y1="41" x2="25" y2="45"/>
+      </g>
+      <g transform="rotate(45 25 25)">
+        <line x1="5" y1="25" x2="9" y2="25"/>
+        <line x1="41" y1="25" x2="45" y2="25"/>
+      </g>
+    </g>
+    <animateTransform attributeName="transform" type="rotate"
+                      from="0 25 25" to="360 25 25" dur="6s" repeatCount="indefinite"/>
+  </g>
+</svg>
+    `,
+    gradient: 'transparent',
     link: '/settings',
     requireAuth: true
   },
+
+  // 5) LOGIN — "Portal Gate" (gate pillars + oscillating beam + arrow)
   {
     id: 7,
     name: 'ورود',
-    icon: 'M10 17l5-5-5-5v3H3v4h7v3zm9-12h-8v2h8v14h-8v2h8a2 2 0 0 0 2-2V5a2 2 0 0 0-2-2z',
-    gradient: 'linear-gradient(135deg, #111111 0%, #222233 50%, #556677 100%)',
+    svg: `
+<svg width="50" height="50" viewBox="0 0 50 50" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <filter id="neonGlowLogin" x="-50%" y="-50%" width="200%" height="200%">
+      <feGaussianBlur stdDeviation="1.2" result="blur"/>
+      <feMerge><feMergeNode in="blur"/><feMergeNode in="SourceGraphic"/></feMerge>
+    </filter>
+  </defs>
+
+  <!-- gates -->
+  <line x1="18" y1="10" x2="18" y2="40" stroke="#ffb432" stroke-width="1.8" filter="url(#neonGlowLogin)"/>
+  <line x1="32" y1="10" x2="32" y2="40" stroke="#ffb432" stroke-width="1.8" filter="url(#neonGlowLogin)"/>
+
+  <!-- portal ellipse -->
+  <ellipse cx="25" cy="25" rx="6" ry="14" stroke="#ffd98a" stroke-width="1.2" fill="none" opacity="0.7">
+    <animate attributeName="rx" values="6;7;6" dur="2.2s" repeatCount="indefinite"/>
+  </ellipse>
+
+  <!-- moving beam -->
+  <line x1="18" y1="25" x2="32" y2="25" stroke="#fff2cc" stroke-width="1.4" filter="url(#neonGlowLogin)">
+    <animate attributeName="stroke-width" values="1.4;2.2;1.4" dur="1.8s" repeatCount="indefinite"/>
+  </line>
+
+  <!-- arrow -->
+  <polyline points="22,21 28,25 22,29" fill="none" stroke="#ffcc66" stroke-width="1.8" filter="url(#neonGlowLogin)">
+    <animateTransform attributeName="transform" type="translate"
+                      values="0 0; 1 0; 0 0" dur="1.8s" repeatCount="indefinite"/>
+  </polyline>
+</svg>
+    `,
+    gradient: 'transparent',
     link: '/login',
     requireAuth: false
-  },
-])
+  }
+]);
 
 // Computed properties
 const isLoggedIn = () => {
-  if(getCookie('app-token') === null){
-    return false;
+  if (getCookie('app-token') === null) {
+    return false
   } else {
-    return true;
+    return true
   }
 }
 
@@ -289,7 +474,7 @@ const buildQuickActions = () => {
 
 const toggleOrb = () => {
   if (navigator.vibrate) {
-    navigator.vibrate([50, 30, 50]);
+    navigator.vibrate([50, 30, 50])
   }
   orbActive.value = !orbActive.value
 }
@@ -312,9 +497,9 @@ const performSearch = () => {
 
 const navigateTo = (action) => {
   orbActive.value = false
-  if(action.requireMe){
-    console.log(action.link.replace('{me}',me.value._id))
-    router.push(action.link.replace('{me}',me.value._id))
+  if (action.requireMe) {
+    console.log(action.link.replace('{me}', me.value._id))
+    router.push(action.link.replace('{me}', me.value._id))
   } else {
     router.push(action.link)
   }
@@ -327,11 +512,9 @@ const toggleNotifications = () => {
   }
 }
 
-
 const toggleQuickActions = () => {
   showQuickActions.value = !showQuickActions.value
 }
-
 
 // Event handlers
 const handleRefreshNavigationState = () => {
@@ -412,7 +595,6 @@ onMounted(() => {
 }
 
 .brand-text {
-
   font-size: 28px;
   font-family: 'Honk', system-ui;
   font-optical-sizing: auto;
@@ -547,7 +729,6 @@ onMounted(() => {
   transition: all 0.5s cubic-bezier(0.68, -0.55, 0.265, 1.55);
   box-shadow: 0 0 20px rgba(29, 155, 240, 0.5), inset 0 0 20px rgba(255, 220, 97, 0.1);
 }
-
 
 .nav-orb:hover {
   transform: scale(1.1) translateX(-50%);

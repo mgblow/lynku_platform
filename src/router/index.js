@@ -98,6 +98,15 @@ const routes = [
       }
     },
     {
+      path: '/gems',
+      name: 'gems',
+      component: () => import('../views/Gems.vue'),
+      props: true,
+      meta: {
+        layout: 'default'
+      }
+    },
+    {
           path: '/logout',
           name: 'Logout',
           // No component needed as we're just redirecting after logic

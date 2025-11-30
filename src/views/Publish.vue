@@ -17,6 +17,7 @@
         </div>
 
       </div>
+      <Sound></Sound>
       <!-- Tweet Text Area -->
       <div class="tweet-textarea">
         <textarea
@@ -33,7 +34,6 @@
           </span>
         </div>
       </div>
-
       <!-- Tweet Actions -->
       <div class="tweet-actions">
         <div class="action-buttons">
@@ -81,6 +81,7 @@ import { getCookie } from '@/cookie'
 import { emitter } from '@/utils/event-bus'
 
 import Globe from '@/components/Globe.vue'
+import Sound from '@/components/Sound.vue'
 
 // ========== STATE ==========
 const router = useRouter()

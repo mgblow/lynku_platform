@@ -91,170 +91,152 @@ const generateAvatarUrl = (person) => {
     </button>
 
     <div class="genz-actions" v-if="appId != null && appId == person._id">
-      <!-- پروفایل من -->
-      <button class="futuristic-button" @click="router.push('/avatar')">
-        <svg width="50" height="50" viewBox="0 0 50 50" xmlns="http://www.w3.org/2000/svg">
+      <!-- AVATAR — Premium neon avatar with dual halo + subtle easing -->
+      <button class="futuristic-button" @click="router.push('/avatar')" aria-label="Avatar settings">
+        <svg width="50" height="50" viewBox="0 0 50 50" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
           <defs>
-            <filter id="neonGlow" x="-50%" y="-50%" width="200%" height="200%">
-              <feGaussianBlur stdDeviation="1.5" result="blur"/>
-              <feMerge>
-                <feMergeNode in="blur"/>
-                <feMergeNode in="SourceGraphic"/>
-              </feMerge>
+            <filter id="glowA-pro" x="-50%" y="-50%" width="200%" height="200%">
+              <feGaussianBlur stdDeviation="1.35" result="b"/>
+              <feMerge><feMergeNode in="b"/><feMergeNode in="SourceGraphic"/></feMerge>
             </filter>
+            <!-- soft specular highlight for premium feel -->
+            <radialGradient id="specA" cx="25%" cy="20%" r="60%">
+              <stop offset="0%" stop-color="#ffffff" stop-opacity="0.55"/>
+              <stop offset="100%" stop-color="#ffffff" stop-opacity="0"/>
+            </radialGradient>
           </defs>
 
           <!-- Head -->
-          <circle cx="25" cy="18" r="8" fill="#ff33ff" filter="url(#neonGlow)">
-            <animate attributeName="r" values="8;9;8" dur="1.5s" repeatCount="indefinite"/>
+          <circle cx="25" cy="18" r="8" fill="#ff33ff" filter="url(#glowA-pro)">
+            <animate attributeName="r" values="8;9;8" dur="1.55s" repeatCount="indefinite" calcMode="spline" keySplines=".25 .1 .25 1;.25 .1 .25 1"/>
           </circle>
+          <!-- subtle highlight -->
+          <ellipse cx="23" cy="15" rx="6" ry="3" fill="url(#specA)" opacity=".35"/>
 
-          <!-- Hair (stylized top) -->
-          <path d="M17,17 Q25,10 33,17 Q25,14 17,17 Z" fill="#ffcc00" filter="url(#neonGlow)">
-            <animateTransform attributeName="transform" type="scale" values="1;1.02;1" dur="2s" repeatCount="indefinite" additive="sum"/>
+          <!-- Hair (sleeker curve) -->
+          <path d="M17,17 Q25,9.8 33,17 Q25,13.8 17,17 Z" fill="#ffd457" filter="url(#glowA-pro)">
+            <animateTransform attributeName="transform" type="scale" values="1;1.018;1" dur="2.1s" repeatCount="indefinite" calcMode="spline" keySplines=".42 0 .58 1;.42 0 .58 1"/>
+          </path>
+
+          <!-- Visor line (premium touch) -->
+          <path d="M20 18.5 Q25 16.8 30 18.5" stroke="#00f6ff" stroke-width="1" fill="none" stroke-linecap="round" filter="url(#glowA-pro)" opacity=".9">
+            <animate attributeName="opacity" values=".9;.6;.9" dur="2.4s" repeatCount="indefinite"/>
           </path>
 
           <!-- Neck -->
-          <rect x="22" y="25" width="6" height="6" fill="#33ccff" rx="2" ry="2" filter="url(#neonGlow)">
-            <animate attributeName="y" values="25;24;25" dur="1.5s" repeatCount="indefinite"/>
+          <rect x="22" y="25" width="6" height="6" rx="2" ry="2" fill="#33ccff" filter="url(#glowA-pro)">
+            <animate attributeName="y" values="25;24.3;25" dur="1.55s" repeatCount="indefinite"/>
           </rect>
 
-          <!-- Shoulders / Torso -->
-          <path d="M15,35 Q25,25 35,35 L35,40 Q25,35 15,40 Z" fill="#33ccff" filter="url(#neonGlow)">
-            <animateTransform attributeName="transform" type="scale" values="1;1.03;1" dur="2s" repeatCount="indefinite" additive="sum"/>
+          <!-- Shoulders (cleaner geometry) -->
+          <path d="M15,35 Q25,25.2 35,35 L35,40 Q25,35.2 15,40 Z" fill="#33ccff" filter="url(#glowA-pro)">
+            <animateTransform attributeName="transform" type="scale" values="1;1.02;1" dur="2.2s" repeatCount="indefinite"/>
           </path>
 
           <!-- Eyes -->
-          <circle cx="22" cy="17" r="1.2" fill="#0ff" filter="url(#neonGlow)">
-            <animate attributeName="r" values="1.2;1.5;1.2" dur="1s" repeatCount="indefinite"/>
+          <circle cx="22" cy="17" r="1.2" fill="#00ffff" filter="url(#glowA-pro)">
+            <animate attributeName="r" values="1.2;1.45;1.2" dur="1s" repeatCount="indefinite"/>
           </circle>
-          <circle cx="28" cy="17" r="1.2" fill="#0ff" filter="url(#neonGlow)">
-            <animate attributeName="r" values="1.2;1.5;1.2" dur="1s" repeatCount="indefinite"/>
+          <circle cx="28" cy="17" r="1.2" fill="#00ffff" filter="url(#glowA-pro)">
+            <animate attributeName="r" values="1.2;1.45;1.2" dur="1s" repeatCount="indefinite"/>
           </circle>
 
-          <!-- Mouth -->
-          <path d="M21,21 Q25,23 29,21" stroke="#ff33ff" stroke-width="1" fill="none" filter="url(#neonGlow)">
-            <animateTransform attributeName="transform" type="translate" values="0 0;0 0.5;0 0" dur="2s" repeatCount="indefinite"/>
+          <!-- Smile -->
+          <path d="M21,21 Q25,23 29,21" stroke="#ff33ff" stroke-width="1" fill="none" filter="url(#glowA-pro)">
+            <animateTransform attributeName="transform" type="translate" values="0 0;0 0.45;0 0" dur="2s" repeatCount="indefinite"/>
           </path>
 
-          <!-- Neon Halo / Outline -->
-          <circle cx="25" cy="18" r="12" stroke="#0ff" stroke-width="1" fill="none" filter="url(#neonGlow)">
-            <animateTransform attributeName="transform" type="rotate" from="0 25 18" to="360 25 18" dur="4s" repeatCount="indefinite"/>
+          <!-- Dual Halos (counter-rotate for premium depth) -->
+          <circle cx="25" cy="18" r="12" stroke="#00f0ff" stroke-width="1" fill="none" filter="url(#glowA-pro)" opacity=".9">
+            <animateTransform attributeName="transform" type="rotate" from="0 25 18" to="360 25 18" dur="4.6s" repeatCount="indefinite"/>
+          </circle>
+          <circle cx="25" cy="18" r="9.5" stroke="#9af9ff" stroke-width="0.8" fill="none" filter="url(#glowA-pro)" opacity=".5">
+            <animateTransform attributeName="transform" type="rotate" from="0 25 18" to="-360 25 18" dur="6.2s" repeatCount="indefinite"/>
           </circle>
         </svg>
-
       </button>
 
-      <!-- تنظیمات -->
-      <button class="futuristic-button" @click="router.push('/gems')">
-        <svg width="50" height="50" viewBox="0 0 50 50" xmlns="http://www.w3.org/2000/svg">
+      <!-- ITEMS — Premium gem cut + orbiting chips + ribbon pulse -->
+      <button class="futuristic-button" @click="router.push('/gems')" aria-label="Gifts and items">
+        <svg width="50" height="50" viewBox="0 0 50 50" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
           <defs>
-            <filter id="neonGlow" x="-50%" y="-50%" width="200%" height="200%">
-              <feGaussianBlur stdDeviation="1.2" result="blur"/>
-              <feMerge>
-                <feMergeNode in="blur"/>
-                <feMergeNode in="SourceGraphic"/>
-              </feMerge>
+            <filter id="glowG-pro" x="-50%" y="-50%" width="200%" height="200%">
+              <feGaussianBlur stdDeviation="1.25" result="b"/>
+              <feMerge><feMergeNode in="b"/><feMergeNode in="SourceGraphic"/></feMerge>
             </filter>
           </defs>
 
-          <!-- Avatar Head -->
-          <circle cx="25" cy="25" r="8" fill="#ff00ff" filter="url(#neonGlow)">
-            <animate attributeName="r" values="8;9;8" dur="1.5s" repeatCount="indefinite"/>
+          <!-- Orbit (subtle) -->
+          <circle cx="25" cy="25" r="16" stroke="#66f2ff" stroke-width="0.6" fill="none" opacity="0.25">
+            <animateTransform attributeName="transform" type="rotate" from="0 25 25" to="360 25 25" dur="11s" repeatCount="indefinite"/>
           </circle>
 
-          <!-- Hair icon -->
-          <path d="M17,20 Q25,10 33,20" stroke="#0ff" stroke-width="2" fill="none" filter="url(#neonGlow)">
-            <animateTransform attributeName="transform" type="rotate" from="0 25 25" to="360 25 25" dur="3s" repeatCount="indefinite"/>
+          <!-- Premium Gem (faceted) -->
+          <g filter="url(#glowG-pro)">
+            <polygon points="25,12 34,19 30,32 20,32 16,19" fill="#7de8ff"/>
+            <polyline points="25,12 34,19 30,32 20,32 16,19 25,12" fill="none" stroke="#c7f7ff" stroke-width="1"/>
+            <polyline points="25,12 27,20 20,32" fill="none" stroke="#eaffff" stroke-width="0.8" opacity=".8"/>
+            <polyline points="34,19 27,20 30,32" fill="none" stroke="#eaffff" stroke-width="0.8" opacity=".8"/>
+            <animateTransform attributeName="transform" type="scale" values="1;1.03;1" dur="1.9s" repeatCount="indefinite"/>
+          </g>
+
+          <!-- Orbiting chips (tokens) -->
+          <g fill="#fff3d1" filter="url(#glowG-pro)">
+            <circle cx="25" cy="9" r="1.4">
+              <animateTransform attributeName="transform" type="rotate" from="0 25 25" to="360 25 25" dur="6s" repeatCount="indefinite"/>
+            </circle>
+            <circle cx="41" cy="25" r="1.4">
+              <animateTransform attributeName="transform" type="rotate" from="0 25 25" to="-360 25 25" dur="7s" repeatCount="indefinite"/>
+            </circle>
+            <circle cx="25" cy="41" r="1.4">
+              <animateTransform attributeName="transform" type="rotate" from="0 25 25" to="360 25 25" dur="5.2s" repeatCount="indefinite"/>
+            </circle>
+          </g>
+
+          <!-- Ribbon pulse (reward vibe) -->
+          <path d="M18 36 H32" stroke="#ffd98a" stroke-width="1.2" filter="url(#glowG-pro)">
+            <animate attributeName="stroke-width" values="1.2;2;1.2" dur="1.6s" repeatCount="indefinite"/>
           </path>
-
-          <!-- Eyes icon -->
-          <circle cx="21" cy="25" r="1.5" fill="#0f0" filter="url(#neonGlow)">
-            <animateTransform attributeName="transform" type="rotate" from="0 25 25" to="-360 25 25" dur="2.5s" repeatCount="indefinite"/>
-          </circle>
-          <circle cx="29" cy="25" r="1.5" fill="#0f0" filter="url(#neonGlow)">
-            <animateTransform attributeName="transform" type="rotate" from="0 25 25" to="-360 25 25" dur="2.5s" repeatCount="indefinite"/>
-          </circle>
-
-          <!-- Clothes icon (shirt) -->
-          <rect x="22" y="32" width="6" height="5" fill="#00f" filter="url(#neonGlow)">
-            <animateTransform attributeName="transform" type="rotate" from="0 25 25" to="360 25 25" dur="4s" repeatCount="indefinite"/>
-          </rect>
-
-          <!-- Accessory icon (tiny circle) -->
-          <circle cx="25" cy="15" r="1.5" fill="#ff0" filter="url(#neonGlow)">
-            <animateTransform attributeName="transform" type="translate" values="0,0;5,-5;0,0" dur="1.2s" repeatCount="indefinite"/>
-          </circle>
-
-          <!-- Small decorative orbiting dots -->
-          <circle cx="10" cy="25" r="1" fill="#0ff">
-            <animateTransform attributeName="transform" type="rotate" from="0 25 25" to="360 25 25" dur="3.5s" repeatCount="indefinite"/>
-          </circle>
-          <circle cx="40" cy="25" r="1" fill="#0ff">
-            <animateTransform attributeName="transform" type="rotate" from="0 25 25" to="-360 25 25" dur="3.5s" repeatCount="indefinite"/>
-          </circle>
         </svg>
-
       </button>
 
-      <button class="futuristic-button" @click="router.push('/lynks')">
-        <svg width="50" height="50" viewBox="0 0 50 50" xmlns="http://www.w3.org/2000/svg">
+      <!-- LYNKS — Premium dimensional portal + twin avatars + particle flow -->
+      <button class="futuristic-button" @click="router.push('/lynks')" aria-label="Relations">
+        <svg width="50" height="50" viewBox="0 0 50 50" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
           <defs>
-            <filter id="neonGlow" x="-50%" y="-50%" width="200%" height="200%">
-              <feGaussianBlur stdDeviation="1.2" result="blur"/>
-              <feMerge>
-                <feMergeNode in="blur"/>
-                <feMergeNode in="SourceGraphic"/>
-              </feMerge>
+            <filter id="glowL-rings" x="-50%" y="-50%" width="200%" height="200%">
+              <feGaussianBlur stdDeviation="1.2" result="b"/>
+              <feMerge><feMergeNode in="b"/><feMergeNode in="SourceGraphic"/></feMerge>
             </filter>
           </defs>
 
-          <!-- MAIN USER AVATAR -->
-          <circle cx="25" cy="25" r="7" fill="#ff00ff" filter="url(#neonGlow)">
-            <animate attributeName="r" values="7;8;7" dur="1.6s" repeatCount="indefinite"/>
+          <!-- Left ring -->
+          <circle cx="20" cy="25" r="9" fill="none" stroke="#00ffff" stroke-width="1.4" filter="url(#glowL-rings)" opacity=".9">
+            <animateTransform attributeName="transform" type="rotate" from="0 20 25" to="360 20 25" dur="6.5s" repeatCount="indefinite"/>
+          </circle>
+          <!-- Right ring -->
+          <circle cx="30" cy="25" r="9" fill="none" stroke="#00ff88" stroke-width="1.4" filter="url(#glowL-rings)" opacity=".9">
+            <animateTransform attributeName="transform" type="rotate" from="0 30 25" to="-360 30 25" dur="6.5s" repeatCount="indefinite"/>
           </circle>
 
-          <!-- Orbit Line -->
-          <circle cx="25" cy="25" r="16" stroke="#0ff" stroke-width="0.5" fill="none" opacity="0.25">
-            <animateTransform attributeName="transform" type="rotate"
-                              from="0 25 25" to="360 25 25" dur="12s" repeatCount="indefinite"/>
-          </circle>
+          <!-- Link overlap highlight -->
+          <ellipse cx="25" cy="25" rx="4.2" ry="2.2" fill="none" stroke="#ff79e3" stroke-width="1.1" filter="url(#glowL-rings)" opacity=".95">
+            <animate attributeName="rx" values="4.2;5.2;4.2" dur="2.2s" repeatCount="indefinite"/>
+          </ellipse>
 
-          <!-- LYNK AVATAR 1 -->
-          <circle cx="25" cy="9" r="4" fill="#00ffff" filter="url(#neonGlow)">
-            <animateTransform attributeName="transform" type="rotate"
-                              from="0 25 25" to="360 25 25" dur="6s" repeatCount="indefinite"/>
-            <animate attributeName="r" values="4;5;4" dur="1.8s" repeatCount="indefinite"/>
-          </circle>
-
-          <!-- LYNK AVATAR 2 -->
-          <circle cx="39" cy="25" r="4" fill="#00ff88" filter="url(#neonGlow)">
-            <animateTransform attributeName="transform" type="rotate"
-                              from="0 25 25" to="-360 25 25" dur="7s" repeatCount="indefinite"/>
-            <animate attributeName="r" values="4;5;4" dur="2s" repeatCount="indefinite"/>
-          </circle>
-
-          <!-- LYNK AVATAR 3 -->
-          <circle cx="25" cy="41" r="4" fill="#ffaa00" filter="url(#neonGlow)">
-            <animateTransform attributeName="transform" type="rotate"
-                              from="0 25 25" to="360 25 25" dur="5s" repeatCount="indefinite"/>
-            <animate attributeName="r" values="4;5;4" dur="1.7s" repeatCount="indefinite"/>
-          </circle>
-
-          <!-- CONNECTING LINES -->
-          <line x1="25" y1="25" x2="25" y2="9" stroke="#0ff" stroke-width="0.8" opacity="0.6">
-            <animate attributeName="opacity" values="0.3;0.7;0.3" dur="2s" repeatCount="indefinite"/>
-          </line>
-          <line x1="25" y1="25" x2="39" y2="25" stroke="#0f0" stroke-width="0.8" opacity="0.6">
-            <animate attributeName="opacity" values="0.3;0.7;0.3" dur="2.2s" repeatCount="indefinite"/>
-          </line>
-          <line x1="25" y1="25" x2="25" y2="41" stroke="#ff0" stroke-width="0.8" opacity="0.6">
-            <animate attributeName="opacity" values="0.3;0.7;0.3" dur="1.9s" repeatCount="indefinite"/>
-          </line>
-
+          <!-- Traveling node across both rings -->
+          <g filter="url(#glowL-rings)">
+            <circle cx="20" cy="16" r="1.5" fill="#ff00cc">
+              <animateTransform attributeName="transform" type="rotate" from="0 20 25" to="360 20 25" dur="3.2s" repeatCount="indefinite"/>
+            </circle>
+            <circle cx="30" cy="34" r="1.5" fill="#ff00cc">
+              <animateTransform attributeName="transform" type="rotate" from="0 30 25" to="-360 30 25" dur="3.2s" repeatCount="indefinite"/>
+            </circle>
+          </g>
         </svg>
-
       </button>
+
+
 
     </div>
 
