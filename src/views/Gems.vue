@@ -18,50 +18,73 @@
       >
         بازار
       </button>
+      <button
+        type="button"
+        class="tab-btn"
+        :class="{ active: activeTab === 'gifts' }"
+        @click="activeTab = 'gifts'"
+      >
+        هدایا
+      </button>
     </div>
 
     <!-- EMPTY STATE -->
-    <div v-if="filteredGems.length === 0" class="empty-state">
+    <div v-if="filteredItems.length === 0" class="empty-state">
       <p v-if="activeTab === 'owned'">
         هنوز جمی نخریدی. از تب «بازار» یکی بردار 😎
       </p>
-      <p v-else>
+      <p v-else-if="activeTab === 'market'">
         همهٔ جم‌های بازار رو گرفتی! 🔥
+      </p>
+      <p v-else>
+        فعلاً هیچ هدیه‌ای نداری. از اینجا می‌تونی برای بقیه هدیه بفرستی 💌
       </p>
     </div>
 
-    <!-- GEM GRID -->
+    <!-- GRID -->
     <div v-else class="row">
-      <div class="col-6 gem-col" v-for="gem in filteredGems" :key="gem.id">
+      <div class="col-6 gem-col" v-for="item in filteredItems" :key="item.id">
         <div
           type="button"
           class="gem-card"
-          @click="openGem(gem)"
+          @click="openItem(item)"
         >
-          <div class="gem-svg" v-html="gem.svg"></div>
+          <div class="gem-svg" v-html="item.svg"></div>
 
           <div class="gem-info">
             <div class="gem-title-row">
               <span class="gem-name">
-                {{ gem.name }}
-                <span v-if="gem.owned" class="owned-dot">●</span>
+                {{ item.name }}
+                <span
+                  v-if="activeTab !== 'gifts' && item.owned"
+                  class="owned-dot"
+                >
+                  ●
+                </span>
               </span>
-              <span class="gem-tagline">{{ gem.tagline }}</span>
+              <span class="gem-tagline">{{ item.tagline }}</span>
             </div>
 
             <div class="gem-meta-row">
               <span class="pill pill-rare">
-                کمیاب · {{ gem.rarityLabel }}
+                <template v-if="activeTab === 'gifts'">
+                  نوع هدیه · {{ item.giftCategoryLabel }}
+                </template>
+                <template v-else>
+                  کمیاب · {{ item.rarityLabel }}
+                </template>
               </span>
               <span class="pill pill-count">
-                باقی‌مانده: {{ gem.remaining }} / {{ gem.total }}
+                باقی‌مانده: {{ item.remaining }} / {{ item.total }}
               </span>
             </div>
 
             <div class="gem-price-row">
-              <span class="price-label">قیمت</span>
+              <span class="price-label">
+                {{ activeTab === 'gifts' ? "هزینه ارسال" : "قیمت" }}
+              </span>
               <span class="price-value">
-                {{ gem.price.toLocaleString("fa-IR") }}
+                {{ item.price.toLocaleString("fa-IR") }}
                 <span class="price-unit">جم</span>
               </span>
             </div>
@@ -73,7 +96,7 @@
     <!-- MODAL -->
     <Transition name="modal-fade">
       <div
-        v-if="selectedGem"
+        v-if="selectedItem"
         class="lynku-modal-backdrop"
         @click.self="closeModal"
       >
@@ -88,61 +111,90 @@
           </button>
 
           <div class="lynku-modal-body">
-            <div class="lynku-modal-svg" v-html="selectedGem.svg"></div>
+            <div class="lynku-modal-svg" v-html="selectedItem.svg"></div>
 
-            <h3 class="lynku-modal-title">{{ selectedGem.name }}</h3>
-            <p class="lynku-modal-tagline">{{ selectedGem.tagline }}</p>
+            <h3 class="lynku-modal-title">{{ selectedItem.name }}</h3>
+            <p class="lynku-modal-tagline">{{ selectedItem.tagline }}</p>
 
             <p class="lynku-modal-desc">
-              {{ selectedGem.description }}
+              {{ selectedItem.description }}
             </p>
 
             <div class="lynku-modal-stats">
               <div class="stat-box">
                 <span class="stat-label">موجودی فعلی</span>
                 <span class="stat-value">
-                  {{ selectedGem.remaining }} / {{ selectedGem.total }}
+                  {{ selectedItem.remaining }} / {{ selectedItem.total }}
                 </span>
               </div>
-              <div class="stat-box">
+              <div class="stat-box" v-if="!isGiftModal">
                 <span class="stat-label">نادر بودن</span>
                 <span class="stat-value">
-                  {{ selectedGem.rarityLabel }}
+                  {{ selectedItem.rarityLabel }}
+                </span>
+              </div>
+              <div class="stat-box" v-else>
+                <span class="stat-label">نوع هدیه</span>
+                <span class="stat-value">
+                  {{ selectedItem.giftCategoryLabel }}
                 </span>
               </div>
               <div class="stat-box">
-                <span class="stat-label">قیمت</span>
+                <span class="stat-label">
+                  {{ isGiftModal ? "هزینه ارسال" : "قیمت" }}
+                </span>
                 <span class="stat-value">
-                  {{ selectedGem.price.toLocaleString("fa-IR") }}
+                  {{ selectedItem.price.toLocaleString("fa-IR") }}
                   <span class="stat-unit">جم</span>
                 </span>
               </div>
             </div>
 
             <div class="lynku-modal-actions">
-              <button
-                v-if="!selectedGem.owned"
-                type="button"
-                class="btn btn-primary"
-                @click="buySelected"
-              >
-                خرید این جم
-              </button>
-              <button
-                v-else
-                type="button"
-                class="btn btn-primary btn-owned"
-                disabled
-              >
-                این جم رو داری ✔
-              </button>
-              <button
-                type="button"
-                class="btn btn-ghost"
-                @click="closeModal"
-              >
-                انصراف
-              </button>
+              <!-- GIFTS -->
+              <template v-if="isGiftModal">
+                <button
+                  type="button"
+                  class="btn btn-primary"
+                  @click="sendGift"
+                >
+                  ارسال این هدیه
+                </button>
+                <button
+                  type="button"
+                  class="btn btn-ghost"
+                  @click="closeModal"
+                >
+                  انصراف
+                </button>
+              </template>
+
+              <!-- GEMS -->
+              <template v-else>
+                <button
+                  v-if="!selectedItem.owned"
+                  type="button"
+                  class="btn btn-primary"
+                  @click="buySelected"
+                >
+                  خرید این جم
+                </button>
+                <button
+                  v-else
+                  type="button"
+                  class="btn btn-primary btn-owned"
+                  disabled
+                >
+                  این جم رو داری ✔
+                </button>
+                <button
+                  type="button"
+                  class="btn btn-ghost"
+                  @click="closeModal"
+                >
+                  انصراف
+                </button>
+              </template>
             </div>
           </div>
         </div>
@@ -156,6 +208,9 @@ import { ref, computed } from "vue"
 
 defineOptions({ name: "GemsView" })
 
+/**
+ * GEMS (market + owned)
+ */
 const gems = ref([
   {
     id: "starship",
@@ -873,37 +928,268 @@ const gems = ref([
   }
 ])
 
-const activeTab = ref("owned") // 'owned' | 'market'
-const selectedGem = ref(null)
+/**
+ * GIFTS (for sending to others)
+ */
+const gifts = ref([
+  {
+    id: "lovePulseGift",
+    name: "هدیه پالس عشق",
+    tagline: "برای کراش‌ها و رِل‌های نئونی",
+    description:
+      "هدیه‌ای با قلب نئون و اموجی‌های معلق که موقع دریافت، یک نبض نرم روی پروفایل طرف مقابل پخش می‌کند.",
+    remaining: 999,
+    total: 9999,
+    price: 25,
+    giftCategoryLabel: "عشق / Love",
+    svg: `
+      <svg width="100" height="100" viewBox="0 0 120 120">
+        <defs>
+          <linearGradient id="grad-love-heart" x1="0%" y1="0%" x2="100%" y2="100%">
+            <stop offset="0%" stop-color="#ff4b9b"/>
+            <stop offset="100%" stop-color="#ffb3ff"/>
+          </linearGradient>
+        </defs>
+        <path
+          d="M60 96
+             C25 72 20 42 38 30
+             C48 24 58 28 60 36
+             C62 28 72 24 82 30
+             C100 42 95 72 60 96Z"
+          fill="url(#grad-love-heart)"
+          stroke="#ffe0f5"
+          stroke-width="2"
+        >
+          <animateTransform
+            attributeName="transform"
+            type="scale"
+            values="1;1.06;1"
+            dur="1.2s"
+            repeatCount="indefinite"
+          />
+        </path>
+        <text x="48" y="52" font-size="14" fill="#ffffff">❤️</text>
+        <text x="70" y="40" font-size="12" fill="#ffdefa">✨</text>
+      </svg>
+    `
+  },
+  {
+    id: "birthdayNovaGift",
+    name: "هدیه نُوا تولد",
+    tagline: "برای تبریک تولدهای GenZ",
+    description:
+      "کیک نئونی با انفجار کنفِتی که به محض دریافت روی پروفایل یک لحظه جشن کوچیک اجرا می‌کند.",
+    remaining: 420,
+    total: 5000,
+    price: 40,
+    giftCategoryLabel: "تولد / Birthday",
+    svg: `
+      <svg width="100" height="100" viewBox="0 0 120 120">
+        <rect x="38" y="60" width="44" height="26" rx="6" fill="#1a1030" stroke="#ffb3ff" stroke-width="2"/>
+        <rect x="42" y="64" width="36" height="10" rx="4" fill="#ff7bb3"/>
+        <rect x="54" y="46" width="4" height="16" fill="#ffd966"/>
+        <circle cx="56" cy="44" r="3" fill="#ffeb99">
+          <animate attributeName="r" values="2;4;2" dur="1s" repeatCount="indefinite"/>
+        </circle>
+        <circle cx="40" cy="40" r="2" fill="#ff33ff">
+          <animate attributeName="cy" values="40;32;40" dur="1.4s" repeatCount="indefinite"/>
+        </circle>
+        <circle cx="80" cy="32" r="2" fill="#33f6ff">
+          <animate attributeName="cy" values="32;26;32" dur="1.2s" repeatCount="indefinite"/>
+        </circle>
+      </svg>
+    `
+  },
+  {
+    id: "hardWorkTrophyGift",
+    name: "هدیه تروفی زحمت‌کش",
+    tagline: "برای آدم‌های خفن و پرتلاش",
+    description:
+      "جام نئونی که روی پروفایل طرف، یک نشان «سخت‌کوش» می‌گذارد و چند روز می‌درخشد.",
+    remaining: 300,
+    total: 3000,
+    price: 50,
+    giftCategoryLabel: "زحمت‌کش / Hard work",
+    svg: `
+      <svg width="100" height="100" viewBox="0 0 120 120">
+        <defs>
+          <linearGradient id="grad-trophy" x1="0%" y1="0%" x2="100%" y2="100%">
+            <stop offset="0%" stop-color="#ffd966"/>
+            <stop offset="100%" stop-color="#ffb347"/>
+          </linearGradient>
+        </defs>
+        <rect x="46" y="78" width="28" height="6" fill="#22223b"/>
+        <rect x="42" y="84" width="36" height="6" rx="2" fill="#333355"/>
+        <path d="M50 78 L70 78 L66 60 L54 60Z" fill="#444466"/>
+        <path d="M54 60 L66 60 L68 40 L52 40Z" fill="url(#grad-trophy)" stroke="#ffeec2" stroke-width="2">
+          <animateTransform
+            attributeName="transform"
+            type="translate"
+            values="0 0;0 -2;0 0"
+            dur="1.8s"
+            repeatCount="indefinite"
+          />
+        </path>
+        <circle cx="60" cy="48" r="4" fill="#ffeec2"/>
+      </svg>
+    `
+  },
+  {
+    id: "supportWaveGift",
+    name: "هدیه موج حمایت",
+    tagline: "وقتی یکی رو می‌خوای ساپورت کنی",
+    description:
+      "امواج نئونی که نشون می‌ده پشت طرف هستی؛ برای روزهای سخت و فاز «هستم کنارت».",
+    remaining: 650,
+    total: 6000,
+    price: 30,
+    giftCategoryLabel: "حمایت / Support",
+    svg: `
+      <svg width="100" height="100" viewBox="0 0 120 120">
+        <defs>
+          <linearGradient id="grad-support" x1="0%" y1="0%" x2="100%" y2="0%">
+            <stop offset="0%" stop-color="#33f6ff"/>
+            <stop offset="100%" stop-color="#7bffb3"/>
+          </linearGradient>
+        </defs>
+        <path
+          d="M10 72
+             C30 64 40 80 60 72
+             C80 64 90 80 110 72"
+          stroke="url(#grad-support)"
+          stroke-width="4"
+          fill="none"
+        >
+          <animate
+            attributeName="d"
+            dur="2.2s"
+            repeatCount="indefinite"
+            values="
+              M10 72 C30 64 40 80 60 72 C80 64 90 80 110 72;
+              M10 70 C30 78 40 64 60 74 C80 82 90 64 110 74;
+              M10 72 C30 64 40 80 60 72 C80 64 90 80 110 72
+            "
+          />
+        </path>
+      </svg>
+    `
+  },
+  {
+    id: "comebackSparkGift",
+    name: "هدیه کامبک اسپارک",
+    tagline: "برای وقتی یکی بعد مدت‌ها برگشته",
+    description:
+      "اسپارک برگشت؛ به محض دریافت، یک افکت «کامبک» روی پروفایل می‌افتد که نشون می‌ده همه منتظرش بودن.",
+    remaining: 180,
+    total: 2000,
+    price: 35,
+    giftCategoryLabel: "کامبک / Comeback",
+    svg: `
+      <svg width="100" height="100" viewBox="0 0 120 120">
+        <defs>
+          <linearGradient id="grad-comeback" x1="0%" y1="0%" x2="100%" y2="100%">
+            <stop offset="0%" stop-color="#ffdd55"/>
+            <stop offset="100%" stop-color="#33f6ff"/>
+          </linearGradient>
+        </defs>
+        <circle cx="60" cy="60" r="22" fill="none" stroke="url(#grad-comeback)" stroke-width="3">
+          <animate attributeName="r" values="18;26;18" dur="1.6s" repeatCount="indefinite"/>
+        </circle>
+        <polygon
+          points="60,42 64,54 76,54 66,62 70,74 60,66 50,74 54,62 44,54 56,54"
+          fill="url(#grad-comeback)"
+        >
+          <animateTransform
+            attributeName="transform"
+            type="rotate"
+            from="0 60 60"
+            to="360 60 60"
+            dur="3s"
+            repeatCount="indefinite"
+          />
+        </polygon>
+      </svg>
+    `
+  },
+  {
+    id: "thankYouBloomGift",
+    name: "هدیه بلوم مرسی",
+    tagline: "برای تشکرهای باکلاسِ Lynku",
+    description:
+      "گل نئونی که روی پروفایل طرف به صورت کوتاه شکوفه می‌زند و حس «دمت گرم» را منتقل می‌کند.",
+    remaining: 500,
+    total: 5000,
+    price: 20,
+    giftCategoryLabel: "مرسی / Thank you",
+    svg: `
+      <svg width="100" height="100" viewBox="0 0 120 120">
+        <defs>
+          <radialGradient id="grad-bloom" cx="50%" cy="50%" r="50%">
+            <stop offset="0%" stop-color="#ffffff"/>
+            <stop offset="40%" stop-color="#ffb3ff"/>
+            <stop offset="100%" stop-color="#ff4b9b"/>
+          </radialGradient>
+        </defs>
+        <circle cx="60" cy="64" r="6" fill="url(#grad-bloom)">
+          <animate attributeName="r" values="4;8;4" dur="1.8s" repeatCount="indefinite"/>
+        </circle>
+        <g fill="#ff7bd5" opacity="0.9">
+          <circle cx="60" cy="50" r="5"/>
+          <circle cx="72" cy="60" r="5"/>
+          <circle cx="60" cy="72" r="5"/>
+          <circle cx="48" cy="60" r="5"/>
+        </g>
+        <rect x="58" y="72" width="4" height="14" rx="2" fill="#33a36b"/>
+      </svg>
+    `
+  }
+])
 
-const filteredGems = computed(() => {
+const activeTab = ref("owned") // 'owned' | 'market' | 'gifts'
+const selectedItem = ref(null)
+const selectedType = ref(null) // 'gem' | 'gift'
+
+const isGiftModal = computed(() => selectedType.value === "gift")
+
+const filteredItems = computed(() => {
+  if (activeTab.value === "gifts") {
+    return gifts.value
+  }
   if (activeTab.value === "owned") {
     return gems.value.filter(g => g.owned)
   }
   return gems.value.filter(g => !g.owned)
 })
 
-function openGem(gem) {
-  selectedGem.value = gem
+function openItem(item) {
+  selectedItem.value = item
+  selectedType.value = activeTab.value === "gifts" ? "gift" : "gem"
 }
 
 function closeModal() {
-  selectedGem.value = null
+  selectedItem.value = null
+  selectedType.value = null
 }
 
 function buySelected() {
-  if (!selectedGem.value) return
-
-  const gem = gems.value.find(g => g.id === selectedGem.value.id)
+  if (!selectedItem.value || selectedType.value !== "gem") return
+  const gem = gems.value.find(g => g.id === selectedItem.value.id)
   if (!gem) return
 
   if (!gem.owned) {
     gem.owned = true
-    if (gem.remaining > 0) {
-      gem.remaining--
-    }
+    if (gem.remaining > 0) gem.remaining--
   }
+  closeModal()
+}
 
+function sendGift() {
+  if (!selectedItem.value || selectedType.value !== "gift") return
+  // TODO: call backend API to send gift
+  console.log("Sending gift:", selectedItem.value.id)
+  if (selectedItem.value.remaining > 0) {
+    selectedItem.value.remaining--
+  }
   closeModal()
 }
 </script>
