@@ -15,11 +15,22 @@
         <div class="step-label">مرور و ثبت</div>
       </div>
     </div>
-    <!-- Step 2: Personal Information -->
+
+    <!-- Step 1: Personal Information -->
     <div v-if="currentStep === 1" class="step-container">
       <div class="step-header">
-        <div class="avatar-preview-large" style="display: inline-block; text-align: center">
-          <img :src="avatarUrl" alt="Avatar Preview" class="preview-image" style="display: inline-block" />
+        <div class="avatar-preview-large" :class="{ glowing: !isAvatarLoading }">
+          <div v-if="isAvatarLoading" class="avatar-skeleton">
+            <div class="avatar-skeleton-inner"></div>
+          </div>
+          <img
+            v-show="!isAvatarLoading"
+            :src="avatarUrl"
+            alt="Avatar Preview"
+            class="preview-image"
+            @load="handleAvatarLoad"
+            @error="handleAvatarError"
+          />
         </div>
         <h2>اطلاعات شخصی</h2>
         <p>لطفا اطلاعات پایه خود را وارد کنید</p>
@@ -28,36 +39,47 @@
       <div class="form-container">
         <div class="form-group">
           <label for="username">نام کاربری</label>
-          <input type="text" id="username" v-model="userProfile.username" placeholder="یه اسم برای خودت انتخاب کن" required />
+          <input
+            type="text"
+            id="username"
+            v-model="userProfile.username"
+            placeholder="یه اسم برای خودت انتخاب کن"
+            required
+          />
         </div>
-
-
 
         <div class="form-row">
           <div class="form-group">
             <label for="age">سن</label>
-            <input type="number" id="age" v-model="userProfile.age" min="1" max="120" placeholder="سن خود را وارد کنید" />
+            <input
+              type="number"
+              id="age"
+              v-model="userProfile.age"
+              min="1"
+              max="120"
+              placeholder="سن خود را وارد کنید"
+            />
           </div>
         </div>
 
         <div class="form-actions">
           <button class="action-btn secondary" @click="prevStep">
             <svg viewBox="0 0 24 24" fill="currentColor">
-              <path d="M15.41 7.41L14 6l-6 6 6 6 1.41-1.41L10.83 12z" />
+              <path d="M15.41 7.41 14 6l-6 6 6 6 1.41-1.41L10.83 12z" />
             </svg>
             مرحله قبل
           </button>
           <button class="action-btn primary" @click="nextStep">
             مرحله بعد
             <svg viewBox="0 0 24 24" fill="currentColor">
-              <path d="M10 6L8.59 7.41 13.17 12l-4.58 4.59L10 18l6-6z" />
+              <path d="M10 6 8.59 7.41 13.17 12l-4.58 4.59L10 18l6-6z" />
             </svg>
           </button>
         </div>
       </div>
     </div>
 
-    <!-- Step 3: Interests and Business -->
+    <!-- Step 2: Interests and Business -->
     <div v-if="currentStep === 2" class="step-container">
       <div class="step-header">
         <h2>علایق و کسب‌وکار</h2>
@@ -76,7 +98,7 @@
               @click="toggleHobby(hobby.id)"
             >
               <div class="interest-icon">
-                <span v-html="hobby.icon"></span>
+                <span>{{ hobby.icon }}</span>
               </div>
               <span class="interest-label">{{ hobby.name }}</span>
             </div>
@@ -86,21 +108,21 @@
         <div class="form-actions">
           <button class="action-btn secondary" @click="prevStep">
             <svg viewBox="0 0 24 24" fill="currentColor">
-              <path d="M15.41 7.41L14 6l-6 6 6 6 1.41-1.41L10.83 12z" />
+              <path d="M15.41 7.41 14 6l-6 6 6 6 1.41-1.41L10.83 12z" />
             </svg>
             مرحله قبل
           </button>
           <button class="action-btn primary" @click="nextStep">
             مرحله بعد
             <svg viewBox="0 0 24 24" fill="currentColor">
-              <path d="M10 6L8.59 7.41 13.17 12l-4.58 4.59L10 18l6-6z" />
+              <path d="M10 6 8.59 7.41 13.17 12l-4.58 4.59L10 18l6-6z" />
             </svg>
           </button>
         </div>
       </div>
     </div>
 
-    <!-- Step 4: Review and Submit -->
+    <!-- Step 3: Review and Submit -->
     <div v-if="currentStep === 3" class="step-container">
       <div class="step-header">
         <h2>مرور و ثبت اطلاعات</h2>
@@ -112,7 +134,19 @@
           <div class="review-section">
             <h3>آواتار شما</h3>
             <div class="avatar-review">
-              <img :src="avatarUrl" alt="Avatar Preview" class="review-avatar" />
+              <div class="avatar-preview-large review" :class="{ glowing: !isAvatarLoading }">
+                <div v-if="isAvatarLoading" class="avatar-skeleton">
+                  <div class="avatar-skeleton-inner"></div>
+                </div>
+                <img
+                  v-show="!isAvatarLoading"
+                  :src="avatarUrl"
+                  alt="Avatar Preview"
+                  class="review-avatar"
+                  @load="handleAvatarLoad"
+                  @error="handleAvatarError"
+                />
+              </div>
             </div>
           </div>
 
@@ -136,18 +170,17 @@
               <div class="info-item full-width">
                 <span class="info-label">علایق:</span>
                 <div class="interests-review">
-                  <span v-for="hobbyId in userProfile.hobbies" :key="hobbyId" class="interest-tag">
+                  <span
+                    v-for="hobbyId in userProfile.hobbies"
+                    :key="hobbyId"
+                    class="interest-tag"
+                  >
                     {{ getHobbyName(hobbyId) }}
                   </span>
                   <span
-                    v-if="userProfile.customInterests"
-                    v-for="interest in userProfile.customInterests.split(',')"
-                    :key="interest"
-                    class="interest-tag custom"
+                    v-if="userProfile.hobbies.length === 0"
+                    class="no-data"
                   >
-                    {{ interest.trim() }}
-                  </span>
-                  <span v-if="userProfile.hobbies.length === 0 && !userProfile.customInterests" class="no-data">
                     علاقه‌ای ثبت نشده
                   </span>
                 </div>
@@ -159,7 +192,7 @@
         <div class="form-actions">
           <button class="action-btn secondary" @click="prevStep">
             <svg viewBox="0 0 24 24" fill="currentColor">
-              <path d="M15.41 7.41L14 6l-6 6 6 6 1.41-1.41L10.83 12z" />
+              <path d="M15.41 7.41 14 6l-6 6 6 6 1.41-1.41L10.83 12z" />
             </svg>
             ویرایش اطلاعات
           </button>
@@ -181,7 +214,7 @@
       <div class="modal-content success-modal" @click.stop>
         <div class="modal-icon">
           <svg viewBox="0 0 24 24" fill="currentColor">
-            <path d="M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41z" />
+            <path d="M9 16.17 4.83 12 3.41 13.41 9 19 21 7l-1.41-1.41z" />
           </svg>
         </div>
         <h3>پروفایل با موفقیت ایجاد شد!</h3>
@@ -201,11 +234,10 @@ import { emitter } from '@/utils/event-bus'
 
 const router = useRouter()
 
-// Reactive data
 const currentStep = ref(1)
 const isSubmitting = ref(false)
 const showSuccessModal = ref(false)
-const activeCategory = ref('style')
+const isAvatarLoading = ref(true)
 
 // Avatar configuration
 const avatarConfig = reactive({
@@ -223,14 +255,14 @@ const avatarConfig = reactive({
   skinColor: 'Light'
 })
 
-// me configuration
+// me configuration (if you need it later)
 const me = reactive({})
 
 // User profile data
 const userProfile = reactive({
   username: '',
   age: null,
-  hobbies: [],
+  hobbies: []
 })
 
 // Hobbies list
@@ -249,16 +281,16 @@ const hobbiesList = ref([
   { id: 'fitness', name: 'تناسب اندام', icon: '💪' }
 ])
 
-// Computed properties
+// Computed avatar URL
 const avatarUrl = computed(() => {
   const baseUrl = process.env.VUE_APP_AVATAR_APP_URL + '/avatars'
   const params = new URLSearchParams(avatarConfig)
   return `${baseUrl}?${params.toString()}`
 })
 
-// Methods
+// Navigation between steps
 const nextStep = () => {
-  if (currentStep.value < 4) {
+  if (currentStep.value < 3) {
     currentStep.value++
   }
 }
@@ -269,6 +301,7 @@ const prevStep = () => {
   }
 }
 
+// Hobbies handling
 const toggleHobby = (hobbyId) => {
   const index = userProfile.hobbies.indexOf(hobbyId)
   if (index > -1) {
@@ -283,9 +316,18 @@ const getHobbyName = (hobbyId) => {
   return hobby ? hobby.name : hobbyId
 }
 
+// Avatar load handlers
+const handleAvatarLoad = () => {
+  isAvatarLoading.value = false
+}
+
+const handleAvatarError = () => {
+  isAvatarLoading.value = false
+}
+
+// Submit profile
 const submitProfile = async () => {
-  // Validation
-  if (!userProfile.username.trim()) {
+  if (!userProfile.username || !userProfile.username.trim()) {
     showError('لطفا نام کاربری خود را وارد کنید')
     return
   }
@@ -293,7 +335,6 @@ const submitProfile = async () => {
   isSubmitting.value = true
 
   try {
-    // Prepare data for API
     const profileData = {
       username: userProfile.username,
       age: userProfile.age,
@@ -314,15 +355,17 @@ const submitProfile = async () => {
       }
     )
 
-    if (response && response.data.success) {
-      emitter.emit("refresh-navigation-state")
+    if (response && response.data && response.data.success) {
+      emitter.emit('refresh-navigation-state')
       emitter.emit('success-message', 'به لینکو دنیای متا خوش آمدید.')
       emitter.emit('reload-me', true)
+      showSuccessModal.value = true
       router.push('/')
+    } else if (response && response.data) {
+      emitter.emit('error-message', response.data.message || 'خطا در ثبت اطلاعات.')
     } else {
-      emitter.emit('error-message', response.data.message)
+      emitter.emit('error-message', 'خطا در ثبت اطلاعات.')
     }
-
   } catch (error) {
     console.error('Error submitting profile:', error)
     showError('خطا در ثبت اطلاعات. لطفا دوباره تلاش کنید.')
@@ -337,27 +380,139 @@ const showError = (message) => {
 
 // Lifecycle
 onMounted(() => {
-  // Load saved avatar configuration if exists
   const savedConfig = localStorage.getItem('userAvatarConfig')
   const meJson = localStorage.getItem('me')
+
   if (savedConfig) {
-    Object.assign(avatarConfig, JSON.parse(savedConfig))
+    try {
+      Object.assign(avatarConfig, JSON.parse(savedConfig))
+    } catch {
+      // ignore parse error, keep defaults
+    }
   }
 
   if (meJson) {
-    Object.assign(me, JSON.parse(meJson))
-    Object.assign(userProfile, me)
+    try {
+      const meData = JSON.parse(meJson)
+      Object.assign(me, meData)
+
+      if (meData.username) {
+        userProfile.username = meData.username
+      }
+      if (meData.age) {
+        userProfile.age = meData.age
+      }
+      if (Array.isArray(meData.hobbies)) {
+        userProfile.hobbies = [...meData.hobbies]
+      }
+    } catch {
+      // ignore
+    }
   }
+
+  // reset avatar loading whenever we mount
+  isAvatarLoading.value = true
 })
 </script>
 
 <style scoped>
 .avatar-profile-container {
-
   background: linear-gradient(135deg, #0f0f0f 0%, #1a1a1a 100%);
   color: #ffffff;
   animation: slideUp 0.3s ease-out;
   border-radius: 16px;
+}
+
+/* Avatar preview (with loading) */
+.avatar-preview-large {
+  position: relative;
+  width: 160px;
+  height: 160px;
+  margin: 0 auto 20px;
+  border-radius: 50%;
+  overflow: hidden;
+  background: rgba(255, 255, 255, 0.03);
+  border: 2px solid #333;
+  box-shadow: 0 0 8px #6a5af9, 0 0 16px rgba(106, 90, 249, 0.4) inset;
+  transition: transform 0.3s ease, box-shadow 0.3s ease, border-color 0.3s ease;
+}
+
+.avatar-preview-large.review {
+  width: 150px;
+  height: 150px;
+}
+
+.avatar-preview-large.glowing {
+  animation: avatarPulse 3s ease-in-out infinite;
+}
+
+@keyframes avatarPulse {
+  0% {
+    box-shadow:
+      0 0 14px rgba(255, 0, 255, 0.35),
+      0 0 28px rgba(255, 0, 255, 0.2),
+      inset 0 0 12px rgba(255, 0, 255, 0.15);
+    border-color: rgba(255, 0, 255, 0.8);
+  }
+  50% {
+    box-shadow:
+      0 0 24px rgba(255, 0, 255, 0.6),
+      0 0 48px rgba(255, 0, 255, 0.35),
+      inset 0 0 18px rgba(255, 0, 255, 0.25);
+    border-color: #ff55ff;
+  }
+  100% {
+    box-shadow:
+      0 0 14px rgba(255, 0, 255, 0.35),
+      0 0 28px rgba(255, 0, 255, 0.2),
+      inset 0 0 12px rgba(255, 0, 255, 0.15);
+    border-color: rgba(255, 0, 255, 0.8);
+  }
+}
+
+.avatar-skeleton {
+  width: 100%;
+  height: 100%;
+  border-radius: 50%;
+  background: radial-gradient(circle at 30% 30%, #333, #111);
+  position: relative;
+  overflow: hidden;
+}
+
+.avatar-skeleton-inner {
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(
+    120deg,
+    rgba(255, 255, 255, 0.04),
+    rgba(255, 255, 255, 0.15),
+    rgba(255, 255, 255, 0.04)
+  );
+  transform: translateX(-100%);
+  animation: shimmer 1.6s infinite;
+  border-radius: 50%;
+}
+
+@keyframes shimmer {
+  0% {
+    transform: translateX(-100%);
+  }
+  100% {
+    transform: translateX(100%);
+  }
+}
+
+.preview-image {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.review-avatar {
+  width: 100%;
+  height: 100%;
+  border-radius: 50%;
+  object-fit: cover;
 }
 
 /* Progress Steps */
@@ -365,6 +520,7 @@ onMounted(() => {
   display: flex;
   justify-content: center;
   margin: 40px 0;
+  position: relative;
 }
 
 .progress-steps::before {
@@ -408,12 +564,10 @@ onMounted(() => {
   font-weight: 600;
   color: #fff;
   border: none;
-  cursor: pointer;
   border-radius: 10px;
   background: #0d0d0d;
   text-transform: uppercase;
   letter-spacing: 1px;
-  transition: 0.3s ease;
   box-shadow: 0 0 8px #6a5af9, 0 0 16px #6a5af9 inset;
 }
 
@@ -596,14 +750,6 @@ textarea {
 .avatar-review {
   display: flex;
   justify-content: center;
-}
-
-.review-avatar {
-  width: 150px;
-  height: 150px;
-  border-radius: 50%;
-  border: 3px solid #1da1f2;
-  box-shadow: 0 8px 25px rgba(29, 161, 242, 0.3);
 }
 
 .info-grid {
