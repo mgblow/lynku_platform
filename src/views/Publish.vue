@@ -17,7 +17,6 @@
         </div>
 
       </div>
-      <Sound></Sound>
       <!-- Tweet Text Area -->
       <div class="tweet-textarea">
         <textarea

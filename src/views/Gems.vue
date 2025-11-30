@@ -1,40 +1,73 @@
 <template>
   <div class="gem-market">
+    <!-- TABS -->
+    <div class="tab-bar">
+      <button
+        type="button"
+        class="tab-btn"
+        :class="{ active: activeTab === 'owned' }"
+        @click="activeTab = 'owned'"
+      >
+        جم‌های من
+      </button>
+      <button
+        type="button"
+        class="tab-btn"
+        :class="{ active: activeTab === 'market' }"
+        @click="activeTab = 'market'"
+      >
+        بازار
+      </button>
+    </div>
+
+    <!-- EMPTY STATE -->
+    <div v-if="filteredGems.length === 0" class="empty-state">
+      <p v-if="activeTab === 'owned'">
+        هنوز جمی نخریدی. از تب «بازار» یکی بردار 😎
+      </p>
+      <p v-else>
+        همهٔ جم‌های بازار رو گرفتی! 🔥
+      </p>
+    </div>
+
     <!-- GEM GRID -->
-    <div class="row">
-       <div class="col-6 gem-col" v-for="gem in gems" :key="gem.id">
-          <div
-            type="button"
-            class="gem-card"
-            @click="openGem(gem)"
-          >
-            <div class="gem-svg" v-html="gem.svg"></div>
+    <div v-else class="row">
+      <div class="col-6 gem-col" v-for="gem in filteredGems" :key="gem.id">
+        <div
+          type="button"
+          class="gem-card"
+          @click="openGem(gem)"
+        >
+          <div class="gem-svg" v-html="gem.svg"></div>
 
-            <div class="gem-info">
-              <div class="gem-title-row">
-                <span class="gem-name">{{ gem.name }}</span>
-                <span class="gem-tagline">{{ gem.tagline }}</span>
-              </div>
+          <div class="gem-info">
+            <div class="gem-title-row">
+              <span class="gem-name">
+                {{ gem.name }}
+                <span v-if="gem.owned" class="owned-dot">●</span>
+              </span>
+              <span class="gem-tagline">{{ gem.tagline }}</span>
+            </div>
 
-              <div class="gem-meta-row">
-                <span class="pill pill-rare">
-                  کمیاب · {{ gem.rarityLabel }}
-                </span>
-                <span class="pill pill-count">
-                  باقی‌مانده: {{ gem.remaining }} / {{ gem.total }}
-                </span>
-              </div>
+            <div class="gem-meta-row">
+              <span class="pill pill-rare">
+                کمیاب · {{ gem.rarityLabel }}
+              </span>
+              <span class="pill pill-count">
+                باقی‌مانده: {{ gem.remaining }} / {{ gem.total }}
+              </span>
+            </div>
 
-              <div class="gem-price-row">
-                <span class="price-label">قیمت</span>
-                <span class="price-value">
-                  {{ gem.price.toLocaleString("fa-IR") }}
-                  <span class="price-unit">جم</span>
-                </span>
-              </div>
+            <div class="gem-price-row">
+              <span class="price-label">قیمت</span>
+              <span class="price-value">
+                {{ gem.price.toLocaleString("fa-IR") }}
+                <span class="price-unit">جم</span>
+              </span>
             </div>
           </div>
-       </div>
+        </div>
+      </div>
     </div>
 
     <!-- MODAL -->
@@ -88,11 +121,20 @@
 
             <div class="lynku-modal-actions">
               <button
+                v-if="!selectedGem.owned"
                 type="button"
                 class="btn btn-primary"
                 @click="buySelected"
               >
                 خرید این جم
+              </button>
+              <button
+                v-else
+                type="button"
+                class="btn btn-primary btn-owned"
+                disabled
+              >
+                این جم رو داری ✔
               </button>
               <button
                 type="button"
@@ -110,7 +152,7 @@
 </template>
 
 <script setup>
-import { ref } from "vue"
+import { ref, computed } from "vue"
 
 defineOptions({ name: "GemsView" })
 
@@ -125,6 +167,7 @@ const gems = ref([
     total: 1000,
     price: 120,
     rarityLabel: "Epic",
+    owned: true,
     svg: `
       <svg width="100" height="100" viewBox="0 0 120 120">
         <defs>
@@ -181,6 +224,7 @@ const gems = ref([
     total: 2000,
     price: 80,
     rarityLabel: "Rare",
+    owned: false,
     svg: `
       <svg width="100" height="100" viewBox="0 0 120 120">
         <defs>
@@ -235,6 +279,7 @@ const gems = ref([
     total: 777,
     price: 210,
     rarityLabel: "Legendary",
+    owned: true,
     svg: `
       <svg width="100" height="100" viewBox="0 0 120 120">
         <defs>
@@ -297,6 +342,7 @@ const gems = ref([
     total: 3000,
     price: 45,
     rarityLabel: "Uncommon",
+    owned: false,
     svg: `
       <svg width="100" height="100" viewBox="0 0 120 120">
         <defs>
@@ -315,10 +361,10 @@ const gems = ref([
           stroke="#ff9ac7"
           stroke-width="2.5"
         >
-          <animate
+          <animateTransform
             attributeName="transform"
             type="scale"
-            values="1 1;1.08 1.08;1 1"
+            values="1;1.08;1"
             dur="1.4s"
             repeatCount="indefinite"
           />
@@ -349,6 +395,7 @@ const gems = ref([
     total: 999,
     price: 150,
     rarityLabel: "Epic",
+    owned: false,
     svg: `
       <svg width="100" height="100" viewBox="0 0 120 120">
         <defs>
@@ -390,6 +437,7 @@ const gems = ref([
     total: 5000,
     price: 30,
     rarityLabel: "Common+",
+    owned: true,
     svg: `
       <svg width="100" height="100" viewBox="0 0 120 120">
         <defs>
@@ -432,6 +480,7 @@ const gems = ref([
     total: 1800,
     price: 60,
     rarityLabel: "Rare",
+    owned: false,
     svg: `
       <svg width="100" height="100" viewBox="0 0 120 120">
         <defs>
@@ -466,6 +515,7 @@ const gems = ref([
     total: 888,
     price: 95,
     rarityLabel: "Epic",
+    owned: false,
     svg: `
       <svg width="100" height="100" viewBox="0 0 120 120">
         <rect x="40" y="40" width="40" height="40" fill="#111122" rx="4"/>
@@ -486,10 +536,352 @@ const gems = ref([
         </circle>
       </svg>
     `
+  },
+  {
+    id: "chronoHalo",
+    name: "هالو زمان‌برگردان",
+    tagline: "اسکرابِ زمان توی پروفایل",
+    description:
+      "حلقه زمانی که آخرین هایلایت‌ها و لحظات مهم پروفایل را به صورت افکت چرخشی نشان می‌دهد.",
+    remaining: 12,
+    total: 365,
+    price: 260,
+    rarityLabel: "Mythic",
+    owned: true,
+    svg: `
+      <svg width="100" height="100" viewBox="0 0 120 120">
+        <defs>
+          <linearGradient id="grad-chrono" x1="0%" y1="0%" x2="100%" y2="100%">
+            <stop offset="0%" stop-color="#ffe36f"/>
+            <stop offset="50%" stop-color="#ff33ff"/>
+            <stop offset="100%" stop-color="#33f6ff"/>
+          </linearGradient>
+        </defs>
+        <circle cx="60" cy="60" r="34" fill="none" stroke="url(#grad-chrono)" stroke-width="4" stroke-dasharray="6 8">
+          <animateTransform
+            attributeName="transform"
+            type="rotate"
+            from="0 60 60"
+            to="360 60 60"
+            dur="6s"
+            repeatCount="indefinite"
+          />
+        </circle>
+        <circle cx="60" cy="60" r="20" fill="#050814" opacity="0.8"/>
+        <path d="M60 44 L60 60 L72 60" stroke="#ffe36f" stroke-width="3" stroke-linecap="round">
+          <animateTransform
+            attributeName="transform"
+            type="rotate"
+            from="0 60 60"
+            to="360 60 60"
+            dur="4s"
+            repeatCount="indefinite"
+          />
+        </path>
+      </svg>
+    `
+  },
+  {
+    id: "glitchOrb",
+    name: "گلیچ اورب",
+    tagline: "توپک نویزی برای هکرها",
+    description:
+      "کُره‌ای که هر چند ثانیه یک‌بار به شکل رندوم گلیچ و دیستورت می‌شود و اطراف اواتارت ظاهر می‌شود.",
+    remaining: 200,
+    total: 1500,
+    price: 110,
+    rarityLabel: "Epic",
+    owned: false,
+    svg: `
+      <svg width="100" height="100" viewBox="0 0 120 120">
+        <defs>
+          <radialGradient id="grad-glitch" cx="50%" cy="50%" r="50%">
+            <stop offset="0%" stop-color="#ffffff"/>
+            <stop offset="40%" stop-color="#00f5a0"/>
+            <stop offset="100%" stop-color="#000000"/>
+          </radialGradient>
+        </defs>
+        <circle cx="60" cy="60" r="26" fill="url(#grad-glitch)">
+          <animate attributeName="r" values="22;30;24;28;26" dur="1.8s" repeatCount="indefinite"/>
+        </circle>
+        <rect x="40" y="50" width="40" height="4" fill="#050814">
+          <animate attributeName="x" values="36;44;38;40" dur="0.4s" repeatCount="indefinite"/>
+        </rect>
+        <rect x="46" y="66" width="28" height="3" fill="#050814">
+          <animate attributeName="x" values="50;42;47;46" dur="0.35s" repeatCount="indefinite"/>
+        </rect>
+      </svg>
+    `
+  },
+  {
+    id: "auroraBand",
+    name: "نوار شفق",
+    tagline: "نور شمالیِ شخصی",
+    description:
+      "نواری از شفق قطبی که روی لبه آواتارت حرکت می‌کند و در لحظات خاص شدت می‌گیرد.",
+    remaining: 420,
+    total: 4000,
+    price: 55,
+    rarityLabel: "Uncommon",
+    owned: false,
+    svg: `
+      <svg width="100" height="100" viewBox="0 0 120 120">
+        <defs>
+          <linearGradient id="grad-aurora" x1="0%" y1="0%" x2="100%" y2="0%">
+            <stop offset="0%" stop-color="#33f6ff"/>
+            <stop offset="50%" stop-color="#7bff7b"/>
+            <stop offset="100%" stop-color="#ffb3ff"/>
+          </linearGradient>
+        </defs>
+        <path
+          d="M10 70
+             C30 60 40 80 60 70
+             C80 60 90 80 110 70
+             L110 90
+             L10 90Z"
+          fill="url(#grad-aurora)"
+          opacity="0.85"
+        >
+          <animate
+            attributeName="d"
+            dur="3s"
+            repeatCount="indefinite"
+            values="
+              M10 70 C30 60 40 80 60 70 C80 60 90 80 110 70 L110 90 L10 90Z;
+              M10 68 C30 78 40 60 60 72 C80 82 90 60 110 72 L110 90 L10 90Z;
+              M10 70 C30 60 40 80 60 70 C80 60 90 80 110 70 L110 90 L10 90Z
+            "
+          />
+        </path>
+      </svg>
+    `
+  },
+  {
+    id: "shadowGlyph",
+    name: "شدو گلیف",
+    tagline: "امضای سایه‌ای",
+    description:
+      "یک گلیف سایه‌ای که روی پس‌زمینه آواتار حک می‌شود و با حرکت موس/انگشت کمی جابه‌جا می‌شود.",
+    remaining: 333,
+    total: 2222,
+    price: 70,
+    rarityLabel: "Rare",
+    owned: false,
+    svg: `
+      <svg width="100" height="100" viewBox="0 0 120 120">
+        <defs>
+          <linearGradient id="grad-shadow" x1="0%" y1="0%" x2="100%" y2="100%">
+            <stop offset="0%" stop-color="#111111"/>
+            <stop offset="100%" stop-color="#444466"/>
+          </linearGradient>
+        </defs>
+        <path
+          d="M30 90
+             C40 40 80 40 90 90
+             L75 80
+             C68 60 52 60 45 80Z"
+          fill="url(#grad-shadow)"
+          opacity="0.9"
+        >
+          <animateTransform
+            attributeName="transform"
+            type="translate"
+            values="0 0;2 -2;-2 1;0 0"
+            dur="2.2s"
+            repeatCount="indefinite"
+          />
+        </path>
+      </svg>
+    `
+  },
+  {
+    id: "dataStream",
+    name: "استریم دیتا",
+    tagline: "بارکد زنده‌ی پروفایل",
+    description:
+      "ستون‌هایی از خط‌های نئونی که مثل دیتاستریم دور پروفایل بالا و پایین می‌روند.",
+    remaining: 190,
+    total: 1500,
+    price: 85,
+    rarityLabel: "Epic",
+    owned: false,
+    svg: `
+      <svg width="100" height="100" viewBox="0 0 120 120">
+        <rect x="20" y="20" width="80" height="80" rx="10" fill="#050814" stroke="#33f6ff" stroke-width="2"/>
+        <rect x="30" y="30" width="6" height="40" fill="#33f6ff">
+          <animate attributeName="height" values="10;40;20;35" dur="1s" repeatCount="indefinite"/>
+        </rect>
+        <rect x="44" y="30" width="6" height="40" fill="#ff33ff">
+          <animate attributeName="height" values="35;15;40;25" dur="1s" repeatCount="indefinite"/>
+        </rect>
+        <rect x="58" y="30" width="6" height="40" fill="#33f6ff">
+          <animate attributeName="height" values="20;40;15;30" dur="1s" repeatCount="indefinite"/>
+        </rect>
+        <rect x="72" y="30" width="6" height="40" fill="#ffb347">
+          <animate attributeName="height" values="40;18;36;22" dur="1s" repeatCount="indefinite"/>
+        </rect>
+      </svg>
+    `
+  },
+  {
+    id: "neonComet",
+    name: "نئون کومِت",
+    tagline: "شهاب‌سنگ اجتماعی",
+    description:
+      "هر بار رشد ناگهانی در پروفایلت اتفاق می‌افتد، یک دنباله‌دار نئونی اطراف آواتارت رد می‌شود.",
+    remaining: 44,
+    total: 500,
+    price: 240,
+    rarityLabel: "Legendary",
+    owned: true,
+    svg: `
+      <svg width="100" height="100" viewBox="0 0 120 120">
+        <defs>
+          <linearGradient id="grad-comet" x1="0%" y1="0%" x2="100%" y2="0%">
+            <stop offset="0%" stop-color="#33f6ff"/>
+            <stop offset="50%" stop-color="#ff33ff"/>
+            <stop offset="100%" stop-color="#ffb347"/>
+          </linearGradient>
+        </defs>
+        <circle cx="20" cy="40" r="4" fill="url(#grad-comet)">
+          <animate
+            attributeName="cx"
+            values="20;100;20"
+            dur="2.4s"
+            repeatCount="indefinite"
+          />
+          <animate
+            attributeName="cy"
+            values="40;60;40"
+            dur="2.4s"
+            repeatCount="indefinite"
+          />
+        </circle>
+        <path
+          d="M20 40 Q60 50 100 60"
+          stroke="url(#grad-comet)"
+          stroke-width="3"
+          stroke-linecap="round"
+          fill="none"
+        >
+          <animate
+            attributeName="stroke-opacity"
+            values="0.2;1;0.2"
+            dur="2.4s"
+            repeatCount="indefinite"
+          />
+        </path>
+      </svg>
+    `
+  },
+  {
+    id: "signalRing",
+    name: "رینگ سیگنال",
+    tagline: "وایب آنلاین بودن",
+    description:
+      "حلقه‌ای که شدت سیگنال و آنلاین بودن تو رو با موج‌های ریز دور آواتار نشان می‌دهد.",
+    remaining: 800,
+    total: 6000,
+    price: 35,
+    rarityLabel: "Common+",
+    owned: false,
+    svg: `
+      <svg width="100" height="100" viewBox="0 0 120 120">
+        <circle cx="60" cy="60" r="20" fill="#050814" stroke="#33f6ff" stroke-width="2"/>
+        <circle cx="60" cy="60" r="26" fill="none" stroke="#33f6ff" stroke-width="2" stroke-dasharray="4 6">
+          <animate attributeName="r" values="22;30;22" dur="1.8s" repeatCount="indefinite"/>
+        </circle>
+        <circle cx="60" cy="60" r="34" fill="none" stroke="#ff33ff" stroke-width="1.5" stroke-dasharray="2 8">
+          <animate attributeName="r" values="30;38;30" dur="1.8s" repeatCount="indefinite"/>
+        </circle>
+      </svg>
+    `
+  },
+  {
+    id: "orbitBits",
+    name: "اوربیت بیت‌ها",
+    tagline: "دورمدارِ دیتا",
+    description:
+      "چند بیت کوچک که مثل ماهواره دور آواتارت می‌چرخند، مخصوص پروفایل‌های تکنولوژی‌محور.",
+    remaining: 260,
+    total: 2200,
+    price: 90,
+    rarityLabel: "Rare",
+    owned: false,
+    svg: `
+      <svg width="100" height="100" viewBox="0 0 120 120">
+        <circle cx="60" cy="60" r="30" fill="none" stroke="#33f6ff" stroke-width="1.5"/>
+        <g fill="#ff33ff">
+          <circle cx="60" cy="30" r="4">
+            <animateTransform
+              attributeName="transform"
+              type="rotate"
+              from="0 60 60"
+              to="360 60 60"
+              dur="4s"
+              repeatCount="indefinite"
+            />
+          </circle>
+          <circle cx="60" cy="90" r="3">
+            <animateTransform
+              attributeName="transform"
+              type="rotate"
+              from="360 60 60"
+              to="0 60 60"
+              dur="3.5s"
+              repeatCount="indefinite"
+            />
+          </circle>
+        </g>
+      </svg>
+    `
+  },
+  {
+    id: "pulseGrid",
+    name: "پالس گرید",
+    tagline: "شبکه نبضی",
+    description:
+      "گریدی از مربع‌های کوچک که نسبت به میزان اکتیویتی تو روشن و خاموش می‌شوند.",
+    remaining: 500,
+    total: 4000,
+    price: 65,
+    rarityLabel: "Uncommon",
+    owned: false,
+    svg: `
+      <svg width="100" height="100" viewBox="0 0 120 120">
+        <rect x="25" y="25" width="70" height="70" rx="8" fill="#050814" stroke="#2c2f66" stroke-width="2"/>
+        <rect x="32" y="32" width="10" height="10" fill="#33f6ff">
+          <animate attributeName="opacity" values="0.2;1;0.2" dur="1s" repeatCount="indefinite"/>
+        </rect>
+        <rect x="50" y="32" width="10" height="10" fill="#ff33ff">
+          <animate attributeName="opacity" values="1;0.2;1" dur="1.3s" repeatCount="indefinite"/>
+        </rect>
+        <rect x="68" y="32" width="10" height="10" fill="#ffaa00">
+          <animate attributeName="opacity" values="0.2;1;0.2" dur="1.1s" repeatCount="indefinite"/>
+        </rect>
+        <rect x="32" y="50" width="10" height="10" fill="#ffffff">
+          <animate attributeName="opacity" values="0.4;1;0.4" dur="1.4s" repeatCount="indefinite"/>
+        </rect>
+        <rect x="50" y="50" width="10" height="10" fill="#33f6ff">
+          <animate attributeName="opacity" values="1;0.3;1" dur="0.9s" repeatCount="indefinite"/>
+        </rect>
+        <rect x="68" y="50" width="10" height="10" fill="#ff33ff">
+          <animate attributeName="opacity" values="0.3;1;0.3" dur="1.2s" repeatCount="indefinite"/>
+        </rect>
+      </svg>
+    `
   }
 ])
 
+const activeTab = ref("owned") // 'owned' | 'market'
 const selectedGem = ref(null)
+
+const filteredGems = computed(() => {
+  if (activeTab.value === "owned") {
+    return gems.value.filter(g => g.owned)
+  }
+  return gems.value.filter(g => !g.owned)
+})
 
 function openGem(gem) {
   selectedGem.value = gem
@@ -501,7 +893,18 @@ function closeModal() {
 
 function buySelected() {
   if (!selectedGem.value) return
-  console.log("Buying gem:", selectedGem.value.id)
+
+  const gem = gems.value.find(g => g.id === selectedGem.value.id)
+  if (!gem) return
+
+  if (!gem.owned) {
+    gem.owned = true
+    if (gem.remaining > 0) {
+      gem.remaining--
+    }
+  }
+
+  closeModal()
 }
 </script>
 
@@ -525,49 +928,52 @@ function buySelected() {
   color: var(--text-main);
   border-radius: 16px;
   margin-top: 50px;
-;
 }
 
-/* Header */
-.header {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: 1rem;
-  margin-bottom: 1.5rem;
+/* Tabs */
+.tab-bar {
+  display: inline-flex;
+  padding: 0.2rem;
+  border-radius: 999px;
+  background: rgba(10, 12, 30, 0.9);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  margin-bottom: 1rem;
 }
 
-.header-main h2 {
-  font-size: 1.4rem;
-  font-weight: 700;
-  letter-spacing: 0.04em;
-}
-
-.header-main p {
-  margin-top: 0.25rem;
+.tab-btn {
+  border: none;
+  background: transparent;
+  color: var(--text-sub);
+  padding: 0.35rem 1rem;
   font-size: 0.85rem;
+  border-radius: 999px;
+  cursor: pointer;
+  transition: background var(--transition-fast), color var(--transition-fast),
+  box-shadow var(--transition-fast), transform var(--transition-fast);
+}
+
+.tab-btn.active {
+  background: linear-gradient(135deg, var(--accent-pink), var(--accent-cyan));
+  color: #050814;
+  box-shadow: 0 0 18px rgba(255, 51, 255, 0.6);
+  transform: translateY(-1px);
+}
+
+/* Empty state */
+.empty-state {
+  margin-top: 1.2rem;
+  font-size: 0.9rem;
   color: var(--text-sub);
 }
 
-.badge {
-  font-size: 0.75rem;
-  padding: 0.3rem 0.7rem;
-  border-radius: 999px;
-  border: 1px solid rgba(255, 255, 255, 0.18);
-  background: linear-gradient(
-    135deg,
-    rgba(255, 51, 255, 0.2),
-    rgba(51, 246, 255, 0.06)
-  );
+/* Owned dot */
+.owned-dot {
+  font-size: 0.6rem;
+  color: var(--accent-cyan);
+  margin-right: 4px;
 }
 
 /* Grid */
-.grid {
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(210px, 1fr));
-  gap: 1rem;
-}
-
 .gem-col {
   padding: 0 5px;
   display: flex;
@@ -714,7 +1120,7 @@ function buySelected() {
   color: var(--accent-cyan);
 }
 
-/* LYNKU MODAL (no clash with Bootstrap) */
+/* Modal */
 .lynku-modal-backdrop {
   position: fixed;
   inset: 0;
@@ -736,7 +1142,6 @@ function buySelected() {
   box-shadow:
     0 24px 60px rgba(0, 0, 0, 0.85),
     0 0 60px rgba(255, 51, 255, 0.5);
-  display: block; /* make sure it's visible even if global CSS does weird stuff */
 }
 
 .lynku-modal-body {
@@ -838,6 +1243,12 @@ function buySelected() {
     0 0 35px rgba(255, 51, 255, 0.9);
 }
 
+.btn-primary.btn-owned {
+  opacity: 0.8;
+  box-shadow: none;
+  cursor: default;
+}
+
 .btn-ghost {
   background: rgba(7, 12, 30, 0.9);
   border-color: rgba(255, 255, 255, 0.12);
@@ -903,10 +1314,6 @@ function buySelected() {
 @media (max-width: 640px) {
   .gem-market {
     padding: 1.1rem;
-  }
-
-  .header-main h2 {
-    font-size: 1.2rem;
   }
 
   .gem-card {
