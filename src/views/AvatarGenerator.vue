@@ -3,8 +3,27 @@
     <!-- Header -->
     <div class="generator-header">
       <div class="header-content">
-        <div class="avatar-preview-large">
-          <img :src="avatarUrl" alt="Avatar Preview" class="preview-image" />
+        <!-- AVATAR PREVIEW WITH SKELETON -->
+        <div
+          class="avatar-preview-large"
+          :class="{ glowing: avatarLoaded }"
+        >
+          <!-- Shimmer skeleton while loading -->
+          <div
+            v-if="!avatarLoaded"
+            class="avatar-skeleton"
+          ></div>
+
+          <!-- Real avatar (fades in when loaded) -->
+          <img
+            :src="avatarUrl"
+            alt="Avatar Preview"
+            class="preview-image"
+            :class="{ 'preview-image--hidden': !avatarLoaded }"
+            @load="onAvatarLoad"
+            @error="onAvatarError"
+          />
+
           <div class="preview-overlay">
             <button class="download-btn" @click="downloadAvatar">
               <svg viewBox="0 0 24 24" fill="currentColor">
@@ -14,6 +33,7 @@
             </button>
           </div>
         </div>
+
         <div class="header-text">
           <h1>جهش به دنیای متحرک و آرمانی بعدی شما</h1>
           <p>جایی که آواتارها ملاقات می‌کنند و دنیاها به هم می‌رسند</p>
@@ -263,7 +283,9 @@
           <h3>پیش‌نمایش آواتار</h3>
           <button class="close-btn" @click="showPreview = false">
             <svg viewBox="0 0 24 24" fill="currentColor">
-              <path d="M19 6.41L17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z" />
+              <path
+                d="M19 6.41L17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z"
+              />
             </svg>
           </button>
         </div>
@@ -271,8 +293,12 @@
           <img :src="avatarUrl" alt="Avatar Preview" class="full-preview" />
         </div>
         <div class="modal-actions">
-          <button class="action-btn secondary" @click="showPreview = false">بستن</button>
-          <button class="action-btn primary" @click="downloadAvatar">دانلود</button>
+          <button class="action-btn secondary" @click="showPreview = false">
+            بستن
+          </button>
+          <button class="action-btn primary" @click="downloadAvatar">
+            دانلود
+          </button>
         </div>
       </div>
     </div>
@@ -280,7 +306,7 @@
 </template>
 
 <script setup>
-import { ref, computed, onMounted } from 'vue'
+import { ref, computed, onMounted, watch } from 'vue'
 import { useRouter } from 'vue-router'
 import { post } from '@/api'
 import { getCookie } from '@/cookie'
@@ -291,6 +317,7 @@ const router = useRouter()
 const activeCategory = ref('style')
 const showPreview = ref(false)
 const isLoading = ref(false)
+const avatarLoaded = ref(false) // 👈 new state
 
 // Avatar configuration
 const avatarConfig = ref({
@@ -310,66 +337,18 @@ const avatarConfig = ref({
 
 // Categories
 const categories = ref([
-  {
-    id: 'style',
-    name: 'سبک',
-    icon: `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="13.5" cy="6.5" r=".5"/><circle cx="17.5" cy="10.5" r=".5"/><circle cx="8.5" cy="7.5" r=".5"/><circle cx="6.5" cy="12.5" r=".5"/><path d="M12 22c5.523 0 10-4.477 10-10S17.523 2 12 2a9.98 9.98 0 0 0-7.09 2.91L2 8l3.09 3.09A9.98 9.98 0 0 0 12 22Z"/></svg>`
-  },
-  {
-    id: 'top',
-    name: 'مو',
-    icon: `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="8" cy="8" r="7"/><path d="M21 21l-5.2-5.2"/></svg>`
-  },
-  {
-    id: 'accessories',
-    name: 'اکسسوری',
-    icon: `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="6" cy="15" r="4"/><circle cx="18" cy="15" r="4"/><path d="M10 15h4"/></svg>`
-  },
-  {
-    id: 'hairColor',
-    name: 'رنگ مو',
-    icon: `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2v10"/><path d="M4.93 10.93a10 10 0 0 0 14.14 0"/></svg>`
-  },
-  {
-    id: 'facialHair',
-    name: 'ریش',
-    icon: `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M2 14s2 4 10 4 10-4 10-4"/><path d="M2 14c0-4 2-8 10-8s10 4 10 8"/></svg>`
-  },
-  {
-    id: 'facialHairColor',
-    name: 'رنگ ریش',
-    icon: `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M2 12h20"/><path d="M12 2v20"/><path d="M19 19l-7-7-7 7"/></svg>`
-  },
-  {
-    id: 'clothes',
-    name: 'لباس',
-    icon: `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 4h16v16H4z"/><path d="M9 4v8l3-2 3 2V4"/></svg>`
-  },
-  {
-    id: 'clotheColor',
-    name: 'رنگ لباس',
-    icon: `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><path d="M4.93 4.93l14.14 14.14"/></svg>`
-  },
-  {
-    id: 'eyes',
-    name: 'چشم‌ها',
-    icon: `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M1 12s4-7 11-7 11 7 11 7-4 7-11 7S1 12 1 12z"/><circle cx="12" cy="12" r="3"/></svg>`
-  },
-  {
-    id: 'eyebrow',
-    name: 'ابرو',
-    icon: `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 9c3-3 15-3 18 0"/></svg>`
-  },
-  {
-    id: 'mouth',
-    name: 'دهان',
-    icon: `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M2 14s2 4 10 4 10-4 10-4"/></svg>`
-  },
-  {
-    id: 'skin',
-    name: 'پوست',
-    icon: `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><path d="M8 15s2 2 4 2 4-2 4-2"/></svg>`
-  }
+  { id: 'style', name: 'سبک' },
+  { id: 'top', name: 'مو' },
+  { id: 'accessories', name: 'اکسسوری' },
+  { id: 'hairColor', name: 'رنگ مو' },
+  { id: 'facialHair', name: 'ریش' },
+  { id: 'facialHairColor', name: 'رنگ ریش' },
+  { id: 'clothes', name: 'لباس' },
+  { id: 'clotheColor', name: 'رنگ لباس' },
+  { id: 'eyes', name: 'چشم‌ها' },
+  { id: 'eyebrow', name: 'ابرو' },
+  { id: 'mouth', name: 'دهان' },
+  { id: 'skin', name: 'پوست' }
 ])
 
 // Options arrays with ref
@@ -393,6 +372,21 @@ const avatarUrl = computed(() => {
   return `${baseUrl}?${params.toString()}`
 })
 
+// 🔁 Whenever avatarUrl changes (style change etc.) show skeleton again
+watch(avatarUrl, () => {
+  avatarLoaded.value = false
+})
+
+// Skeleton handlers
+const onAvatarLoad = () => {
+  avatarLoaded.value = true
+}
+
+const onAvatarError = () => {
+  // fallback: hide skeleton even if image failed
+  avatarLoaded.value = true
+}
+
 // Methods
 const getAvatarPickConfig = async () => {
   try {
@@ -412,7 +406,7 @@ const getAvatarPickConfig = async () => {
       return null
     }
   } catch (error) {
-    // showError('خطا در ارسال توییت. لطفاً دوباره تلاش کنید.')
+    // handle error if needed
   } finally {
     isLoading.value = false
   }
@@ -452,35 +446,29 @@ const resetAvatar = () => {
 
 const saveAvatar = async () => {
   try {
-    // Save avatar configuration to localStorage
     localStorage.setItem('userAvatarConfig', JSON.stringify(avatarConfig.value))
 
-    // Publish avatar change event
-    try {
-      const response = await post(
-        '/api/v1',
-        {
-          topic: 'updatePersonAvatar',
-          data: avatarConfig.value
-        },
-        {
-          token: getCookie('app-token')
-        }
-      )
-      if (response && response.data.success) {
-        emitter.emit('success-message', 'آواتارت با موفقیت ساخته شد')
-        emitter.emit('reload-me', true)
-        router.push({ path: '/settings' })
-      } else {
-        emitter.emit('error-message', response.data.message)
+    const response = await post(
+      '/api/v1',
+      {
+        topic: 'updatePersonAvatar',
+        data: avatarConfig.value
+      },
+      {
+        token: getCookie('app-token')
       }
-    } catch (error) {
-      // showError('خطا در ارسال توییت. لطفاً دوباره تلاش کنید.')
-    } finally {
-      isLoading.value = false
+    )
+    if (response && response.data.success) {
+      emitter.emit('success-message', 'آواتارت با موفقیت ساخته شد')
+      emitter.emit('reload-me', true)
+      router.push({ path: '/settings' })
+    } else {
+      emitter.emit('error-message', response.data.message)
     }
   } catch (error) {
     showError('خطا در ذخیره‌سازی آواتار')
+  } finally {
+    isLoading.value = false
   }
 }
 
@@ -499,10 +487,6 @@ const downloadAvatar = async () => {
   } catch (error) {
     showError('خطا در دانلود آواتار')
   }
-}
-
-const showSuccess = (message) => {
-  alert(message)
 }
 
 const showError = (message) => {
@@ -554,7 +538,6 @@ const initializeDefaultOptions = () => {
     { value: 'ShortHairTheCaesarSidePart', label: 'سزار با خط' }
   ]
 
-  // Initialize other default options similarly...
   accessoriesTypes.value = [
     { value: 'Blank', label: 'هیچ‌کدام' },
     { value: 'Kurt', label: 'کلاه کورت' },
@@ -565,7 +548,7 @@ const initializeDefaultOptions = () => {
     { value: 'Wayfarers', label: 'عینک ویفرز' }
   ]
 
-  // Initialize other arrays with default values...
+  // You can continue initializing other arrays (hairColors, etc.) as before
 }
 
 onMounted(async () => {
@@ -574,18 +557,19 @@ onMounted(async () => {
   try {
     const response = await getAvatarPickConfig()
 
-    // Extract config safely
     const body = response?.data?.body || response
     const newAvatarConfig = body?.avatarPicks || response?.avatarPicks
 
     if (newAvatarConfig) {
-      // Update options with fetched config
       avatarStyles.value = newAvatarConfig.avatarStyles || avatarStyles.value
       topTypes.value = newAvatarConfig.topTypes || topTypes.value
-      accessoriesTypes.value = newAvatarConfig.accessoriesTypes || accessoriesTypes.value
+      accessoriesTypes.value =
+        newAvatarConfig.accessoriesTypes || accessoriesTypes.value
       hairColors.value = newAvatarConfig.hairColors || hairColors.value
-      facialHairTypes.value = newAvatarConfig.facialHairTypes || facialHairTypes.value
-      facialHairColors.value = newAvatarConfig.facialHairColors || facialHairColors.value
+      facialHairTypes.value =
+        newAvatarConfig.facialHairTypes || facialHairTypes.value
+      facialHairColors.value =
+        newAvatarConfig.facialHairColors || facialHairColors.value
       clotheTypes.value = newAvatarConfig.clotheTypes || clotheTypes.value
       clotheColors.value = newAvatarConfig.clotheColors || clotheColors.value
       eyeTypes.value = newAvatarConfig.eyeTypes || eyeTypes.value
@@ -594,20 +578,192 @@ onMounted(async () => {
       skinColors.value = newAvatarConfig.skinColors || skinColors.value
     }
 
-    // Load saved avatar configuration if exists
     const savedConfig = localStorage.getItem('userAvatarConfig')
     if (savedConfig) {
       avatarConfig.value = JSON.parse(savedConfig)
     }
-
   } catch (error) {
     console.error('Error loading avatar config:', error)
   }
 })
 </script>
 
-
 <style scoped>
+.avatar-generator-container {
+  background: linear-gradient(135deg, #0f0f0f 0%, #1a1a1a 100%);
+  color: #ffffff;
+  padding: 20px;
+  animation: slideUp 0.3s ease-out;
+  border-radius: 16px;
+}
+
+.generator-header {
+  background: #000000;
+  border-radius: 20px;
+  padding: 30px;
+  margin-bottom: 30px;
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+  border: 1px solid #333;
+}
+
+.header-content {
+  display: flex;
+  align-items: center;
+  gap: 30px;
+}
+
+/* AVATAR PREVIEW + SKELETON */
+.avatar-preview-large {
+  position: relative;
+  width: 220px;
+  height: 220px;
+  border-radius: 50%;
+  overflow: hidden;
+
+  box-shadow: 0 0 8px #6a5af9, 0 0 16px #6a5af9 inset;
+  background: rgba(255, 255, 255, 0.03);
+  backdrop-filter: blur(10px);
+  transition: transform 0.3s ease, box-shadow 0.3s ease, border-color 0.3s ease;
+}
+
+/* Hover interaction */
+.avatar-preview-large:hover {
+  transform: translateY(-6px) scale(1.04);
+  box-shadow:
+    0 0 20px rgba(255, 0, 255, 0.55),
+    0 0 40px rgba(255, 0, 255, 0.35),
+    inset 0 0 18px rgba(255, 0, 255, 0.25);
+  border-color: #ff33ff;
+}
+
+/* Subtle breathing glow animation (when loaded) */
+.avatar-preview-large.glowing {
+  animation: avatarPulse 3s ease-in-out infinite;
+}
+
+@keyframes avatarPulse {
+  0% {
+    box-shadow:
+      0 0 14px rgba(255, 0, 255, 0.35),
+      0 0 28px rgba(255, 0, 255, 0.2),
+      inset 0 0 12px rgba(255, 0, 255, 0.15);
+    border-color: rgba(255, 0, 255, 0.9);
+  }
+  50% {
+    box-shadow:
+      0 0 24px rgba(255, 0, 255, 0.6),
+      0 0 48px rgba(255, 0, 255, 0.35),
+      inset 0 0 18px rgba(255, 0, 255, 0.25);
+    border-color: #ff55ff;
+  }
+  100% {
+    box-shadow:
+      0 0 14px rgba(255, 0, 255, 0.35),
+      0 0 28px rgba(255, 0, 255, 0.2),
+      inset 0 0 12px rgba(255, 0, 255, 0.15);
+    border-color: rgba(255, 0, 255, 0.9);
+  }
+}
+
+/* Skeleton shimmer */
+.avatar-skeleton {
+  position: absolute;
+  inset: 0;
+  border-radius: 50%;
+  border: 3px solid rgba(150, 150, 255, 0.35);
+  background: linear-gradient(
+    120deg,
+    #0a0a1a 0%,
+    #20206a 25%,
+    #0a0a1a 50%,
+    #20206a 75%,
+    #0a0a1a 100%
+  );
+  background-size: 200% 100%;
+  animation: shimmer 1.2s infinite linear;
+  box-shadow: 0 0 26px rgba(80, 80, 200, 0.55);
+}
+
+@keyframes shimmer {
+  0% {
+    background-position: -200% 0;
+  }
+  100% {
+    background-position: 200% 0;
+  }
+}
+
+.preview-image {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  opacity: 1;
+  transition: opacity 0.3s ease-out;
+}
+
+.preview-image--hidden {
+  opacity: 0;
+}
+
+.preview-overlay {
+  position: absolute;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.8);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  opacity: 0;
+  transition: opacity 0.3s ease;
+}
+
+.avatar-preview-large:hover .preview-overlay {
+  opacity: 1;
+}
+
+.download-btn {
+  background: linear-gradient(135deg, #000000 0%, #1a0a2a 50%, #cc00ff 100%);
+  border: none;
+  color: white;
+  padding: 8px 16px;
+  border-radius: 20px;
+  font-size: 0.9rem;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  transition: all 0.3s ease;
+}
+
+.download-btn:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 15px rgba(29, 161, 242, 0.4);
+}
+
+.download-btn svg {
+  width: 16px;
+  height: 16px;
+}
+
+/* ... rest of your styles unchanged ... */
+.header-text h1 {
+  margin: 0;
+  font-size: 2rem;
+  font-weight: 700;
+  background: linear-gradient(135deg, #1da1f2, #00ba7c);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+.header-text p {
+  margin: 10px 0 0 0;
+  color: #8899a6;
+  font-size: 1.1rem;
+}
+
+/* (keep all the rest of your existing CSS below: generator-content, category-nav, options-grid, buttons, modal, media queries, etc.) */
 .avatar-generator-container {
   background: linear-gradient(135deg, #0f0f0f 0%, #1a1a1a 100%);
   color: #ffffff;
@@ -1221,6 +1377,4 @@ onMounted(async () => {
     height: 50px;
   }
 }
-
-
 </style>
