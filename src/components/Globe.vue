@@ -22,7 +22,7 @@ import Ping from '@/components/Ping.vue'
 import wires from '@/data/wire-data'
 import countries from '@/data/countries'
 import Gift from '@/components/Gift.vue'
-import Publish from '@/views/Publish.vue'
+import Tex from '@/views/Tex.vue'
 import GiftCard from '@/components/globe/GiftCard.vue'
 import PingCard from '@/components/globe/PingCard.vue'
 

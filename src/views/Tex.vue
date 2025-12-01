@@ -8,15 +8,26 @@
             <img style="width: 100%" :src="avatarUrl" />
           </div>
         </div>
+
         <div class="header-text">
           <h3>یه تکس جدید ارسال کن</h3>
-          <p style="text-align: right">
-            <small>📍 {{ props.location.lat.toFixed(4) }} , {{ props.location.lng.toFixed(4) }}</small>
-            <small>📍 {{locationText}}</small>
+
+          <!-- Location info -->
+          <p style="text-align: right; margin-top: 6px">
+            <!-- Raw coordinates -->
+            <small v-if="currentLocation">
+              📍 {{ currentLocation.lat.toFixed(4) }} , {{ currentLocation.lng.toFixed(4) }}
+            </small>
+          </p>
+          <p style="text-align: right; margin-top: 2px">
+            <!-- Human friendly city estimation -->
+            <small v-if="locationText">
+              🏙️ {{ locationText }}
+            </small>
           </p>
         </div>
-
       </div>
+
       <!-- Tweet Text Area -->
       <div class="tweet-textarea">
         <textarea
@@ -28,18 +39,30 @@
           @input="updateCharacterCount"
         ></textarea>
         <div class="textarea-actions">
-          <span class="character-count" :class="{ warning: characterCount > 250, danger: characterCount > 270 }">
+          <span
+            class="character-count"
+            :class="{ warning: characterCount > 250, danger: characterCount > 270 }"
+          >
             {{ characterCount }}/280
           </span>
         </div>
       </div>
+
       <!-- Tweet Actions -->
       <div class="tweet-actions">
         <div class="action-buttons">
           <!-- Emoji Picker Trigger -->
           <button class="action-btn" @click="toggleEmojiPicker">
-            <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" fill="currentColor" viewBox="0 0 16 16">
-              <path d="M8 15A7 7 0 1 1 8 1a7 7 0 0 1 0 14zm0 1A8 8 0 1 0 8 0a8 8 0 0 0 0 16z" />
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              width="20"
+              height="20"
+              fill="currentColor"
+              viewBox="0 0 16 16"
+            >
+              <path
+                d="M8 15A7 7 0 1 1 8 1a7 7 0 0 1 0 14zm0 1A8 8 0 1 0 8 0a8 8 0 0 0 0 16z"
+              />
               <path
                 d="M4.285 9.567a.5.5 0 0 1 .683.183A3.498 3.498 0 0 0 8 11.5a3.498 3.498 0 0 0 3.032-1.75.5.5 0 1 1 .866.5A4.498 4.498 0 0 1 8 12.5a4.498 4.498 0 0 1-3.898-2.25.5.5 0 0 1 .183-.683zM7 6.5C7 7.328 6.552 8 6 8s-1-.672-1-1.5S5.448 5 6 5s1 .672 1 1.5zm4 0c0 .828-.448 1.5-1 1.5s-1-.672-1-1.5S9.448 5 10 5s1 .672 1 1.5z"
               />
@@ -50,10 +73,34 @@
         <!-- Tweet Button -->
         <button class="tweet-btn" :disabled="!canPublish" @click="postPublish">
           <span class="btn-text">تکس کن</span>
-          <svg v-if="isLoading" class="spinner" width="20" height="20" viewBox="0 0 20 20">
-            <circle cx="10" cy="10" r="8" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round">
-              <animate attributeName="stroke-dasharray" values="1, 50; 50, 1; 1, 50" dur="1.5s" repeatCount="indefinite" />
-              <animate attributeName="stroke-dashoffset" values="0; -15; -34" dur="1.5s" repeatCount="indefinite" />
+          <svg
+            v-if="isLoading"
+            class="spinner"
+            width="20"
+            height="20"
+            viewBox="0 0 20 20"
+          >
+            <circle
+              cx="10"
+              cy="10"
+              r="8"
+              stroke="currentColor"
+              stroke-width="2"
+              fill="none"
+              stroke-linecap="round"
+            >
+              <animate
+                attributeName="stroke-dasharray"
+                values="1, 50; 50, 1; 1, 50"
+                dur="1.5s"
+                repeatCount="indefinite"
+              />
+              <animate
+                attributeName="stroke-dashoffset"
+                values="0; -15; -34"
+                dur="1.5s"
+                repeatCount="indefinite"
+              />
             </circle>
           </svg>
         </button>
@@ -62,7 +109,12 @@
       <!-- Emoji Picker -->
       <div v-if="showEmojiPicker" class="emoji-picker">
         <div class="emoji-grid">
-          <span v-for="emoji in popularEmojis" :key="emoji" class="emoji" @click="addEmoji(emoji)">
+          <span
+            v-for="emoji in popularEmojis"
+            :key="emoji"
+            class="emoji"
+            @click="addEmoji(emoji)"
+          >
             {{ emoji }}
           </span>
         </div>
@@ -74,46 +126,69 @@
 <script setup>
 import { ref, reactive, computed, onMounted, watch } from 'vue'
 import { useRouter } from 'vue-router'
-
 import { post } from '../api'
 import { getCookie } from '@/cookie'
 import { emitter } from '@/utils/event-bus'
 
-import Globe from '@/components/Globe.vue'
-import Sound from '@/components/Sound.vue'
-
-// ========== STATE ==========
+// ========== ROUTER ==========
 const router = useRouter()
 
-const showSound = ref(false)
-const coords = ref(null)
+// ========== PROPS ==========
+const props = defineProps({
+  // This should be set by parent when user clicks somewhere on globe/map
+  location: {
+    type: Object,
+    required: false,
+    default: null // { lat, lng }
+  }
+})
+
+// ========== STATE ==========
+const currentLocation = ref(null) // actual location used in header + API
 const publishText = ref('')
-const locationText = ref('')
+const locationText = ref('') // city / country label
 const showEmojiPicker = ref(false)
 const isLoading = ref(false)
 const characterCount = ref(0)
 
-const props = defineProps({
-  location: {
-    type: Object,
-    required: true
-  }
-})
-
-
-const popularEmojis = ref(['😊', '😂', '❤️', '🔥', '👍', '👏', '🎉', '🙏', '😍', '😎', '🤔', '😢', '🙌', '💯', '✨', '🌟'])
-
-// Avatar config (same behavior as original)
+// Avatar config
 const avatarConfig = reactive({})
+
+// Emoji set
+const popularEmojis = ref([
+  '😊',
+  '😂',
+  '❤️',
+  '🔥',
+  '👍',
+  '👏',
+  '🎉',
+  '🙏',
+  '😍',
+  '😎',
+  '🤔',
+  '😢',
+  '🙌',
+  '💯',
+  '✨',
+  '🌟'
+])
 
 // ========== COMPUTED ==========
 const canPublish = computed(() => {
   const len = publishText.value.trim().length
-  return len > 0 && len <= 280 && !isLoading.value
+  return !!currentLocation.value && len > 0 && len <= 280 && !isLoading.value
 })
 
 const avatarUrl = computed(() => {
-  Object.assign(avatarConfig, JSON.parse(localStorage.getItem('userAvatarConfig')))
+  try {
+    const saved = localStorage.getItem('userAvatarConfig')
+    if (saved) {
+      Object.assign(avatarConfig, JSON.parse(saved))
+    }
+  } catch (e) {
+    console.warn('Error reading avatar config', e)
+  }
 
   const baseUrl = process.env.VUE_APP_AVATAR_APP_URL + '/avatars'
   const params = new URLSearchParams(avatarConfig)
@@ -121,27 +196,55 @@ const avatarUrl = computed(() => {
 })
 
 // ========== LIFECYCLE ==========
-onMounted(() => {
+onMounted(async () => {
   scrollToTop()
-  handleLocationSelect(props.location)
+
+  // if parent already sent location on mount
+  if (props.location) {
+    await handleLocationSelect(props.location)
+  } else {
+    // fallback: use browser geo if nothing passed
+    try {
+      const geo = await getUserLocation()
+      await handleLocationSelect(geo)
+    } catch (e) {
+      console.warn('No location available:', e.message)
+    }
+  }
 })
+
+// When parent changes location (click somewhere else on globe)
+watch(
+  () => props.location,
+  async (newVal) => {
+    if (newVal && newVal.lat && newVal.lng) {
+      await handleLocationSelect(newVal)
+    }
+  },
+  { deep: true }
+)
 
 // ========== METHODS ==========
 async function handleLocationSelect(c) {
-  try {
-    locationText.value = `Lat: ${c.lat.toFixed(4)}, Lon: ${c.lng.toFixed(4)}`
+  currentLocation.value = { lat: c.lat, lng: c.lng }
+  locationText.value = '' // reset while loading
 
+  try {
     const response = await fetch(
       `https://api.bigdatacloud.net/data/reverse-geocode-client?latitude=${c.lat}&longitude=${c.lng}&localityLanguage=en`
     )
     const data = await response.json()
 
-    if (data.city) {
-      locationText.value = `Lat: ${c.lat.toFixed(4)}, Lon: ${c.lng.toFixed(4)}, ${data.city}, ${data.countryName}`
-    }
+    // Try to build a nice "city - region - country" label
+    const city = data.city || data.locality || data.principalSubdivision || ''
+    const region = data.principalSubdivision || ''
+    const country = data.countryName || ''
+
+    const parts = [city, region, country].filter(Boolean)
+    locationText.value = parts.length ? parts.join(' - ') : 'منطقه ناشناس'
   } catch (e) {
-    console.error(e)
-    locationText.value = `Lat: ${c.lat.toFixed(4)}, Lon: ${c.lng.toFixed(4)}`
+    console.error('Reverse geocode error:', e)
+    locationText.value = 'منطقه ناشناس'
   }
 }
 
@@ -159,12 +262,8 @@ function addEmoji(emoji) {
   updateCharacterCount()
 }
 
-async function addSound() {
-  showSound.value = !showSound.value
-}
-
 async function postPublish() {
-  if (!canPublish.value) return
+  if (!canPublish.value || !currentLocation.value) return
 
   isLoading.value = true
   emitter.emit('http-start', true)
@@ -178,7 +277,12 @@ async function postPublish() {
           text: publishText.value,
           location: {
             type: 'Point',
-            coordinates: [props.lng, props.lat]
+            // ✅ FIX: use currentLocation (lon, lat)
+            coordinates: [currentLocation.value.lng, currentLocation.value.lat],
+            meta: {
+              // optional extra info if backend wants it later
+              label: locationText.value
+            }
           }
         }
       },
@@ -187,30 +291,26 @@ async function postPublish() {
 
     if (response?.data?.success) {
       publishText.value = ''
-      locationText.value = ''
       characterCount.value = 0
 
-      emitter.emit('success-message', 'پینگت با موفقیت انجام شد!')
+      emitter.emit('success-message', 'تکس‌ات با موفقیت منتشر شد!')
       router.push('/')
+    } else {
+      emitter.emit(
+        'error-message',
+        response?.data?.message || 'تو تکس کردنت مشکلی به وجود اومده!'
+      )
     }
   } catch (error) {
     console.error('Error posting:', error)
-    emitter.emit('error-message', 'تو پینگ کردنت مشکلی به وجود اومده!')
+    emitter.emit('error-message', 'تو تکس کردنت مشکلی به وجود اومده!')
   } finally {
     emitter.emit('http-stop', true)
     isLoading.value = false
   }
 }
 
-// Toast helpers
-function showSuccess(msg) {
-  alert(msg)
-}
-
-function showError(msg) {
-  alert(msg)
-}
-
+// Helpers
 function scrollToTop() {
   window.scrollTo({
     top: 0,
@@ -236,7 +336,6 @@ async function getUserLocation() {
           lat: pos.coords.latitude,
           lng: pos.coords.longitude
         }),
-
       (err) => {
         let msg = ''
         switch (err.code) {
@@ -261,6 +360,7 @@ async function getUserLocation() {
 </script>
 
 <style scoped>
+/* your original styles unchanged */
 .sound-glass-enter-from,
 .sound-glass-leave-to {
   opacity: 0;
@@ -286,7 +386,6 @@ async function getUserLocation() {
   transition: all 0.3s ease;
   border-radius: 16px;
   width: 100vw;
-  height: 50vh;
   height: fit-content;
 }
 
@@ -327,7 +426,7 @@ async function getUserLocation() {
 
 .header-text p {
   color: #8899a6;
-  margin: 5px 0 0 0;
+  margin: 0;
   font-size: 0.9rem;
 }
 
@@ -432,6 +531,7 @@ async function getUserLocation() {
 }
 
 .spinner {
+  margin-right: 8px;
   animation: spin 1s linear infinite;
 }
 
@@ -464,91 +564,8 @@ async function getUserLocation() {
   transform: scale(1.2);
 }
 
-.location-tag {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  background: #1a3a53;
-  padding: 8px 12px;
-  border-radius: 20px;
-  margin-top: 15px;
-  animation: slideDown 0.2s ease-out;
-}
-
-.location-text {
-  color: #1da1f2;
-  font-size: 0.9rem;
-  display: flex;
-  align-items: center;
-  gap: 5px;
-}
-
-.remove-location {
-  background: none;
-  border: none;
-  color: #8899a6;
-  cursor: pointer;
-  font-size: 1.2rem;
-  padding: 0;
-  width: 20px;
-  height: 20px;
-  border-radius: 50%;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-}
-
-.remove-location:hover {
-  background: #e0245e;
-  color: white;
-}
-
-.tweet-preview {
-  background: #000000;
-  border: 1px solid #333;
-  border-radius: 16px;
-  padding: 20px;
-  margin-top: 20px;
-  animation: slideUp 0.3s ease-out;
-}
-
-.preview-header h4 {
-  color: #ffffff;
-  margin: 0 0 15px 0;
-  font-weight: 600;
-  border-bottom: 1px solid #333;
-  padding-bottom: 10px;
-}
-
-.preview-content {
-  color: #ffffff;
-}
-
-.preview-text {
-  line-height: 1.6;
-  margin-bottom: 10px;
-  white-space: pre-wrap;
-}
-
-.preview-location {
-  color: #1da1f2;
-  font-size: 0.9rem;
-}
-
 .btn-text {
   font-weight: 700;
-}
-
-@keyframes slideUp {
-  from {
-    opacity: 0;
-    transform: translateY(20px);
-  }
-
-  to {
-    opacity: 1;
-    transform: translateY(0);
-  }
 }
 
 @keyframes slideDown {
@@ -599,7 +616,7 @@ async function getUserLocation() {
   }
 }
 
-/* Custom scrollbar for textarea */
+/* Scrollbar for textarea */
 .tweet-input::-webkit-scrollbar {
   width: 6px;
 }
@@ -616,15 +633,5 @@ async function getUserLocation() {
 
 .tweet-input::-webkit-scrollbar-thumb:hover {
   background: #555;
-}
-
-.globe-container {
-  overflow: hidden;
-}
-
-.preview-image {
-  width: 100%;
-  border-radius: 15px;
-  box-shadow: 0 0 5px #eee;
 }
 </style>

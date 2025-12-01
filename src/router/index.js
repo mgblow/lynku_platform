@@ -1,5 +1,5 @@
 import { createRouter, createWebHashHistory } from 'vue-router'
-import Publish from '../views/Publish.vue'
+import Tex from '../views/Tex.vue'
 import Login from '../views/Login.vue'
 import Mail from '../views/Mail.vue'
 import Chat from '../views/Chat.vue'
@@ -44,7 +44,7 @@ const routes = [
     {
         path: '/publish',
         name: 'Publish',
-        component: Publish,
+        component: Tex,
         meta: {
             layout: 'default'
         }
