@@ -5,9 +5,10 @@ import { emitter } from '@/utils/event-bus'
 import Gift from '@/components/Gift.vue'
 import Tex from '@/views/Tex.vue'
 import Person from '@/components/Person.vue'
-import Ping from '@/components/Ping.vue'
+import TexBox from '@/components/TexBox.vue'
 import AvatarGenerator from '@/views/AvatarGenerator.vue'
 import Settings from '@/views/Settings.vue'
+import Gem from '@/components/Gem.vue'
 
 const props = defineProps({
   selectedData: { type: Object, default: null }
@@ -39,12 +40,13 @@ onMounted(() => {
       ...data,
       type
     }
+    console.log(drawerData.value)
     isMinimized.value = false
   }
 
   emitter.on('drawer:publish', openWithType('publish'))
-  emitter.on('drawer:ping', openWithType('ping'))
-  emitter.on('drawer:gift', openWithType('gift'))
+  emitter.on('drawer:tex', openWithType('tex'))
+  emitter.on('drawer:gem', openWithType('gem'))
   emitter.on('drawer:person', openWithType('person'))
   emitter.on('drawer:avatarConfig', openWithType('avatarConfig'))
   emitter.on('drawer:settings', openWithType('settings'))
@@ -56,8 +58,8 @@ onMounted(() => {
 
 onBeforeUnmount(() => {
   emitter.off('drawer:publish')
-  emitter.off('drawer:ping')
-  emitter.off('drawer:gift')
+  emitter.off('drawer:tex')
+  emitter.off('drawer:gem')
   emitter.off('drawer:person')
   emitter.off('drawer:avatarConfig')
   emitter.off('drawer:settings')
@@ -96,9 +98,10 @@ onBeforeUnmount(() => {
       <!-- Dynamic content -->
       <AvatarGenerator v-if="drawerData.type === 'avatarConfig'" />
       <Settings v-else-if="drawerData.type === 'settings'" />
-      <Ping v-else-if="drawerData.type === 'ping'" />
+      <TexBox v-else-if="drawerData.type === 'tex'" :selectedData="drawerData"/>
       <Person v-else-if="drawerData.type === 'person'" :selectedData="drawerData" />
       <Gift v-else-if="drawerData.type === 'gift'" :selectedData="drawerData" />
+      <Gem v-else-if="drawerData.type === 'gem'" :selectedData="drawerData" />
       <Tex v-else-if="drawerData.type === 'publish'" :location="drawerData" />
     </div>
   </Teleport>

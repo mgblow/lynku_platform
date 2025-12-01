@@ -2,9 +2,11 @@
   <Globe
     style="height: 100vh; width: 100%"
     :autoRotateSpeed="0.3"
-    :hexed="true"
+    :hexed="false"
     :palette="simpleDark"
+    :wired="false"
     :data="data"
+    image-url="world.topo.200404.3x5400x2700.jpg"
     :location-picker="true"
   />
 </template>

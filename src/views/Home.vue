@@ -3,207 +3,397 @@
     :autoRotateSpeed="0.35"
     :hexed="true"
     palette="futuristic"
-    image-url="world.topo.200404.3x5400x2700.jpg"
+    :wired="false"
     :data="data"
   />
 </template>
 
 <script setup>
-import { ref } from 'vue'
+import { onMounted, ref } from 'vue'
 import Globe from '@/components/Globe.vue'
 
-const data = ref([]) // <-- reactive reference
+/**
+ * MQTT-normalized payload:
+ *   type: 'tex' | 'person' | 'gem'
+ *   _id: Mongo ObjectId string
+ *   lat, lng: number
+ *   city, country: string
+ *
+ * tex:
+ *   text, stats, authorName, authorHandle, avatarConfig, isGemTex, createdAt
+ * person:
+ *   handle, status, gemsCollected, avatarConfig
+ * gem:
+ *   rarity, value
+ */
 
-const people = [
-  { type: 'person', name: 'Luna', city: 'Hanoi', lat: 21.0278, lng: 105.8342 },
-  { type: 'person', name: 'Tyler', city: 'Seattle', lat: 47.6062, lng: -122.3321 },
-  { type: 'person', name: 'Aria', city: 'Kuala Lumpur', lat: 3.139, lng: 101.6869 },
-  { type: 'person', name: 'Leo', city: 'Singapore', lat: 1.3521, lng: 103.8198 },
-  { type: 'person', name: 'Mason', city: 'Denver', lat: 39.7392, lng: -104.9903 },
-  { type: 'person', name: 'Parisa', city: 'Tehran', lat: 35.6892, lng: 51.389 },
-  { type: 'person', name: 'Amir', city: 'Mashhad', lat: 36.2605, lng: 59.6168 },
-  { type: 'person', name: 'Zahra', city: 'Isfahan', lat: 32.6546, lng: 51.668 },
-  { type: 'person', name: 'Reza', city: 'Tabriz', lat: 38.0962, lng: 46.2738 },
-  { type: 'person', name: 'Narges', city: 'Shiraz', lat: 29.5918, lng: 52.5837 },
-  { type: 'person', name: 'Ali', city: 'Karaj', lat: 35.84, lng: 50.9391 },
-  { type: 'person', name: 'Sara', city: 'Ahvaz', lat: 31.3183, lng: 48.6706 },
-  { type: 'person', name: 'Hossein', city: 'Qom', lat: 34.6399, lng: 50.8759 },
-  { type: 'person', name: 'Leila', city: 'Rasht', lat: 37.2809, lng: 49.5832 }
-]
+const data = ref([])
 
-const pings = [
-  // 🌍 Global users
+// 🔹 Mixed batch: tex + person + gem in one array
+const worldEventsSeed = [
+  // ---------- TEX (short thoughts) ----------
   {
-    type: 'ping',
-    name: 'Luna',
-    city: 'Hanoi',
-    lat: 21.0278,
-    lng: 105.8342,
-    text: 'Lost in thought under pink neon lights 🌸✨ #nightvibes',
-    likes: 128,
-    reping: 21,
-    comments: 8
-  },
-
-  {
-    type: 'ping',
-    name: 'Tyler',
-    city: 'Seattle',
-    lat: 47.6062,
-    lng: -122.3321,
-    text: 'Rainy mornings + black coffee ☕ = perfect coding weather.',
-    likes: 203,
-    reping: 44,
-    comments: 17
-  },
-
-  {
-    type: 'ping',
-    name: 'Aria',
-    city: 'Kuala Lumpur',
-    lat: 3.139,
-    lng: 101.6869,
-    text: 'City feels alive tonight 🌆💖 #neon #galaxy',
-    likes: 97,
-    reping: 12,
-    comments: 6
-  },
-
-  {
-    type: 'ping',
-    name: 'Leo',
-    city: 'Singapore',
-    lat: 1.3521,
-    lng: 103.8198,
-    text: 'Sometimes silence speaks louder than sound.',
-    likes: 78,
-    reping: 9,
-    comments: 5
-  },
-
-  {
-    type: 'ping',
-    name: 'Mason',
-    city: 'Denver',
-    lat: 39.7392,
-    lng: -104.9903,
-    text: 'Just deployed something that didn’t crash 😎 #devlife',
-    likes: 255,
-    reping: 62,
-    comments: 24
-  },
-
-  // 🇮🇷 Iranian users (70%)
-  {
-    type: 'ping',
-    name: 'Parisa',
-    city: 'Tehran',
+    type: 'tex',
+    _id: '671fa3c2b19e4d12c831f203',
     lat: 35.6892,
     lng: 51.389,
+    city: 'Tehran',
+    country: 'IR',
+
+    name: 'Parisa',
+    authorName: 'Parisa',
+    authorHandle: 'parisa',
+    avatarConfig: {
+      avatarStyle: 'Circle',
+      topType: 'Hijab',
+      clotheType: 'BlazerSweater'
+    },
+
     text: 'تهران بوی بارون میده، و دلم بوی دلتنگی 🍂☕️',
-    likes: 430,
-    reping: 110,
-    comments: 47
-  },
+    isGemTex: true,
+    createdAt: '2025-11-30T18:02:00Z',
 
-  {
-    type: 'ping',
-    name: 'Amir',
-    city: 'Mashhad',
-    lat: 36.2605,
-    lng: 59.6168,
-    text: 'تو سکوت شب، فقط صدای تایپ‌ کردنه که آرومم می‌کنه 💻✨',
-    likes: 289,
-    reping: 71,
-    comments: 33
+    stats: {
+      likes: 430,
+      lynks: 110,
+      comments: 47,
+      views: 4200
+    }
   },
-
   {
-    type: 'ping',
-    name: 'Zahra',
-    city: 'Isfahan',
-    lat: 32.6546,
-    lng: 51.668,
-    text: 'یه قهوه‌ی تلخ و یه آهنگ قدیمی... همین کافیه برای امشب ☕🎶',
-    likes: 376,
-    reping: 92,
-    comments: 38
+    type: 'tex',
+    _id: '671fa3c2b19e4d12c831f204',
+    lat: 47.6062,
+    lng: -122.3321,
+    city: 'Seattle',
+    country: 'US',
+
+    name: 'Tyler',
+    authorName: 'Tyler',
+    authorHandle: 'tyler',
+    avatarConfig: {
+      avatarStyle: 'Circle',
+      topType: 'ShortHairShortFlat',
+      clotheType: 'ShirtCrewNeck'
+    },
+
+    text: 'Rainy mornings + black coffee ☕ = perfect coding weather.',
+    isGemTex: false,
+    createdAt: '2025-11-27T07:45:00Z',
+
+    stats: {
+      likes: 203,
+      lynks: 44,
+      comments: 17,
+      views: 2100
+    }
   },
-
   {
-    type: 'ping',
-    name: 'Reza',
-    city: 'Tabriz',
-    lat: 38.0962,
-    lng: 46.2738,
-    text: 'کاش همه چیز به سادگی یه سلام بود 👋',
-    likes: 214,
-    reping: 48,
-    comments: 16
+    type: 'tex',
+    _id: '671fa3c2b19e4d12c831f205',
+    lat: 3.139,
+    lng: 101.6869,
+    city: 'Kuala Lumpur',
+    country: 'MY',
+
+    name: 'Aria',
+    authorName: 'Aria',
+    authorHandle: 'aria',
+    avatarConfig: {
+      avatarStyle: 'Circle',
+      topType: 'LongHairFro',
+      clotheType: 'Hoodie'
+    },
+
+    text: 'City feels alive tonight 🌆💖 #neon #galaxy',
+    isGemTex: false,
+    createdAt: '2025-11-28T18:20:00Z',
+
+    stats: {
+      likes: 97,
+      lynks: 12,
+      comments: 6,
+      views: 890
+    }
   },
-
   {
-    type: 'ping',
-    name: 'Narges',
-    city: 'Shiraz',
+    type: 'tex',
+    _id: '671fa3c2b19e4d12c831f206',
+    lat: 39.7392,
+    lng: -104.9903,
+    city: 'Denver',
+    country: 'US',
+
+    name: 'Mason',
+    authorName: 'Mason',
+    authorHandle: 'mason',
+    avatarConfig: {
+      avatarStyle: 'Circle',
+      topType: 'ShortHairShortFlat',
+      clotheType: 'Hoodie'
+    },
+
+    text: 'Just shipped something that didn’t crash 😎 #devlife',
+    isGemTex: true,
+    createdAt: '2025-11-30T02:11:00Z',
+
+    stats: {
+      likes: 255,
+      lynks: 62,
+      comments: 24,
+      views: 3100
+    }
+  },
+  {
+    type: 'tex',
+    _id: '671fa3c2b19e4d12c831f207',
     lat: 29.5918,
     lng: 52.5837,
+    city: 'Shiraz',
+    country: 'IR',
+
+    name: 'Narges',
+    authorName: 'Narges',
+    authorHandle: 'narges',
+    avatarConfig: {
+      avatarStyle: 'Circle',
+      topType: 'LongHairStraight',
+      clotheType: 'BlazerSweater'
+    },
+
     text: 'عطر بهار نارنج پیچیده توی خیابونای شیراز 🍊🌸',
-    likes: 498,
-    reping: 120,
-    comments: 54
-  },
+    isGemTex: true,
+    createdAt: '2025-11-30T06:52:00Z',
 
-  {
-    type: 'ping',
-    name: 'Ali',
-    city: 'Karaj',
-    lat: 35.84,
-    lng: 50.9391,
-    text: 'امروز فقط با هدفون و خلسه‌ی موسیقی 🎧🔥',
-    likes: 175,
-    reping: 39,
-    comments: 12
+    stats: {
+      likes: 498,
+      lynks: 120,
+      comments: 54,
+      views: 5600
+    }
   },
-
   {
-    type: 'ping',
-    name: 'Sara',
-    city: 'Ahvaz',
-    lat: 31.3183,
-    lng: 48.6706,
-    text: 'خورشید هنوزم عاشق جنوبه ☀️🌴 #Ahvaz',
-    likes: 322,
-    reping: 87,
-    comments: 29
-  },
-
-  {
-    type: 'ping',
-    name: 'Hossein',
-    city: 'Qom',
-    lat: 34.6399,
-    lng: 50.8759,
-    text: 'زندگی یه مسابقه نیست، یه سفره 🚶‍♂️',
-    likes: 142,
-    reping: 28,
-    comments: 10
-  },
-
-  {
-    type: 'ping',
-    name: 'Leila',
-    city: 'Rasht',
+    type: 'tex',
+    _id: '671fa3c2b19e4d12c831f208',
     lat: 37.2809,
     lng: 49.5832,
+    city: 'Rasht',
+    country: 'IR',
+
+    name: 'Leila',
+    authorName: 'Leila',
+    authorHandle: 'leila',
+    avatarConfig: {
+      avatarStyle: 'Circle',
+      topType: 'LongHairStraight',
+      clotheType: 'Hoodie'
+    },
+
     text: 'بارونای رشت هیچ‌وقت تکراری نمی‌شن 🌧💜',
-    likes: 401,
-    reping: 95,
-    comments: 40
+    isGemTex: true,
+    createdAt: '2025-11-29T08:40:00Z',
+
+    stats: {
+      likes: 401,
+      lynks: 95,
+      comments: 40,
+      views: 4700
+    }
+  },
+
+  // ---------- PEOPLE (presence layer) ----------
+  {
+    type: 'person',
+    _id: '671fa399b19e4d12c831f106',
+    lat: 29.5918,
+    lng: 52.5837,
+    city: 'Shiraz',
+    country: 'IR',
+
+    name: 'Narges',
+    handle: 'narges',
+    status: 'Exploring Lynku gems',
+    gemsCollected: 6,
+
+    avatarConfig: {
+      avatarStyle: 'Circle',
+      topType: 'LongHairStraight',
+      clotheType: 'BlazerSweater'
+    }
+  },
+  {
+    type: 'person',
+    _id: '671fa399b19e4d12c831f101',
+    lat: 21.0278,
+    lng: 105.8342,
+    city: 'Hanoi',
+    country: 'VN',
+
+    name: 'Luna',
+    handle: 'luna',
+    status: 'Designing a new avatar',
+    gemsCollected: 4,
+
+    avatarConfig: {
+      avatarStyle: 'Circle',
+      topType: 'LongHairFro',
+      clotheType: 'Hoodie'
+    }
+  },
+  {
+    type: 'person',
+    _id: '671fa399b19e4d12c831f102',
+    lat: 47.6062,
+    lng: -122.3321,
+    city: 'Seattle',
+    country: 'US',
+
+    name: 'Tyler',
+    handle: 'tyler',
+    status: 'Refactoring timelines service',
+    gemsCollected: 2,
+
+    avatarConfig: {
+      avatarStyle: 'Circle',
+      topType: 'ShortHairShortFlat',
+      clotheType: 'ShirtCrewNeck'
+    }
+  },
+  {
+    type: 'person',
+    _id: '671fa399b19e4d12c831f103',
+    lat: 35.6892,
+    lng: 51.389,
+    city: 'Tehran',
+    country: 'IR',
+
+    name: 'Parisa',
+    handle: 'parisa',
+    status: 'Scrolling through night texes',
+    gemsCollected: 3,
+
+    avatarConfig: {
+      avatarStyle: 'Circle',
+      topType: 'Hijab',
+      clotheType: 'Hoodie'
+    }
+  },
+  {
+    type: 'person',
+    _id: '671fa399b19e4d12c831f104',
+    lat: 3.139,
+    lng: 101.6869,
+    city: 'Kuala Lumpur',
+    country: 'MY',
+
+    name: 'Aria',
+    handle: 'aria',
+    status: 'Night ride in neon city',
+    gemsCollected: 1,
+
+    avatarConfig: {
+      avatarStyle: 'Circle',
+      topType: 'LongHairFro',
+      clotheType: 'Hoodie'
+    }
+  },
+  {
+    type: 'person',
+    _id: '671fa399b19e4d12c831f105',
+    lat: 31.3183,
+    lng: 48.6706,
+    city: 'Ahvaz',
+    country: 'IR',
+
+    name: 'Sara',
+    handle: 'sara',
+    status: 'Listening to lo-fi under the sun',
+    gemsCollected: 5,
+
+    avatarConfig: {
+      avatarStyle: 'Circle',
+      topType: 'LongHairStraight',
+      clotheType: 'Overall'
+    }
+  },
+
+  // ---------- GEMS (collectibles on the map) ----------
+  {
+    type: 'gem',
+    _id: '671fa4aa0e5f4c18f9b1a001',
+    lat: 35.9,
+    lng: 51.7,
+    city: 'Near Tehran',
+    country: 'IR',
+
+    name: 'Aurora Link Shard',
+    rarity: 'rare',
+    value: 15
+  },
+  {
+    type: 'gem',
+    _id: '671fa4aa0e5f4c18f9b1a002',
+    lat: 37.4,
+    lng: 49.7,
+    city: 'Near Rasht',
+    country: 'IR',
+
+    name: 'Rain Echo Gem',
+    rarity: 'epic',
+    value: 25
+  },
+  {
+    type: 'gem',
+    _id: '671fa4aa0e5f4c18f9b1a003',
+    lat: 47.9,
+    lng: -122.5,
+    city: 'Seattle Orbit',
+    country: 'US',
+
+    name: 'Neon Pulse Core',
+    rarity: 'legendary',
+    value: 40
+  },
+  {
+    type: 'gem',
+    _id: '671fa4aa0e5f4c18f9b1a004',
+    lat: 35.84,
+    lng: 50.9391,
+    city: 'Karaj Belt',
+    country: 'IR',
+
+    name: 'Echo Byte Fragment',
+    rarity: 'uncommon',
+    value: 8
+  },
+  {
+    type: 'gem',
+    _id: '671fa4aa0e5f4c18f9b1a005',
+    lat: 1.3521,
+    lng: 103.8198,
+    city: 'Singapore Sky',
+    country: 'SG',
+
+    name: 'Skyline Prism',
+    rarity: 'rare',
+    value: 18
+  },
+  {
+    type: 'gem',
+    _id: '671fa4aa0e5f4c18f9b1a006',
+    lat: 32.6546,
+    lng: 51.668,
+    city: 'Isfahan Halo',
+    country: 'IR',
+
+    name: 'Safavid Glow Core',
+    rarity: 'epic',
+    value: 28
   }
 ]
 
-setTimeout(() => {
-  data.value = [...pings]
-}, 1000)
+// Later: MQTT.on('message') → data.value.push(event)
+onMounted(() => {
+  data.value = worldEventsSeed
+})
 </script>
