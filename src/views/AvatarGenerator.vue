@@ -56,6 +56,37 @@
         </button>
       </div>
 
+      <!-- Mood / Gender / Random -->
+      <div class="mood-gender-bar">
+        <div class="pill-group">
+          <button
+            v-for="g in genderOptions"
+            :key="g.value"
+            class="pill-btn"
+            :class="{ active: selectedGender === g.value }"
+            @click="selectedGender = g.value"
+          >
+            {{ g.label }}
+          </button>
+        </div>
+
+        <div class="pill-group">
+          <button
+            v-for="m in moodOptions"
+            :key="m.value"
+            class="pill-btn"
+            :class="{ active: selectedMood === m.value }"
+            @click="selectedMood = m.value"
+          >
+            {{ m.label }}
+          </button>
+        </div>
+
+        <button class="action-btn primary random-btn" @click="randomizeAvatar">
+          🎲 آواتار تصادفی
+        </button>
+      </div>
+
       <!-- Options Grid -->
       <div class="options-container">
         <div class="options-section">
@@ -317,7 +348,7 @@ const router = useRouter()
 const activeCategory = ref('style')
 const showPreview = ref(false)
 const isLoading = ref(false)
-const avatarLoaded = ref(false) // 👈 new state
+const avatarLoaded = ref(false)
 
 // Avatar configuration
 const avatarConfig = ref({
@@ -351,6 +382,24 @@ const categories = ref([
   { id: 'skin', name: 'پوست' }
 ])
 
+// Mood / Gender options
+const genderOptions = ref([
+  { value: 'any', label: 'آزاد' },
+  { value: 'male', label: 'پسر' },
+  { value: 'female', label: 'دختر' }
+])
+
+const moodOptions = ref([
+  { value: 'any', label: 'هر حالتی' },
+  { value: 'happy', label: 'شاد' },
+  { value: 'sad', label: 'غمگین' },
+  { value: 'angry', label: 'عصبانی' },
+  { value: 'chill', label: 'ریلکس' }
+])
+
+const selectedGender = ref('any')
+const selectedMood = ref('any')
+
 // Options arrays with ref
 const avatarStyles = ref([])
 const topTypes = ref([])
@@ -372,7 +421,7 @@ const avatarUrl = computed(() => {
   return `${baseUrl}?${params.toString()}`
 })
 
-// 🔁 Whenever avatarUrl changes (style change etc.) show skeleton again
+// Watch URL to show skeleton
 watch(avatarUrl, () => {
   avatarLoaded.value = false
 })
@@ -383,11 +432,10 @@ const onAvatarLoad = () => {
 }
 
 const onAvatarError = () => {
-  // fallback: hide skeleton even if image failed
   avatarLoaded.value = true
 }
 
-// Methods
+// API
 const getAvatarPickConfig = async () => {
   try {
     const response = await post(
@@ -406,7 +454,7 @@ const getAvatarPickConfig = async () => {
       return null
     }
   } catch (error) {
-    // handle error if needed
+    return null
   } finally {
     isLoading.value = false
   }
@@ -442,6 +490,169 @@ const resetAvatar = () => {
     mouthType: 'Default',
     skinColor: 'Light'
   }
+}
+
+// 🔹 helper to pick random item safely
+const randomItem = (arr) => {
+  if (!arr || arr.length === 0) return null
+  const idx = Math.floor(Math.random() * arr.length)
+  return arr[idx]
+}
+
+// 🔹 Randomize avatar based on gender + mood
+const randomizeAvatar = () => {
+  const next = { ...avatarConfig.value }
+
+  // ----- gender-based hair / top -----
+  const allTop = topTypes.value.map((t) => t.value)
+
+  const maleHair = [
+    'ShortHairShortFlat',
+    'ShortHairSides',
+    'ShortHairTheCaesar',
+    'ShortHairTheCaesarSidePart',
+    'ShortHairShortRound',
+    'ShortHairShortCurly',
+    'ShortHairDreads01',
+    'ShortHairDreads02',
+    'ShortHairShaggyMullet'
+  ]
+
+  const femaleHair = [
+    'LongHairStraight',
+    'LongHairStraight2',
+    'LongHairStraightStrand',
+    'LongHairCurly',
+    'LongHairBun',
+    'LongHairBigHair',
+    'LongHairBob',
+    'LongHairNotTooLong',
+    'LongHairFrida'
+  ]
+
+  let candidateTop = [...allTop]
+
+  if (selectedGender.value === 'male') {
+    candidateTop = allTop.filter(
+      (v) =>
+        maleHair.includes(v) ||
+        v === 'NoHair' ||
+        v === 'Hat' ||
+        v.startsWith('WinterHat')
+    )
+  } else if (selectedGender.value === 'female') {
+    candidateTop = allTop.filter(
+      (v) =>
+        femaleHair.includes(v) ||
+        v === 'Hijab' ||
+        v === 'LongHairFrida'
+    )
+  }
+
+  if (candidateTop.length === 0) candidateTop = allTop
+  if (candidateTop.length > 0) {
+    next.topType = randomItem(candidateTop)
+  }
+
+  // accessories
+  const accVals = accessoriesTypes.value.map((a) => a.value)
+  if (accVals.length > 0) {
+    next.accessoriesType = randomItem(accVals)
+  }
+
+  // hair color
+  const hairVals = hairColors.value.map((c) => c.value)
+  if (hairVals.length > 0) {
+    next.hairColor = randomItem(hairVals)
+  }
+
+  // clothes
+  const clothVals = clotheTypes.value.map((c) => c.value)
+  if (clothVals.length > 0) {
+    next.clotheType = randomItem(clothVals)
+  }
+
+  const clothColorVals = clotheColors.value.map((c) => c.value)
+  if (clothColorVals.length > 0) {
+    next.clotheColor = randomItem(clothColorVals)
+  }
+
+  // skin
+  const skinVals = skinColors.value.map((s) => s.value)
+  if (skinVals.length > 0) {
+    next.skinColor = randomItem(skinVals)
+  }
+
+  // facial hair
+  if (selectedGender.value === 'male') {
+    const facialVals = facialHairTypes.value
+      .map((f) => f.value)
+      .filter((v) => v !== 'Blank')
+    if (facialVals.length > 0 && Math.random() < 0.6) {
+      next.facialHairType = randomItem(facialVals)
+    } else {
+      next.facialHairType = 'Blank'
+    }
+  } else {
+    next.facialHairType = 'Blank'
+  }
+
+  // ----- mood presets -----
+  const moodPresets = {
+    happy: {
+      eyeTypes: ['Happy', 'Default', 'Hearts'],
+      mouthTypes: ['Smile', 'Default'],
+      eyebrowTypes: ['Default', 'RaisedExcited', 'RaisedExcitedNatural']
+    },
+    sad: {
+      eyeTypes: ['Cry', 'Squint'],
+      mouthTypes: ['Sad', 'Serious', 'Disbelief'],
+      eyebrowTypes: ['SadConcerned', 'SadConcernedNatural']
+    },
+    angry: {
+      eyeTypes: ['Squint', 'Dizzy', 'EyeRoll'],
+      mouthTypes: ['Serious', 'Grimace'],
+      eyebrowTypes: ['Angry', 'AngryNatural']
+    },
+    chill: {
+      eyeTypes: ['Default', 'Side', 'Wink', 'WinkWacky'],
+      mouthTypes: ['Smile', 'Tongue', 'Default'],
+      eyebrowTypes: ['Default', 'RaisedExcited', 'RaisedExcitedNatural']
+    }
+  }
+
+  const availableEyes = eyeTypes.value.map((e) => e.value)
+  const availableMouths = mouthTypes.value.map((m) => m.value)
+  const availableBrows = eyebrowTypes.value.map((b) => b.value)
+
+  if (selectedMood.value !== 'any' && moodPresets[selectedMood.value]) {
+    const preset = moodPresets[selectedMood.value]
+
+    const moodEyes = (preset.eyeTypes || []).filter((v) =>
+      availableEyes.includes(v)
+    )
+    const moodMouths = (preset.mouthTypes || []).filter((v) =>
+      availableMouths.includes(v)
+    )
+    const moodBrows = (preset.eyebrowTypes || []).filter((v) =>
+      availableBrows.includes(v)
+    )
+
+    if (moodEyes.length > 0) next.eyeType = randomItem(moodEyes)
+    else if (availableEyes.length > 0) next.eyeType = randomItem(availableEyes)
+
+    if (moodMouths.length > 0) next.mouthType = randomItem(moodMouths)
+    else if (availableMouths.length > 0) next.mouthType = randomItem(availableMouths)
+
+    if (moodBrows.length > 0) next.eyebrowType = randomItem(moodBrows)
+    else if (availableBrows.length > 0) next.eyebrowType = randomItem(availableBrows)
+  } else {
+    if (availableEyes.length > 0) next.eyeType = randomItem(availableEyes)
+    if (availableMouths.length > 0) next.mouthType = randomItem(availableMouths)
+    if (availableBrows.length > 0) next.eyebrowType = randomItem(availableBrows)
+  }
+
+  avatarConfig.value = next
 }
 
 const saveAvatar = async () => {
@@ -547,8 +758,6 @@ const initializeDefaultOptions = () => {
     { value: 'Sunglasses', label: 'عینک آفتابی' },
     { value: 'Wayfarers', label: 'عینک ویفرز' }
   ]
-
-  // You can continue initializing other arrays (hairColors, etc.) as before
 }
 
 onMounted(async () => {
@@ -619,11 +828,10 @@ onMounted(async () => {
   height: 220px;
   border-radius: 50%;
   overflow: hidden;
-
   box-shadow: 0 0 8px #6a5af9, 0 0 16px #6a5af9 inset;
   background: rgba(255, 255, 255, 0.03);
   backdrop-filter: blur(10px);
-  transition: transform 0.3s ease, box-shadow 0.3s ease, border-color 0.3s ease;
+  transition: transform 0.3s ease, box-shadow 0.3s ease, border-color 0.3s.ease;
 }
 
 /* Hover interaction */
@@ -746,154 +954,6 @@ onMounted(async () => {
   height: 16px;
 }
 
-/* ... rest of your styles unchanged ... */
-.header-text h1 {
-  margin: 0;
-  font-size: 2rem;
-  font-weight: 700;
-  background: linear-gradient(135deg, #1da1f2, #00ba7c);
-  -webkit-background-clip: text;
-  -webkit-text-fill-color: transparent;
-  background-clip: text;
-}
-
-.header-text p {
-  margin: 10px 0 0 0;
-  color: #8899a6;
-  font-size: 1.1rem;
-}
-
-/* (keep all the rest of your existing CSS below: generator-content, category-nav, options-grid, buttons, modal, media queries, etc.) */
-.avatar-generator-container {
-  background: linear-gradient(135deg, #0f0f0f 0%, #1a1a1a 100%);
-  color: #ffffff;
-  padding: 20px;
-  animation: slideUp 0.3s ease-out;
-  border-radius: 16px;
-}
-
-.generator-header {
-  background: #000000;
-  border-radius: 20px;
-  padding: 30px;
-  margin-bottom: 30px;
-  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
-  border: 1px solid #333;
-}
-
-.header-content {
-  display: flex;
-  align-items: center;
-  gap: 30px;
-}
-
-.avatar-preview-large {
-  position: relative;
-  width: 220px;
-  height: 220px;
-  border-radius: 50%;
-  overflow: hidden;
-
-  box-shadow: 0 0 8px #6a5af9, 0 0 16px #6a5af9 inset;
-
-
-  /* Glass effect */
-  background: rgba(255, 255, 255, 0.03);
-  backdrop-filter: blur(10px);
-
-  transition: transform 0.3s ease, box-shadow 0.3s ease, border-color 0.3s ease;
-}
-
-/* Hover interaction */
-.avatar-preview-large:hover {
-  transform: translateY(-6px) scale(1.04);
-
-  box-shadow:
-    0 0 20px rgba(255, 0, 255, 0.55),
-    0 0 40px rgba(255, 0, 255, 0.35),
-    inset 0 0 18px rgba(255, 0, 255, 0.25);
-
-  border-color: #ff33ff;
-}
-
-/* 🔥 Subtle breathing glow animation */
-.avatar-preview-large.glowing {
-  animation: avatarPulse 3s ease-in-out infinite;
-}
-
-@keyframes avatarPulse {
-  0% {
-    box-shadow:
-      0 0 14px rgba(255, 0, 255, 0.35),
-      0 0 28px rgba(255, 0, 255, 0.20),
-      inset 0 0 12px rgba(255, 0, 255, 0.15);
-    border-color: rgba(255, 0, 255, 0.9);
-  }
-  50% {
-    box-shadow:
-      0 0 24px rgba(255, 0, 255, 0.6),
-      0 0 48px rgba(255, 0, 255, 0.35),
-      inset 0 0 18px rgba(255, 0, 255, 0.25);
-    border-color: #ff55ff;
-  }
-  100% {
-    box-shadow:
-      0 0 14px rgba(255, 0, 255, 0.35),
-      0 0 28px rgba(255, 0, 255, 0.20),
-      inset 0 0 12px rgba(255, 0, 255, 0.15);
-    border-color: rgba(255, 0, 255, 0.9);
-  }
-}
-
-
-.preview-image {
-  width: 100%;
-  height: 100%;
-  object-fit: cover;
-}
-
-.preview-overlay {
-  position: absolute;
-  top: 0;
-  left: 0;
-  right: 0;
-  bottom: 0;
-  background: rgba(0, 0, 0, 0.8);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  opacity: 0;
-  transition: opacity 0.3s ease;
-}
-
-.avatar-preview-large:hover .preview-overlay {
-  opacity: 1;
-}
-
-.download-btn {
-  background: linear-gradient(135deg, #000000 0%, #1a0a2a 50%, #cc00ff 100%);
-  border: none;
-  color: white;
-  padding: 8px 16px;
-  border-radius: 20px;
-  font-size: 0.9rem;
-  cursor: pointer;
-  display: flex;
-  align-items: center;
-  gap: 5px;
-  transition: all 0.3s ease;
-}
-
-.download-btn:hover {
-  transform: translateY(-2px);
-  box-shadow: 0 4px 15px rgba(29, 161, 242, 0.4);
-}
-
-.download-btn svg {
-  width: 16px;
-  height: 16px;
-}
-
 .header-text h1 {
   margin: 0;
   font-size: 2rem;
@@ -954,12 +1014,9 @@ onMounted(async () => {
     0 0 8px rgba(214, 0, 255, 0.4),
     0 0 16px rgba(214, 0, 255, 0.25),
     inset 0 0 10px rgba(214, 0, 255, 0.15);
-  transform: translateY(-4px) scale(1.02);  border-color: #1da1f2;
+  transform: translateY(-4px) scale(1.02);
+  border-color: #1da1f2;
   color: white;
-}
-
-.category-icon {
-  font-size: 1.2rem;
 }
 
 .options-container {
@@ -1003,22 +1060,6 @@ onMounted(async () => {
 }
 
 .option-card {
-  background: rgba(255, 255, 255, 0.05);
-  border: 2px solid transparent;
-  border-radius: 12px;
-  padding: 15px;
-  cursor: pointer;
-  transition: all 0.3s ease;
-  text-align: center;
-}
-
-.option-card:hover {
-  background: rgba(255, 255, 255, 0.1);
-  transform: translateY(-2px);
-  border-color: #333;
-}
-
-.option-card {
   padding: 16px;
   border-radius: 14px;
   border: 2px solid transparent;
@@ -1027,6 +1068,7 @@ onMounted(async () => {
   transition: 0.25s ease;
   cursor: pointer;
   margin-top: 10px;
+  text-align: center;
 }
 
 .option-card:hover {
@@ -1042,10 +1084,6 @@ onMounted(async () => {
     0 0 16px rgba(214, 0, 255, 0.25),
     inset 0 0 10px rgba(214, 0, 255, 0.15);
   transform: translateY(-4px) scale(1.02);
-}
-
-/* Soft breathing glow animation */
-.option-card.selected {
   animation: neonPulse 2.4s ease-in-out infinite;
 }
 
@@ -1053,23 +1091,22 @@ onMounted(async () => {
   0% {
     box-shadow:
       0 0 8px rgba(214, 0, 255, 0.35),
-      0 0 16px rgba(214, 0, 255, 0.20),
+      0 0 16px rgba(214, 0, 255, 0.2),
       inset 0 0 8px rgba(214, 0, 255, 0.12);
   }
   50% {
     box-shadow:
       0 0 14px rgba(214, 0, 255, 0.55),
-      0 0 28px rgba(214, 0, 255, 0.30),
+      0 0 28px rgba(214, 0, 255, 0.3),
       inset 0 0 14px rgba(214, 0, 255, 0.18);
   }
   100% {
     box-shadow:
       0 0 8px rgba(214, 0, 255, 0.35),
-      0 0 16px rgba(214, 0, 255, 0.20),
+      0 0 16px rgba(214, 0, 255, 0.2),
       inset 0 0 8px rgba(214, 0, 255, 0.12);
   }
 }
-
 
 .option-preview {
   width: 60px;
@@ -1118,6 +1155,63 @@ onMounted(async () => {
   display: block;
 }
 
+/* Mood / Gender bar */
+.mood-gender-bar {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px;
+  align-items: center;
+  justify-content: center;
+  margin-bottom: 22px;
+  border-radius: 12px;
+  padding: 12px 16px;
+  background: radial-gradient(circle at 0 0, rgba(214, 0, 255, 0.1), transparent 60%),
+  radial-gradient(circle at 100% 100%, rgba(0, 234, 255, 0.08), transparent 60%);
+}
+
+.pill-group {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 6px;
+}
+
+.pill-label {
+  font-size: 0.82rem;
+  color: #9ca3af;
+}
+
+.pill-btn {
+  padding: 6px 10px;
+  border-radius: 999px;
+  border: 1px solid rgba(148, 163, 184, 0.4);
+  background: rgba(15, 23, 42, 0.7);
+  color: #e5e7eb;
+  font-size: 0.8rem;
+  cursor: pointer;
+  transition: 0.2s ease;
+}
+
+.pill-btn:hover {
+  border-color: #6a5af9;
+  box-shadow: 0 0 10px rgba(106, 90, 249, 0.4);
+}
+
+.pill-btn.active {
+  background: radial-gradient(circle, #6a5af9, #1e293b);
+  border-color: #a855f7;
+  box-shadow:
+    0 0 10px rgba(168, 85, 247, 0.6),
+    0 0 20px rgba(59, 130, 246, 0.4);
+}
+
+/* Random button inside mood bar */
+.random-btn {
+  font-size: 0.8rem;
+  padding-inline: 18px;
+}
+
+/* Quick actions */
 .quick-actions-bar {
   display: flex;
   gap: 15px;
@@ -1187,7 +1281,6 @@ onMounted(async () => {
   opacity: 1;
 }
 
-
 .action-btn.secondary {
   background: rgba(255, 255, 255, 0.1);
   color: #ffffff;
@@ -1204,6 +1297,7 @@ onMounted(async () => {
   height: 18px;
 }
 
+/* Modal */
 .preview-modal {
   position: fixed;
   top: 0;
@@ -1288,12 +1382,12 @@ onMounted(async () => {
   justify-content: center;
 }
 
+/* Animations */
 @keyframes slideUp {
   from {
     opacity: 0;
     transform: translateY(20px);
   }
-
   to {
     opacity: 1;
     transform: translateY(0);

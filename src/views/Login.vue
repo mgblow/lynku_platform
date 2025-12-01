@@ -187,9 +187,9 @@ const verify = async () => {
       setCookie("app-id", response._id, 7)
       setCookie("app-channel", response.channel, 7)
       emitter.emit('brokerCredentials')
-      emitter.emit('refresh-navigation-state')
 
       if (response.firstLogin) {
+        emitter.emit('refresh-navigation-state');
         router.push('/avatar')
       } else {
         router.push('/')

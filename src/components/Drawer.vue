@@ -1,10 +1,11 @@
 <script setup>
+import { onMounted, ref, onBeforeUnmount } from 'vue'
+import { emitter } from '@/utils/event-bus'
+
 import Gift from '@/components/Gift.vue'
 import Publish from '@/views/Publish.vue'
 import Person from '@/components/Person.vue'
 import Ping from '@/components/Ping.vue'
-import { onMounted, ref } from 'vue'
-import { emitter } from '@/utils/event-bus'
 import AvatarGenerator from '@/views/AvatarGenerator.vue'
 import Settings from '@/views/Settings.vue'
 
@@ -12,69 +13,93 @@ const props = defineProps({
   selectedData: { type: Object, default: null }
 })
 
-const closePanel = (()=> {
-  drawerData.value = {}
-  emitter.emit('globe:pointOfView', { lat: 30, lng: 20, altitude: 3.5, transition: 1500 })
-})
-
 const drawerData = ref({})
+const isMinimized = ref(false)
+
+const closePanel = () => {
+  drawerData.value = {}
+  isMinimized.value = false
+  emitter.emit('globe:pointOfView', {
+    lat: 30,
+    lng: 20,
+    altitude: 3.5,
+    transition: 1500
+  })
+}
+
+const toggleMinimize = () => {
+  // Only allow minimizing if something is open
+  if (!drawerData.value.type) return
+  isMinimized.value = !isMinimized.value
+}
 
 onMounted(() => {
-  emitter.on('drawer:publish', (data) => {
+  const openWithType = (type) => (data) => {
     drawerData.value = {
       ...data,
-      type: 'publish',
+      type
     }
-  })
-  emitter.on('drawer:ping', (data) => {
-    drawerData.value = {
-      ...data,
-      type: 'ping',
-    }
-  })
-  emitter.on('drawer:gift', (data) => {
-    drawerData.value = {
-      ...data,
-      type: 'gift',
-    }
-  })
-  emitter.on('drawer:person', (data) => {
-    drawerData.value = {
-      ...data,
-      type: 'person',
-    }
-  })
-  emitter.on('drawer:avatarConfig', (data) => {
-    drawerData.value = {
-      ...data,
-      type: 'avatarConfig',
-    }
-  })
-  emitter.on('drawer:settings', (data) => {
-    drawerData.value = {
-      ...data,
-      type: 'settings',
-    }
-  })
+    isMinimized.value = false
+  }
 
-
+  emitter.on('drawer:publish', openWithType('publish'))
+  emitter.on('drawer:ping', openWithType('ping'))
+  emitter.on('drawer:gift', openWithType('gift'))
+  emitter.on('drawer:person', openWithType('person'))
+  emitter.on('drawer:avatarConfig', openWithType('avatarConfig'))
+  emitter.on('drawer:settings', openWithType('settings'))
 
   emitter.on('drawer:close', () => {
     closePanel()
   })
 })
+
+onBeforeUnmount(() => {
+  emitter.off('drawer:publish')
+  emitter.off('drawer:ping')
+  emitter.off('drawer:gift')
+  emitter.off('drawer:person')
+  emitter.off('drawer:avatarConfig')
+  emitter.off('drawer:settings')
+  emitter.off('drawer:close')
+})
 </script>
 
 <template>
   <Teleport to="body">
-    <div class="user-popup" v-show="drawerData.type" v-if="drawerData.type">
-      <button class="close-btn" @click="closePanel()">×</button>
-      <AvatarGenerator v-if="drawerData.type === 'avatarConfig'"></AvatarGenerator>
-      <Settings v-if="drawerData.type === 'settings'"></Settings>
-      <Ping v-if="drawerData.type === 'ping'"></Ping>
-      <Person v-if="drawerData.type === 'person'" :selectedData="drawerData"></Person>
-      <Gift v-if="drawerData.type === 'gift'" :selectedData="drawerData"></Gift>
-      <Publish v-if="drawerData.type === 'publish'" :location="drawerData"></Publish>
+    <div
+      v-if="drawerData.type"
+      v-show="drawerData.type"
+      class="user-popup"
+      :class="{ minimized: isMinimized }"
+    >
+      <!-- Close -->
+      <button class="close-btn" @click="closePanel">
+        ×
+      </button>
+
+      <!-- Minimize -->
+      <button class="minimize-btn" @click="toggleMinimize">
+        <svg viewBox="0 0 24 24" aria-hidden="true">
+          <!-- simple chevron to imply up/down -->
+          <path
+            v-if="!isMinimized"
+            d="M6 9l6 6 6-6"
+          />
+          <path
+            v-else
+            d="M6 15l6-6 6 6"
+          />
+        </svg>
+      </button>
+
+      <!-- Dynamic content -->
+      <AvatarGenerator v-if="drawerData.type === 'avatarConfig'" />
+      <Settings v-else-if="drawerData.type === 'settings'" />
+      <Ping v-else-if="drawerData.type === 'ping'" />
+      <Person v-else-if="drawerData.type === 'person'" :selectedData="drawerData" />
+      <Gift v-else-if="drawerData.type === 'gift'" :selectedData="drawerData" />
+      <Publish v-else-if="drawerData.type === 'publish'" :location="drawerData" />
     </div>
   </Teleport>
 </template>
@@ -129,11 +154,25 @@ onMounted(() => {
   color: white;
   width: 280px;
   z-index: 10000;
-  animation: slideIn 0.4s cubic-bezier(0.25, 0.8, 0.25, 1);
   display: flex;
   flex-direction: column;
   align-items: center;
   text-align: center;
+
+  animation: slideIn 0.4s cubic-bezier(0.25, 0.8, 0.25, 1);
+  transition:
+    top 0.35s ease,
+    transform 0.35s ease,
+    box-shadow 0.35s ease,
+    opacity 0.35s ease;
+}
+
+/* Minimized state – slide down on desktop */
+.user-popup.minimized {
+  top: 70%; /* ~70% down the viewport */
+  transform: translateY(-50%);
+  box-shadow: 0 0 12px rgba(0, 0, 0, 0.7);
+  opacity: 0.9;
 }
 
 @keyframes slideIn {
@@ -160,7 +199,9 @@ onMounted(() => {
   width: 35px;
   height: 35px;
   border-radius: 50%;
-  transition: background 0.3s, transform 0.3s;
+  transition:
+    background 0.3s,
+    transform 0.3s;
   line-height: 1;
 }
 
@@ -169,10 +210,44 @@ onMounted(() => {
   transform: rotate(90deg);
 }
 
+/* Minimize button on the left */
+.minimize-btn {
+  position: absolute;
+  top: 15px;
+  left: 15px;
+  background: rgba(255, 255, 255, 0.06);
+  border: none;
+  color: #e0f7fa;
+  cursor: pointer;
+  padding: 0;
+  width: 35px;
+  height: 35px;
+  border-radius: 50%;
+  transition:
+    background 0.3s,
+    transform 0.3s;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.minimize-btn:hover {
+  background: rgba(255, 255, 255, 0.18);
+  transform: translateY(1px);
+}
+
+.minimize-btn svg {
+  width: 18px;
+  height: 18px;
+  stroke: currentColor;
+  stroke-width: 2;
+  fill: none;
+}
+
 .user-popup h3 {
   margin: 0 0 5px 0;
   font-size: 1.5rem;
-  color: #4a90e2; /* Primary blue */
+  color: #4a90e2;
   text-shadow: 0 0 5px rgba(74, 144, 226, 0.5);
 }
 
@@ -183,10 +258,17 @@ onMounted(() => {
     right: 0;
     left: 0;
     width: 100%;
-    transform: none; /* Override desktop transform */
+    transform: none;
     border-radius: 20px 20px 0 0;
     padding: 20px;
     animation: slideInMobile 0.4s cubic-bezier(0.25, 0.8, 0.25, 1);
+  }
+
+  /* On mobile, minimized = slide sheet further down */
+  .user-popup.minimized {
+    bottom: -60%; /* keep just a small strip visible */
+    transform: none;
+    opacity: 0.9;
   }
 
   @keyframes slideInMobile {
@@ -203,6 +285,11 @@ onMounted(() => {
   .close-btn {
     top: 10px;
     right: 10px;
+  }
+
+  .minimize-btn {
+    top: 10px;
+    left: 10px;
   }
 }
 
@@ -224,10 +311,14 @@ onMounted(() => {
 @keyframes globePulse {
   0%,
   100% {
-    box-shadow: 0 0 25px rgba(0, 255, 230, 0.15), inset 0 0 20px rgba(0, 255, 230, 0.05);
+    box-shadow:
+      0 0 25px rgba(0, 255, 230, 0.15),
+      inset 0 0 20px rgba(0, 255, 230, 0.05);
   }
   50% {
-    box-shadow: 0 0 40px rgba(0, 255, 230, 0.25), inset 0 0 25px rgba(0, 255, 230, 0.1);
+    box-shadow:
+      0 0 40px rgba(0, 255, 230, 0.25),
+      inset 0 0 25px rgba(0, 255, 230, 0.1);
   }
 }
 </style>
