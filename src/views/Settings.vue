@@ -1,227 +1,346 @@
 <template>
-  <div class="avatar-profile-container nt-5">
-    <!-- Progress Steps -->
-    <div class="progress-steps">
-      <div class="step" :class="{ active: currentStep === 1, completed: currentStep > 1 }">
-        <div class="step-number">1</div>
-        <div class="step-label">اطلاعات شخصی</div>
-      </div>
-      <div class="step" :class="{ active: currentStep === 2, completed: currentStep > 2 }">
-        <div class="step-number">2</div>
-        <div class="step-label">علایق و کسب‌وکار</div>
-      </div>
-      <div class="step" :class="{ active: currentStep === 3 }">
-        <div class="step-number">3</div>
-        <div class="step-label">مرور و ثبت</div>
-      </div>
-    </div>
-
-    <!-- Step 1: Personal Information -->
-    <div v-if="currentStep === 1" class="step-container">
-      <div class="step-header">
-        <div class="avatar-preview-large" :class="{ glowing: !isAvatarLoading }">
+  <div class="lynku-settings">
+    <!-- ===== HEADER: AVATAR + USER + ACTIONS ===== -->
+    <header class="settings-header">
+      <div class="header-main">
+        <!-- Avatar -->
+        <div class="avatar-wrapper" :class="{ glowing: !isAvatarLoading }">
           <div v-if="isAvatarLoading" class="avatar-skeleton">
             <div class="avatar-skeleton-inner"></div>
           </div>
           <img
             v-show="!isAvatarLoading"
             :src="avatarUrl"
-            alt="Avatar Preview"
-            class="preview-image"
+            alt="Avatar"
+            class="avatar-img"
             @load="handleAvatarLoad"
             @error="handleAvatarError"
           />
         </div>
-        <h2>اطلاعات شخصی</h2>
-        <p>لطفا اطلاعات پایه خود را وارد کنید</p>
       </div>
-
-      <div class="form-container">
-        <div class="form-group">
-          <label for="username">نام کاربری</label>
-          <input
-            type="text"
-            id="username"
-            v-model="userProfile.username"
-            placeholder="یه اسم برای خودت انتخاب کن"
-            required
-          />
+      <!-- Title + Username -->
+      <div class="header-text">
+        <div class="header-title">
+          <h1>فضای شخصی لینکویی تو ✨</h1>
+          <p>آواتار، مود، علایق و تنظیمات حضورت تو جهان Lynku</p>
         </div>
 
-        <div class="form-row">
-          <div class="form-group">
-            <label for="age">سن</label>
+        <div class="header-username">
+          <label>نام کاربری</label>
+          <div class="username-row">
+            <span class="username-prefix">@</span>
             <input
-              type="number"
-              id="age"
-              v-model="userProfile.age"
-              min="1"
-              max="120"
-              placeholder="سن خود را وارد کنید"
+              v-model="userProfile.username"
+              type="text"
+              class="username-input"
+              placeholder="مثلاً mojtabaa یا luna.world"
             />
           </div>
         </div>
-
-        <div class="form-actions">
-          <button class="action-btn secondary" @click="prevStep">
-            <svg viewBox="0 0 24 24" fill="currentColor">
-              <path d="M15.41 7.41 14 6l-6 6 6 6 1.41-1.41L10.83 12z" />
-            </svg>
-            مرحله قبل
-          </button>
-          <button class="action-btn primary" @click="nextStep">
-            مرحله بعد
-            <svg viewBox="0 0 24 24" fill="currentColor">
-              <path d="M10 6 8.59 7.41 13.17 12l-4.58 4.59L10 18l6-6z" />
-            </svg>
-          </button>
-        </div>
       </div>
-    </div>
+    </header>
 
-    <!-- Step 2: Interests and Business -->
-    <div v-if="currentStep === 2" class="step-container">
-      <div class="step-header">
-        <h2>علایق و کسب‌وکار</h2>
-        <p>علایق و زمینه فعالیت خود را انتخاب کنید</p>
-      </div>
+    <!-- ===== MAIN LAYOUT ===== -->
+    <div class="settings-layout">
+      <!-- LEFT NAV -->
+      <nav class="settings-nav">
+        <div class="nav-label">بخش‌ها</div>
+        <div class="nav-list">
+          <button
+            v-for="section in sections"
+            :key="section.id"
+            class="nav-item"
+            :class="{ active: activeSection === section.id }"
+            @click="activeSection = section.id"
+          >
+            <div class="nav-icon">
+              <!-- icons (no JSX) -->
+              <svg v-if="section.id === 'profile'" viewBox="0 0 24 24">
+                <path
+                  d="M12 12a4 4 0 1 0-4-4 4 4 0 0 0 4 4zm0 2c-4 0-7 1.79-7 4v1h14v-1c0-2.21-3-4-7-4z"
+                />
+              </svg>
 
-      <div class="form-container">
-        <div class="form-group">
-          <label>علایق و سرگرمی‌ها</label>
-          <div class="interests-grid">
-            <div
-              v-for="hobby in hobbiesList"
-              :key="hobby.id"
-              class="interest-card"
-              :class="{ selected: userProfile.hobbies.includes(hobby.id) }"
-              @click="toggleHobby(hobby.id)"
-            >
-              <div class="interest-icon">
-                <span>{{ hobby.icon }}</span>
-              </div>
-              <span class="interest-label">{{ hobby.name }}</span>
+              <svg v-else-if="section.id === 'interests'" viewBox="0 0 24 24">
+                <path
+                  d="M12 21.35 10.55 20C5.4 15.36 2 12.28 2 8.5A4.5 4.5 0 0 1 6.5 4 5 5 0 0 1 12 6a5 5 0 0 1 5.5-2 4.5 4.5 0 0 1 4.5 4.5c0 3.78-3.4 6.86-8.55 11.5z"
+                />
+              </svg>
+
+              <svg v-else-if="section.id === 'app'" viewBox="0 0 24 24">
+                <path
+                  d="M12 4a8 8 0 0 0-8 8h3l3-4v6l3-4 3 4v-6l3 4h3a8 8 0 0 0-8-8z"
+                />
+              </svg>
+
+              <svg v-else-if="section.id === 'notifications'" viewBox="0 0 24 24">
+                <path
+                  d="M12 22a2 2 0 0 0 2-2H10a2 2 0 0 0 2 2zm6-6V11a6 6 0 0 0-5-5.92V4a1 1 0 0 0-2 0v1.08A6 6 0 0 0 6 11v5l-2 2v1h16v-1z"
+                />
+              </svg>
+
+              <svg v-else-if="section.id === 'account'" viewBox="0 0 24 24">
+                <path
+                  d="M10 17v2H5a2 2 0 0 1-2-2V7a2 2 0 0 1 2-2h5v2H5v10zm9.59-5-3.3-3.29L17 7l5 5-5 5-1.71-1.71L19.59 12z"
+                />
+              </svg>
             </div>
+            <div class="nav-text">
+              <span class="nav-title">{{ section.label }}</span>
+              <span class="nav-subtitle">{{ section.sub }}</span>
+            </div>
+          </button>
+        </div>
+      </nav>
+
+      <!-- RIGHT CONTENT -->
+      <section class="settings-content">
+        <!-- PROFILE -->
+        <div v-if="activeSection === 'profile'" class="settings-card">
+          <div class="card-header">
+            <h2>اطلاعات پروفایل</h2>
+            <p>نام کاربری، سن و بیوی کوتاه که کنار آواتارت دیده می‌شه.</p>
           </div>
-        </div>
 
-        <div class="form-actions">
-          <button class="action-btn secondary" @click="prevStep">
-            <svg viewBox="0 0 24 24" fill="currentColor">
-              <path d="M15.41 7.41 14 6l-6 6 6 6 1.41-1.41L10.83 12z" />
-            </svg>
-            مرحله قبل
-          </button>
-          <button class="action-btn primary" @click="nextStep">
-            مرحله بعد
-            <svg viewBox="0 0 24 24" fill="currentColor">
-              <path d="M10 6 8.59 7.41 13.17 12l-4.58 4.59L10 18l6-6z" />
-            </svg>
-          </button>
-        </div>
-      </div>
-    </div>
-
-    <!-- Step 3: Review and Submit -->
-    <div v-if="currentStep === 3" class="step-container">
-      <div class="step-header">
-        <h2>مرور و ثبت اطلاعات</h2>
-        <p>اطلاعات خود را بررسی کرده و ثبت نهایی را انجام دهید</p>
-      </div>
-
-      <div class="review-container">
-        <div class="review-card">
-          <div class="review-section">
-            <h3>آواتار شما</h3>
-            <div class="avatar-review">
-              <div class="avatar-preview-large review" :class="{ glowing: !isAvatarLoading }">
-                <div v-if="isAvatarLoading" class="avatar-skeleton">
-                  <div class="avatar-skeleton-inner"></div>
-                </div>
-                <img
-                  v-show="!isAvatarLoading"
-                  :src="avatarUrl"
-                  alt="Avatar Preview"
-                  class="review-avatar"
-                  @load="handleAvatarLoad"
-                  @error="handleAvatarError"
+          <div class="form-grid">
+            <div class="form-group">
+              <label>نام کاربری</label>
+              <div class="username-row">
+                <span class="username-prefix">@</span>
+                <input
+                  v-model="userProfile.username"
+                  type="text"
+                  class="username-input"
+                  placeholder="مثلاً neon.mj یا orbit.luna"
                 />
               </div>
             </div>
-          </div>
 
-          <div class="review-section">
-            <h3>اطلاعات شخصی</h3>
-            <div class="info-grid">
-              <div class="info-item">
-                <span class="info-label">نام کاربری:</span>
-                <span class="info-value">{{ userProfile.username }}</span>
-              </div>
-              <div class="info-item">
-                <span class="info-label">سن:</span>
-                <span class="info-value">{{ userProfile.age || 'ثبت نشده' }}</span>
-              </div>
+            <div class="form-group">
+              <label>سن</label>
+              <input
+                v-model="userProfile.age"
+                type="number"
+                min="1"
+                max="120"
+                placeholder="اختیاری"
+              />
             </div>
           </div>
 
-          <div class="review-section">
-            <h3>علایق و کسب‌وکار</h3>
-            <div class="info-grid">
-              <div class="info-item full-width">
-                <span class="info-label">علایق:</span>
-                <div class="interests-review">
-                  <span
-                    v-for="hobbyId in userProfile.hobbies"
-                    :key="hobbyId"
-                    class="interest-tag"
-                  >
-                    {{ getHobbyName(hobbyId) }}
-                  </span>
-                  <span
-                    v-if="userProfile.hobbies.length === 0"
-                    class="no-data"
-                  >
-                    علاقه‌ای ثبت نشده
-                  </span>
+          <div class="form-group">
+            <label>بیو / معرفی کوتاه</label>
+            <textarea
+              v-model="userProfile.bio"
+              rows="3"
+              placeholder="مثلاً: عاشق شهرهای نئونی، کافه‌های خلوت و کد زدن تا صبح..."
+            ></textarea>
+          </div>
+        </div>
+
+        <!-- INTERESTS -->
+        <div v-else-if="activeSection === 'interests'" class="settings-card">
+          <div class="card-header">
+            <h2>علایق</h2>
+            <p>چیزهایی که الگوریتم و آدم‌ها از استایل و حال‌وهوات می‌فهمن.</p>
+          </div>
+
+          <div class="form-group">
+            <label>علایق و سرگرمی‌ها</label>
+            <div class="interests-grid">
+              <button
+                v-for="hobby in hobbiesList"
+                :key="hobby.id"
+                type="button"
+                class="interest-card"
+                :class="{ selected: userProfile.hobbies.includes(hobby.id) }"
+                @click="toggleHobby(hobby.id)"
+              >
+                <div class="interest-icon">{{ hobby.icon }}</div>
+                <span class="interest-label">{{ hobby.name }}</span>
+              </button>
+            </div>
+          </div>
+        </div>
+
+        <!-- APP & PRIVACY -->
+        <div v-else-if="activeSection === 'app'" class="settings-card">
+          <div class="card-header">
+            <h2>ظاهر و حریم خصوصی</h2>
+            <p>حس و حال اپ و این‌که چقدر دیده بشی.</p>
+          </div>
+
+          <div class="form-grid">
+            <div class="form-group">
+              <label>تم</label>
+              <select v-model="settings.theme">
+                <option value="system">هماهنگ با سیستم</option>
+                <option value="dark">تاریک (پیشنهادی)</option>
+                <option value="light">روشن</option>
+              </select>
+            </div>
+
+            <div class="form-group">
+              <label>زبان رابط کاربری</label>
+              <select v-model="settings.language">
+                <option value="fa">فارسی</option>
+                <option value="en">English</option>
+                <option value="fa-en">دو زبانه (آزمایشی)</option>
+              </select>
+            </div>
+          </div>
+
+          <div class="toggle-list">
+            <div class="toggle-item">
+              <div class="toggle-texts">
+                <div class="toggle-title">نمایش وضعیت آنلاین</div>
+                <div class="toggle-sub">
+                  اگر روشن باشه، دوستانت می‌فهمن الان تو Lynku فعالی یا نه.
                 </div>
               </div>
+              <label class="switch">
+                <input type="checkbox" v-model="settings.showOnlineStatus" />
+                <span class="slider"></span>
+              </label>
+            </div>
+
+            <div class="toggle-item">
+              <div class="toggle-texts">
+                <div class="toggle-title">نمایش شهر / لوکیشن کلی</div>
+                <div class="toggle-sub">
+                  بدون لوکیشن دقیق؛ فقط شهر یا محدودهٔ تقریبی.
+                </div>
+              </div>
+              <label class="switch">
+                <input type="checkbox" v-model="settings.showLocation" />
+                <span class="slider"></span>
+              </label>
+            </div>
+
+            <div class="toggle-item">
+              <div class="toggle-texts">
+                <div class="toggle-title">اجازه پیام از افراد ناشناس</div>
+                <div class="toggle-sub">
+                  اگر خاموش باشد، فقط کسانی که فالو کردی می‌تونن پیام بدن.
+                </div>
+              </div>
+              <label class="switch">
+                <input type="checkbox" v-model="settings.allowStrangerMessages" />
+                <span class="slider"></span>
+              </label>
             </div>
           </div>
         </div>
 
-        <div class="form-actions">
-          <button class="action-btn secondary" @click="prevStep">
-            <svg viewBox="0 0 24 24" fill="currentColor">
-              <path d="M15.41 7.41 14 6l-6 6 6 6 1.41-1.41L10.83 12z" />
-            </svg>
-            ویرایش اطلاعات
-          </button>
-          <button class="action-btn primary" @click="submitProfile" :disabled="isSubmitting">
-            <span v-if="isSubmitting">
-              <svg class="spinner" viewBox="0 0 24 24">
-                <circle cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4" fill="none" />
-              </svg>
-              در حال ثبت...
-            </span>
-            <span v-else> ثبت نهایی پروفایل </span>
-          </button>
+        <!-- NOTIFICATIONS -->
+        <div v-else-if="activeSection === 'notifications'" class="settings-card">
+          <div class="card-header">
+            <h2>نوتیفیکیشن‌ها</h2>
+            <p>چطور و کِی خبرات رو بگیری.</p>
+          </div>
+
+          <div class="toggle-list">
+            <div class="toggle-item">
+              <div class="toggle-texts">
+                <div class="toggle-title">نوتیفیکیشن پوش</div>
+                <div class="toggle-sub">
+                  برای پیام‌ها، منشن‌ها، دعوت‌ها و رویدادهای مهم.
+                </div>
+              </div>
+              <label class="switch">
+                <input type="checkbox" v-model="settings.pushNotifications" />
+                <span class="slider"></span>
+              </label>
+            </div>
+
+            <div class="toggle-item">
+              <div class="toggle-texts">
+                <div class="toggle-title">ایمیل خلاصه هفتگی</div>
+                <div class="toggle-sub">
+                  خلاصهٔ فعالیت‌ها، پیشنهاد دنیاها و آدم‌های جدید.
+                </div>
+              </div>
+              <label class="switch">
+                <input type="checkbox" v-model="settings.emailDigest" />
+                <span class="slider"></span>
+              </label>
+            </div>
+
+            <div class="toggle-item">
+              <div class="toggle-texts">
+                <div class="toggle-title">صدا و ویبره داخل اپ</div>
+                <div class="toggle-sub">
+                  برای نوتی‌های مهم و لحظه‌های ویژه.
+                </div>
+              </div>
+              <label class="switch">
+                <input type="checkbox" v-model="settings.inAppSounds" />
+                <span class="slider"></span>
+              </label>
+            </div>
+          </div>
         </div>
-      </div>
+
+        <!-- ACCOUNT -->
+        <div v-else-if="activeSection === 'account'" class="settings-card">
+          <div class="card-header">
+            <h2>حساب کاربری و امنیت</h2>
+            <p>جایی برای چیزهای جدی‌تر مثل ایمیل، امنیت و خروج.</p>
+          </div>
+
+          <div class="info-grid">
+            <div class="info-item">
+              <span class="info-label">شناسه داخلی (UID)</span>
+              <span class="info-value mono">{{ me.id || 'نامشخص' }}</span>
+            </div>
+            <div class="info-item">
+              <span class="info-label">ایمیل</span>
+              <span class="info-value">{{ me.email || 'ثبت نشده' }}</span>
+            </div>
+          </div>
+
+          <div class="account-actions">
+            <button class="chip-btn ghost" @click="openSecurity">
+              امنیت و ورودها
+            </button>
+            <button class="chip-btn ghost" @click="openSessions">
+              دستگاه‌های فعال
+            </button>
+          </div>
+
+          <div class="danger-zone">
+            <h3>منطقه حساس</h3>
+            <p>کارهایی که بهتره با حواس جمع انجام بدی.</p>
+            <button class="danger-btn" @click="logout">
+              خروج از حساب
+            </button>
+          </div>
+        </div>
+      </section>
     </div>
 
-    <!-- Success Modal -->
-    <div v-if="showSuccessModal" class="modal-overlay" @click="showSuccessModal = false">
-      <div class="modal-content success-modal" @click.stop>
-        <div class="modal-icon">
-          <svg viewBox="0 0 24 24" fill="currentColor">
-            <path d="M9 16.17 4.83 12 3.41 13.41 9 19 21 7l-1.41-1.41z" />
+    <!-- SAVE BAR -->
+    <footer class="save-bar">
+      <span class="save-hint">
+        همهٔ تغییرات (پروفایل، علایق، تنظیمات) با هم ذخیره می‌شن.
+      </span>
+      <button class="save-btn" :disabled="isSaving" @click="saveAll">
+        <span v-if="isSaving" class="save-loading">
+          <svg class="spinner" viewBox="0 0 24 24">
+            <circle
+              cx="12"
+              cy="12"
+              r="10"
+              stroke="currentColor"
+              stroke-width="4"
+              fill="none"
+            />
           </svg>
-        </div>
-        <h3>پروفایل با موفقیت ایجاد شد!</h3>
-        <p>اطلاعات شما با موفقیت در سیستم ثبت شد.</p>
-        <button class="action-btn primary" @click="showSuccessModal = false">باشه</button>
-      </div>
-    </div>
+          در حال ذخیره...
+        </span>
+        <span v-else>ذخیره همه تغییرات</span>
+      </button>
+    </footer>
   </div>
 </template>
 
@@ -234,12 +353,11 @@ import { emitter } from '@/utils/event-bus'
 
 const router = useRouter()
 
-const currentStep = ref(1)
-const isSubmitting = ref(false)
-const showSuccessModal = ref(false)
+const activeSection = ref('profile')
 const isAvatarLoading = ref(true)
+const isSaving = ref(false)
 
-// Avatar configuration
+// avatar config
 const avatarConfig = reactive({
   avatarStyle: 'Circle',
   topType: 'ShortHairShortFlat',
@@ -255,17 +373,43 @@ const avatarConfig = reactive({
   skinColor: 'Light'
 })
 
-// me configuration (if you need it later)
-const me = reactive({})
+// me info
+const me = reactive({
+  id: null,
+  email: null
+})
 
-// User profile data
+// user profile
 const userProfile = reactive({
   username: '',
   age: null,
-  hobbies: []
+  bio: '',
+  hobbies: [],
+  mood: 'chill'
 })
 
-// Hobbies list
+// app / privacy / notification settings
+const settings = reactive({
+  theme: 'dark',
+  language: 'fa',
+  showOnlineStatus: true,
+  showLocation: false,
+  allowStrangerMessages: true,
+  pushNotifications: true,
+  emailDigest: false,
+  inAppSounds: true
+})
+
+// sections meta
+const sections = [
+  { id: 'profile', label: 'پروفایل', sub: 'نام کاربری، سن، بیو' },
+  { id: 'interests', label: 'علایق تو', sub: 'سرگرمی‌ها و استایل حضور' },
+  { id: 'app', label: 'ظاهر و حریم خصوصی', sub: 'تم، زبان، دیده‌شدن' },
+  { id: 'notifications', label: 'نوتیفیکیشن‌ها', sub: 'پوش، ایمیل، صدا' },
+  { id: 'account', label: 'حساب کاربری', sub: 'امنیت، دستگاه‌ها، خروج' }
+]
+
+// interests
 const hobbiesList = ref([
   { id: 'sports', name: 'ورزش', icon: '⚽' },
   { id: 'music', name: 'موسیقی', icon: '🎵' },
@@ -281,202 +425,236 @@ const hobbiesList = ref([
   { id: 'fitness', name: 'تناسب اندام', icon: '💪' }
 ])
 
-// Computed avatar URL
+// moods
+const moodOptions = [
+  { value: 'any', label: 'آزاد', icon: '🔄' },
+  { value: 'happy', label: 'شاد', icon: '😄' },
+  { value: 'chill', label: 'آرام', icon: '😌' },
+  { value: 'hyper', label: 'پر انرژی', icon: '⚡' },
+  { value: 'quiet', label: 'کم‌حرف', icon: '🌙' }
+]
+
+// avatar URL
 const avatarUrl = computed(() => {
   const baseUrl = process.env.VUE_APP_AVATAR_APP_URL + '/avatars'
-  const params = new URLSearchParams(avatarConfig)
+  const params = new URLSearchParams({ ...avatarConfig })
   return `${baseUrl}?${params.toString()}`
 })
 
-// Navigation between steps
-const nextStep = () => {
-  if (currentStep.value < 3) {
-    currentStep.value++
-  }
+const handleAvatarLoad = () => {
+  isAvatarLoading.value = false
+}
+const handleAvatarError = () => {
+  isAvatarLoading.value = false
 }
 
-const prevStep = () => {
-  if (currentStep.value > 1) {
-    currentStep.value--
-  }
-}
-
-// Hobbies handling
+// toggle hobbies
 const toggleHobby = (hobbyId) => {
-  const index = userProfile.hobbies.indexOf(hobbyId)
-  if (index > -1) {
-    userProfile.hobbies.splice(index, 1)
+  const idx = userProfile.hobbies.indexOf(hobbyId)
+  if (idx > -1) {
+    userProfile.hobbies.splice(idx, 1)
   } else {
     userProfile.hobbies.push(hobbyId)
   }
 }
 
-const getHobbyName = (hobbyId) => {
-  const hobby = hobbiesList.value.find((h) => h.id === hobbyId)
-  return hobby ? hobby.name : hobbyId
-}
-
-// Avatar load handlers
-const handleAvatarLoad = () => {
-  isAvatarLoading.value = false
-}
-
-const handleAvatarError = () => {
-  isAvatarLoading.value = false
-}
-
-// Submit profile
-const submitProfile = async () => {
+// save all
+const saveAll = async () => {
   if (!userProfile.username || !userProfile.username.trim()) {
-    showError('لطفا نام کاربری خود را وارد کنید')
+    emitter.emit('error-message', 'لطفا نام کاربری خود را وارد کنید')
     return
   }
 
-  isSubmitting.value = true
+  isSaving.value = true
 
   try {
-    const profileData = {
+    const payload = {
       username: userProfile.username,
       age: userProfile.age,
+      bio: userProfile.bio,
       avatar: { ...avatarConfig },
       avatarUrl: avatarUrl.value,
       hobbies: [...userProfile.hobbies],
-      createdAt: new Date().toISOString()
+      mood: userProfile.mood,
+      settings: { ...settings },
+      updatedAt: new Date().toISOString()
     }
 
     const response = await post(
       '/api/v1',
-      {
-        topic: 'updatePersonProfile',
-        data: profileData
-      },
-      {
-        token: getCookie('app-token')
-      }
+      { topic: 'updatePersonProfile', data: payload },
+      { token: getCookie('app-token') }
     )
 
-    if (response && response.data && response.data.success) {
-      emitter.emit('refresh-navigation-state')
-      emitter.emit('success-message', 'به لینکو دنیای متا خوش آمدید.')
+    if (response?.data?.success) {
+      emitter.emit('success-message', 'پروفایل و تنظیمات با موفقیت ذخیره شد ✨')
       emitter.emit('reload-me', true)
-      showSuccessModal.value = true
-      router.push('/')
-    } else if (response && response.data) {
-      emitter.emit('error-message', response.data.message || 'خطا در ثبت اطلاعات.')
+      localStorage.setItem('userAvatarConfig', JSON.stringify(avatarConfig))
+      localStorage.setItem(
+        'lynku-settings',
+        JSON.stringify({ profile: userProfile, settings })
+      )
     } else {
-      emitter.emit('error-message', 'خطا در ثبت اطلاعات.')
+      emitter.emit(
+        'error-message',
+        response?.data?.message || 'خطا در ذخیره‌سازی تنظیمات.'
+      )
     }
-  } catch (error) {
-    console.error('Error submitting profile:', error)
-    showError('خطا در ثبت اطلاعات. لطفا دوباره تلاش کنید.')
+  } catch (e) {
+    console.error(e)
+    emitter.emit('error-message', 'خطا در ذخیره‌سازی تنظیمات. دوباره تلاش کن.')
   } finally {
-    isSubmitting.value = false
+    isSaving.value = false
   }
 }
 
-const showError = (message) => {
-  emitter.emit('error-message', message)
+// account actions
+const logout = () => {
+  try {
+    localStorage.removeItem('me')
+    localStorage.removeItem('userAvatarConfig')
+    localStorage.removeItem('lynku-settings')
+  } catch (e) {
+    // ignore
+  }
+  emitter.emit('logout', true)
+  router.push('/logout')
 }
 
-// Lifecycle
+const goToAccount = () => {
+  activeSection.value = 'account'
+}
+
+const openSecurity = () => {
+  emitter.emit('info-message', 'بخش امنیت و ورودها به‌زودی در دسترس خواهد بود.')
+}
+
+const openSessions = () => {
+  emitter.emit('info-message', 'مدیریت دستگاه‌های فعال به‌زودی اضافه می‌شود.')
+}
+
+// init
 onMounted(() => {
+  isAvatarLoading.value = true
+
   const savedConfig = localStorage.getItem('userAvatarConfig')
   const meJson = localStorage.getItem('me')
+  const savedSettings = localStorage.getItem('lynku-settings')
 
   if (savedConfig) {
     try {
       Object.assign(avatarConfig, JSON.parse(savedConfig))
     } catch {
-      // ignore parse error, keep defaults
+      // ignore
     }
   }
 
   if (meJson) {
     try {
       const meData = JSON.parse(meJson)
-      Object.assign(me, meData)
+      me.id = meData?.id || meData?._id || null
+      me.email = meData?.email || null
 
-      if (meData.username) {
-        userProfile.username = meData.username
-      }
-      if (meData.age) {
-        userProfile.age = meData.age
-      }
-      if (Array.isArray(meData.hobbies)) {
-        userProfile.hobbies = [...meData.hobbies]
-      }
+      if (meData.username) userProfile.username = meData.username
+      if (meData.age) userProfile.age = meData.age
+      if (meData.bio) userProfile.bio = meData.bio
+      if (Array.isArray(meData.hobbies)) userProfile.hobbies = [...meData.hobbies]
+      if (meData.mood) userProfile.mood = meData.mood
     } catch {
       // ignore
     }
   }
 
-  // reset avatar loading whenever we mount
-  isAvatarLoading.value = true
+  if (savedSettings) {
+    try {
+      const parsed = JSON.parse(savedSettings)
+      if (parsed.profile) Object.assign(userProfile, parsed.profile)
+      if (parsed.settings) Object.assign(settings, parsed.settings)
+    } catch {
+      // ignore
+    }
+  }
 })
 </script>
 
 <style scoped>
-.avatar-profile-container {
-  background: linear-gradient(135deg, #0f0f0f 0%, #1a1a1a 100%);
-  color: #ffffff;
+:root {
+  color-scheme: dark;
+}
+
+.lynku-settings {
+  direction: rtl;
+  background: radial-gradient(circle at top, #050816 0%, #02010a 40%, #000 100%);
+  color: #f9fafb;
+  padding: 24px 26px 80px;
+  border-radius: 18px;
+  height: 100vh;
+  box-sizing: border-box;
+  font-family: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
   animation: slideUp 0.3s ease-out;
+}
+
+/* ===== HEADER ===== */
+.settings-header {
+  display: flex;
+  justify-content: space-between;
+  gap: 24px;
+  align-items: center;
+  margin-bottom: 22px;
+  padding: 18px 20px;
   border-radius: 16px;
+  border: 1px solid rgba(148, 163, 184, 0.35);
+  background:
+    radial-gradient(circle at top left, rgba(56, 189, 248, 0.16), transparent 55%),
+    radial-gradient(circle at bottom right, rgba(244, 114, 182, 0.16), transparent 55%),
+    rgba(15, 23, 42, 0.85);
+  backdrop-filter: blur(18px);
+  box-shadow:
+    0 18px 40px rgba(0, 0, 0, 0.75),
+    0 0 40px rgba(56, 189, 248, 0.1);
 }
 
-/* Avatar preview (with loading) */
-.avatar-preview-large {
+.header-main {
+  text-align: center;
+  align-items: center;
+  gap: 18px;
+}
+
+/* Avatar */
+.avatar-wrapper {
   position: relative;
-  width: 160px;
-  height: 160px;
-  margin: 0 auto 20px;
-  border-radius: 50%;
+  display: inline-block;
+  width: 200px !important;
+  height: 200px !important;
+  border-radius: 999px;
   overflow: hidden;
-  background: rgba(255, 255, 255, 0.03);
-  border: 2px solid #333;
-  box-shadow: 0 0 8px #6a5af9, 0 0 16px rgba(106, 90, 249, 0.4) inset;
-  transition: transform 0.3s ease, box-shadow 0.3s ease, border-color 0.3s ease;
+  border: 2px solid rgba(148, 163, 184, 0.6);
+  background: radial-gradient(circle at 30% 20%, #1f2937, #020617);
+  box-shadow:
+    0 0 16px rgba(129, 140, 248, 0.6),
+    inset 0 0 16px rgba(15, 23, 42, 0.9);
+  transition: transform 0.25s ease, box-shadow 0.25s ease, border-color 0.25s ease;
 }
 
-.avatar-preview-large.review {
-  width: 150px;
-  height: 150px;
+.avatar-wrapper:hover {
+  transform: translateY(-2px) scale(1.03);
+  border-color: #a855f7;
+  box-shadow:
+    0 0 20px rgba(168, 85, 247, 0.7),
+    0 0 36px rgba(56, 189, 248, 0.4);
 }
 
-.avatar-preview-large.glowing {
+.avatar-wrapper.glowing {
   animation: avatarPulse 3s ease-in-out infinite;
-}
-
-@keyframes avatarPulse {
-  0% {
-    box-shadow:
-      0 0 14px rgba(255, 0, 255, 0.35),
-      0 0 28px rgba(255, 0, 255, 0.2),
-      inset 0 0 12px rgba(255, 0, 255, 0.15);
-    border-color: rgba(255, 0, 255, 0.8);
-  }
-  50% {
-    box-shadow:
-      0 0 24px rgba(255, 0, 255, 0.6),
-      0 0 48px rgba(255, 0, 255, 0.35),
-      inset 0 0 18px rgba(255, 0, 255, 0.25);
-    border-color: #ff55ff;
-  }
-  100% {
-    box-shadow:
-      0 0 14px rgba(255, 0, 255, 0.35),
-      0 0 28px rgba(255, 0, 255, 0.2),
-      inset 0 0 12px rgba(255, 0, 255, 0.15);
-    border-color: rgba(255, 0, 255, 0.8);
-  }
 }
 
 .avatar-skeleton {
   width: 100%;
   height: 100%;
-  border-radius: 50%;
-  background: radial-gradient(circle at 30% 30%, #333, #111);
+  border-radius: inherit;
   position: relative;
   overflow: hidden;
+  background: radial-gradient(circle at 30% 30%, #4b5563, #020617);
 }
 
 .avatar-skeleton-inner {
@@ -484,13 +662,587 @@ onMounted(() => {
   inset: 0;
   background: linear-gradient(
     120deg,
-    rgba(255, 255, 255, 0.04),
-    rgba(255, 255, 255, 0.15),
-    rgba(255, 255, 255, 0.04)
+    rgba(249, 250, 251, 0.03),
+    rgba(249, 250, 251, 0.3),
+    rgba(249, 250, 251, 0.03)
   );
   transform: translateX(-100%);
   animation: shimmer 1.6s infinite;
+}
+
+.avatar-img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+/* Header text */
+.header-text {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.header-title h1 {
+  margin: 0;
+  font-size: 1.5rem;
+  line-height: 1.4;
+  background: linear-gradient(135deg, #e5e7eb, #a5b4fc, #22d3ee);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+}
+
+.header-title p {
+  margin: 0;
+  font-size: 0.9rem;
+  color: #9ca3af;
+}
+
+/* username inline */
+.header-username {
+  margin-top: 10px;
+}
+
+.header-username label {
+  display: block;
+  font-size: 0.78rem;
+  color: #9ca3af;
+  margin-bottom: 4px;
+}
+
+.username-row {
+  display: flex;
+  align-items: center;
+  background: rgba(15, 23, 42, 0.9);
+  border-radius: 999px;
+  border: 1px solid rgba(55, 65, 81, 0.9);
+  overflow: hidden;
+}
+
+.username-prefix {
+  padding: 8px 10px;
+  font-size: 0.88rem;
+  color: #6b7280;
+  background: radial-gradient(circle at center, rgba(31, 41, 55, 0.95), rgba(15, 23, 42, 0.7));
+  border-left: 1px solid rgba(55, 65, 81, 0.9);
+}
+
+.username-input {
+  flex: 1;
+  background: transparent;
+  border: none;
+  color: #e5e7eb;
+  padding: 8px 10px;
+  font-size: 0.9rem;
+}
+
+.username-input::placeholder {
+  color: #6b7280;
+}
+
+.username-input:focus {
+  outline: none;
+}
+
+/* header actions */
+.header-actions {
+  display: flex;
+  gap: 8px;
+  align-items: center;
+}
+
+/* chip buttons */
+.chip-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 8px 14px;
+  border-radius: 999px;
+  font-size: 0.8rem;
+  border: 1px solid transparent;
+  cursor: pointer;
+  transition: 0.2s ease;
+  background: rgba(15, 23, 42, 0.9);
+  color: #e5e7eb;
+}
+
+.chip-btn svg {
+  width: 16px;
+  height: 16px;
+}
+
+.chip-btn.ghost {
+  border-color: rgba(55, 65, 81, 0.9);
+}
+
+.chip-btn.ghost:hover {
+  border-color: #38bdf8;
+  box-shadow: 0 0 12px rgba(56, 189, 248, 0.4);
+}
+
+.chip-btn.danger {
+  background: linear-gradient(135deg, #b91c1c, #f97373);
+  color: #fee2e2;
+}
+
+.chip-btn.danger:hover {
+  box-shadow: 0 0 14px rgba(248, 113, 113, 0.65);
+}
+
+/* ===== MAIN LAYOUT ===== */
+.settings-layout {
+  margin-top: 18px;
+  display: grid;
+  grid-template-columns: 260px minmax(0, 1fr);
+  gap: 18px;
+}
+
+/* NAV */
+.settings-nav {
+  border-radius: 16px;
+  border: 1px solid rgba(55, 65, 81, 0.9);
+  background: radial-gradient(circle at top left, rgba(59, 130, 246, 0.16), transparent 55%),
+  rgba(15, 23, 42, 0.95);
+  padding: 14px 12px 16px;
+  box-shadow: 0 12px 30px rgba(0, 0, 0, 0.75);
+}
+
+.nav-label {
+  font-size: 0.78rem;
+  color: #6b7280;
+  margin-bottom: 10px;
+}
+
+.nav-list {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.nav-item {
+  width: 100%;
+  border: none;
+  background: transparent;
+  color: #e5e7eb;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 8px 8px;
+  border-radius: 10px;
+  cursor: pointer;
+  transition: 0.18s ease;
+}
+
+.nav-item:hover {
+  background: rgba(30, 64, 175, 0.45);
+}
+
+.nav-item.active {
+  background: linear-gradient(135deg, rgba(56, 189, 248, 0.15), rgba(129, 140, 248, 0.3));
+  box-shadow:
+    0 0 10px rgba(129, 140, 248, 0.7),
+    0 0 18px rgba(56, 189, 248, 0.35);
+}
+
+.nav-icon svg {
+  width: 20px;
+  height: 20px;
+  color: #a5b4fc;
+}
+
+.nav-text {
+  text-align: right;
+}
+
+.nav-title {
+  font-size: 0.86rem;
+  font-weight: 600;
+}
+
+.nav-subtitle {
+  font-size: 0.7rem;
+  color: #9ca3af;
+}
+
+/* CONTENT */
+.settings-content {
+  border-radius: 16px;
+  border: 1px solid rgba(55, 65, 81, 0.9);
+  background: radial-gradient(circle at top left, rgba(129, 140, 248, 0.22), transparent 55%),
+  radial-gradient(circle at bottom right, rgba(59, 130, 246, 0.18), transparent 60%),
+  rgba(15, 23, 42, 0.97);
+  box-shadow:
+    0 16px 40px rgba(0, 0, 0, 0.9),
+    0 0 24px rgba(129, 140, 248, 0.35);
+  padding: 18px 18px 22px;
+  min-height: 340px;
+}
+
+.settings-card {
+  display: flex;
+  flex-direction: column;
+  gap: 18px;
+}
+
+/* card header */
+.card-header h2 {
+  margin: 0;
+  font-size: 1.1rem;
+  color: #e5e7eb;
+}
+
+.card-header p {
+  margin: 4px 0 0 0;
+  font-size: 0.82rem;
+  color: #9ca3af;
+}
+
+/* form layout */
+.form-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 14px 16px;
+}
+
+.form-group {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.form-group label {
+  font-size: 0.8rem;
+  color: #e5e7eb;
+}
+
+input,
+select,
+textarea {
+  border-radius: 10px;
+  border: 1px solid rgba(55, 65, 81, 0.9);
+  background: rgba(15, 23, 42, 0.9);
+  color: #e5e7eb;
+  padding: 9px 10px;
+  font-size: 0.88rem;
+  transition: border 0.15s ease, box-shadow 0.15s ease, background 0.15s ease;
+  font-family: inherit;
+}
+
+input:focus,
+select:focus,
+textarea:focus {
+  outline: none;
+  border-color: #38bdf8;
+  box-shadow: 0 0 0 1px rgba(56, 189, 248, 0.6);
+}
+
+textarea {
+  resize: vertical;
+  min-height: 80px;
+}
+
+input::placeholder,
+textarea::placeholder {
+  color: #6b7280;
+}
+
+/* interests */
+.interests-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(105px, 1fr));
+  gap: 10px;
+}
+
+.interest-card {
+  border-radius: 12px;
+  padding: 9px 8px;
+  border: 1px solid rgba(55, 65, 81, 0.9);
+  background: radial-gradient(circle at top left, rgba(59, 130, 246, 0.2), transparent 70%),
+  rgba(15, 23, 42, 0.9);
+  color: #e5e7eb;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 4px;
+  cursor: pointer;
+  font-size: 0.8rem;
+  transition: 0.18s ease;
+}
+
+.interest-card:hover {
+  transform: translateY(-2px);
+  border-color: #38bdf8;
+}
+
+.interest-card.selected {
+  border-color: #a855f7;
+  box-shadow:
+    0 0 12px rgba(168, 85, 247, 0.7),
+    0 0 22px rgba(56, 189, 248, 0.4);
+}
+
+.interest-icon {
+  font-size: 1.3rem;
+}
+
+.interest-label {
+  font-size: 0.78rem;
+}
+
+/* mood pills */
+.pill-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.pill-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  border-radius: 999px;
+  padding: 6px 10px;
+  font-size: 0.8rem;
+  border: 1px solid rgba(55, 65, 81, 0.9);
+  background: rgba(15, 23, 42, 0.85);
+  color: #e5e7eb;
+  cursor: pointer;
+  transition: 0.18s ease;
+}
+
+.pill-btn:hover {
+  border-color: #38bdf8;
+}
+
+.pill-btn.active {
+  border-color: #a855f7;
+  background: radial-gradient(circle at center, rgba(129, 140, 248, 0.65), rgba(15, 23, 42, 0.9));
+  box-shadow:
+    0 0 10px rgba(129, 140, 248, 0.7),
+    0 0 18px rgba(56, 189, 248, 0.5);
+}
+
+.pill-emoji {
+  font-size: 1rem;
+}
+
+/* toggles */
+.toggle-list {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.toggle-item {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 10px 10px;
+  border-radius: 12px;
+  border: 1px solid rgba(55, 65, 81, 0.9);
+  background: rgba(15, 23, 42, 0.85);
+}
+
+.toggle-texts {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.toggle-title {
+  font-size: 0.86rem;
+  color: #e5e7eb;
+}
+
+.toggle-sub {
+  font-size: 0.76rem;
+  color: #9ca3af;
+}
+
+/* switch */
+.switch {
+  position: relative;
+  display: inline-block;
+  width: 42px;
+  height: 24px;
+}
+
+.switch input {
+  opacity: 0;
+  width: 0;
+  height: 0;
+}
+
+.slider {
+  position: absolute;
+  cursor: pointer;
+  inset: 0;
+  background-color: #4b5563;
+  transition: 0.2s;
+  border-radius: 999px;
+}
+
+.slider::before {
+  position: absolute;
+  content: '';
+  height: 18px;
+  width: 18px;
+  left: 3px;
+  top: 3px;
+  background-color: white;
+  transition: 0.2s;
   border-radius: 50%;
+}
+
+.switch input:checked + .slider {
+  background: linear-gradient(135deg, #38bdf8, #a855f7);
+}
+
+.switch input:checked + .slider::before {
+  transform: translateX(18px);
+}
+
+/* account */
+.info-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 12px 16px;
+  margin-top: 4px;
+}
+
+.info-item {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.info-label {
+  font-size: 0.78rem;
+  color: #9ca3af;
+}
+
+.info-value {
+  font-size: 0.88rem;
+  color: #e5e7eb;
+}
+
+.info-value.mono {
+  font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, 'Liberation Mono', 'Courier New',
+  monospace;
+}
+
+.account-actions {
+  margin-top: 14px;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.danger-zone {
+  margin-top: 18px;
+  padding: 12px;
+  border-radius: 12px;
+  border: 1px dashed rgba(248, 113, 113, 0.7);
+  background: rgba(30, 64, 175, 0.1);
+}
+
+.danger-zone h3 {
+  margin: 0 0 4px 0;
+  font-size: 0.98rem;
+  color: #fecaca;
+}
+
+.danger-zone p {
+  margin: 0 0 10px 0;
+  font-size: 0.78rem;
+  color: #fca5a5;
+}
+
+.danger-btn {
+  border-radius: 999px;
+  padding: 7px 14px;
+  border: 1px solid rgba(248, 113, 113, 0.9);
+  background: rgba(127, 29, 29, 0.95);
+  color: #fee2e2;
+  cursor: pointer;
+  font-size: 0.82rem;
+  transition: 0.18s ease;
+}
+
+.danger-btn:hover {
+  box-shadow: 0 0 14px rgba(248, 113, 113, 0.8);
+}
+
+/* save bar */
+.save-bar {
+  position: sticky;
+  bottom: 0;
+  margin-top: 20px;
+  padding-top: 10px;
+  border-top: 1px solid rgba(31, 41, 55, 0.9);
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 10px;
+  background: linear-gradient(to top, rgba(15, 23, 42, 0.98), rgba(15, 23, 42, 0.4), transparent);
+  backdrop-filter: blur(12px);
+}
+
+.save-hint {
+  font-size: 0.78rem;
+  color: #9ca3af;
+}
+
+.save-btn {
+  border-radius: 999px;
+  padding: 8px 18px;
+  border: none;
+  cursor: pointer;
+  font-size: 0.86rem;
+  font-weight: 600;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  color: #0f172a;
+  background: linear-gradient(135deg, #38bdf8, #a855f7);
+  box-shadow:
+    0 0 12px rgba(56, 189, 248, 0.7),
+    0 0 24px rgba(168, 85, 247, 0.6);
+  transition: 0.18s ease;
+}
+
+.save-btn:hover:not(:disabled) {
+  transform: translateY(-1px);
+}
+
+.save-btn:disabled {
+  opacity: 0.6;
+  cursor: default;
+}
+
+.save-loading {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.spinner {
+  width: 16px;
+  height: 16px;
+  animation: spin 0.9s linear infinite;
+}
+
+/* animations */
+@keyframes slideUp {
+  from {
+    transform: translateY(10px);
+    opacity: 0;
+  }
+  to {
+    transform: translateY(0);
+    opacity: 1;
+  }
 }
 
 @keyframes shimmer {
@@ -502,525 +1254,101 @@ onMounted(() => {
   }
 }
 
-.preview-image {
-  width: 100%;
-  height: 100%;
-  object-fit: cover;
-}
-
-.review-avatar {
-  width: 100%;
-  height: 100%;
-  border-radius: 50%;
-  object-fit: cover;
-}
-
-/* Progress Steps */
-.progress-steps {
-  display: flex;
-  justify-content: center;
-  margin: 40px 0;
-  position: relative;
-}
-
-.progress-steps::before {
-  content: '';
-  position: absolute;
-  top: 20px;
-  left: 50px;
-  right: 50px;
-  height: 2px;
-  background: #333;
-  z-index: 1;
-}
-
-.step {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  position: relative;
-  z-index: 2;
-  flex: 1;
-  max-width: 100px;
-}
-
-.step-number {
-  width: 40px;
-  height: 40px;
-  border-radius: 50%;
-  background: #333;
-  color: #8899a6;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  font-weight: bold;
-  margin-bottom: 8px;
-  transition: all 0.3s ease;
-}
-
-.step.active .step-number {
-  padding: 12px 28px;
-  font-size: 16px;
-  font-weight: 600;
-  color: #fff;
-  border: none;
-  border-radius: 10px;
-  background: #0d0d0d;
-  text-transform: uppercase;
-  letter-spacing: 1px;
-  box-shadow: 0 0 8px #6a5af9, 0 0 16px #6a5af9 inset;
-}
-
-.step.completed .step-number {
-  background: #00ba7c;
-  color: white;
-}
-
-.step-label {
-  font-size: 0.8rem;
-  color: #8899a6;
-  text-align: center;
-}
-
-.step.active .step-label {
-  color: #1da1f2;
-}
-
-.step.completed .step-label {
-  color: #00ba7c;
-}
-
-/* Step Container */
-.step-container {
-  background: #000000;
-  border-radius: 20px;
-  padding: 30px;
-  margin-bottom: 30px;
-  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
-  border: 1px solid #333;
-}
-
-.step-header {
-  text-align: center;
-  margin-bottom: 30px;
-}
-
-.step-header h2 {
-  margin: 0 0 10px 0;
-  font-size: 1.8rem;
-  font-weight: 700;
-  background: linear-gradient(135deg, #1da1f2, #00ba7c);
-  -webkit-background-clip: text;
-  -webkit-text-fill-color: transparent;
-  background-clip: text;
-}
-
-.step-header p {
-  margin: 0;
-  color: #8899a6;
-  font-size: 1rem;
-}
-
-/* Form Styles */
-.form-container {
-  max-width: 600px;
-  margin: 0 auto;
-}
-
-.form-group {
-  margin-bottom: 25px;
-}
-
-.form-row {
-  display: flex;
-  gap: 20px;
-}
-
-.form-row .form-group {
-  flex: 1;
-}
-
-label {
-  display: block;
-  margin-bottom: 8px;
-  color: #ffffff;
-  font-weight: 500;
-}
-
-input,
-select,
-textarea {
-  width: 100%;
-  padding: 12px 16px;
-  background: rgba(255, 255, 255, 0.05);
-  border: 1px solid #333;
-  border-radius: 8px;
-  color: #ffffff;
-  font-size: 1rem;
-  transition: all 0.3s ease;
-}
-
-input:focus,
-select:focus,
-textarea:focus {
-  outline: none;
-  border-color: #1da1f2;
-  box-shadow: 0 0 0 2px rgba(29, 161, 242, 0.2);
-}
-
-input::placeholder,
-textarea::placeholder {
-  color: #8899a6;
-}
-
-textarea {
-  resize: vertical;
-  min-height: 100px;
-}
-
-/* Interests Grid */
-.interests-grid {
-  display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(120px, 1fr));
-  gap: 12px;
-}
-
-.interest-card {
-  background: rgba(255, 255, 255, 0.05);
-  border: 2px solid transparent;
-  border-radius: 12px;
-  padding: 15px 10px;
-  cursor: pointer;
-  transition: all 0.3s ease;
-  text-align: center;
-}
-
-.interest-card:hover {
-  background: rgba(255, 255, 255, 0.1);
-  transform: translateY(-2px);
-}
-
-.interest-card.selected {
-  border-color: #1da1f2;
-  background: rgba(29, 161, 242, 0.1);
-}
-
-.interest-icon {
-  font-size: 1.5rem;
-  margin-bottom: 8px;
-}
-
-.interest-label {
-  font-size: 0.8rem;
-  color: #ffffff;
-}
-
-/* Review Section */
-.review-container {
-  max-width: 700px;
-  margin: 0 auto;
-}
-
-.review-card {
-  background: rgba(255, 255, 255, 0.05);
-  border-radius: 16px;
-  padding: 25px;
-  margin-bottom: 30px;
-  border: 1px solid #333;
-}
-
-.review-section {
-  margin-bottom: 25px;
-  padding-bottom: 25px;
-  border-bottom: 1px solid #333;
-}
-
-.review-section:last-child {
-  margin-bottom: 0;
-  padding-bottom: 0;
-  border-bottom: none;
-}
-
-.review-section h3 {
-  margin: 0 0 15px 0;
-  color: #1da1f2;
-  font-size: 1.2rem;
-}
-
-.avatar-review {
-  display: flex;
-  justify-content: center;
-}
-
-.info-grid {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 15px;
-}
-
-.info-item {
-  display: flex;
-  flex-direction: column;
-  gap: 5px;
-  flex: 1;
-  min-width: 200px;
-}
-
-.info-item.full-width {
-  flex: 1 0 100%;
-}
-
-.info-label {
-  color: #8899a6;
-  font-size: 0.9rem;
-}
-
-.info-value {
-  color: #ffffff;
-  font-weight: 500;
-}
-
-.interests-review {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 8px;
-  margin-top: 5px;
-}
-
-.interest-tag {
-  background: rgba(29, 161, 242, 0.2);
-  color: #1da1f2;
-  padding: 4px 12px;
-  border-radius: 20px;
-  font-size: 0.8rem;
-}
-
-.interest-tag.custom {
-  background: rgba(0, 186, 124, 0.2);
-  color: #00ba7c;
-}
-
-.no-data {
-  color: #8899a6;
-  font-style: italic;
-}
-
-/* Form Actions */
-.form-actions {
-  display: flex;
-  gap: 15px;
-  justify-content: center;
-  padding-top: 20px;
-  border-top: 1px solid #333;
-}
-
-.action-btn {
-  padding: 12px 24px;
-  border-radius: 25px;
-  font-weight: 600;
-  cursor: pointer;
-  transition: all 0.3s ease;
-  display: flex;
-  align-items: center;
-  gap: 8px;
-  border: none;
-  font-size: 0.9rem;
-}
-
-.action-btn.primary {
-  padding: 12px 28px;
-  font-size: 16px;
-  font-weight: 600;
-  color: #fff;
-  border: none;
-  cursor: pointer;
-  border-radius: 10px;
-  background: #0d0d0d;
-  text-transform: uppercase;
-  letter-spacing: 1px;
-  transition: 0.3s ease;
-  box-shadow: 0 0 8px #6a5af9, 0 0 16px #6a5af9 inset;
-}
-
-.action-btn.primary:hover:not(:disabled) {
-  background: linear-gradient(135deg, #1a91da 0%, #1a7bb9 100%);
-  transform: translateY(-2px);
-  box-shadow: 0 6px 20px rgba(29, 161, 242, 0.4);
-}
-
-.action-btn.primary:disabled {
-  opacity: 0.6;
-  cursor: not-allowed;
-  transform: none;
-}
-
-.action-btn.secondary {
-  background: rgba(255, 255, 255, 0.1);
-  color: #ffffff;
-  border: 1px solid #333;
-}
-
-.action-btn.secondary:hover {
-  background: rgba(255, 255, 255, 0.2);
-  transform: translateY(-2px);
-}
-
-.action-btn svg {
-  width: 18px;
-  height: 18px;
-}
-
-/* Spinner */
-.spinner {
-  width: 18px;
-  height: 18px;
-  animation: spin 1s linear infinite;
+@keyframes avatarPulse {
+  0% {
+    box-shadow:
+      0 0 14px rgba(129, 140, 248, 0.5),
+      0 0 28px rgba(56, 189, 248, 0.3);
+  }
+  50% {
+    box-shadow:
+      0 0 24px rgba(129, 140, 248, 0.9),
+      0 0 40px rgba(56, 189, 248, 0.5);
+  }
+  100% {
+    box-shadow:
+      0 0 14px rgba(129, 140, 248, 0.5),
+      0 0 28px rgba(56, 189, 248, 0.3);
+  }
 }
 
 @keyframes spin {
-  from {
-    transform: rotate(0deg);
-  }
   to {
     transform: rotate(360deg);
   }
 }
 
-/* Success Modal */
-.modal-overlay {
-  position: fixed;
-  top: 0;
-  left: 0;
-  right: 0;
-  bottom: 0;
-  background: rgba(0, 0, 0, 0.8);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  z-index: 10000;
-  animation: fadeIn 0.3s ease-out;
-}
-
-.success-modal {
-  background: #000000;
-  border-radius: 20px;
-  padding: 40px;
-  max-width: 400px;
-  text-align: center;
-  border: 1px solid #333;
-  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.5);
-  animation: scaleIn 0.3s ease-out;
-}
-
-.modal-icon {
-  width: 80px;
-  height: 80px;
-  background: rgba(0, 186, 124, 0.2);
-  border-radius: 50%;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  margin: 0 auto 20px;
-}
-
-.modal-icon svg {
-  width: 40px;
-  height: 40px;
-  color: #00ba7c;
-}
-
-.success-modal h3 {
-  margin: 0 0 10px 0;
-  color: #ffffff;
-  font-size: 1.5rem;
-}
-
-.success-modal p {
-  margin: 0 0 25px 0;
-  color: #8899a6;
-}
-
-/* Animations */
-@keyframes slideUp {
-  from {
-    opacity: 0;
-    transform: translateY(20px);
-  }
-  to {
-    opacity: 1;
-    transform: translateY(0);
+/* responsive */
+@media (max-width: 1024px) {
+  .settings-layout {
+    grid-template-columns: 220px minmax(0, 1fr);
   }
 }
 
-@keyframes fadeIn {
-  from {
-    opacity: 0;
-  }
-  to {
-    opacity: 1;
-  }
-}
-
-@keyframes scaleIn {
-  from {
-    opacity: 0;
-    transform: scale(0.9);
-  }
-  to {
-    opacity: 1;
-    transform: scale(1);
-  }
-}
-
-/* Responsive Design */
 @media (max-width: 768px) {
-  .avatar-profile-container {
-    padding: 10px;
+  .lynku-settings {
+    padding: 14px 12px 70px;
+    margin-top: 4rem;
   }
 
-  .progress-steps {
-    flex-wrap: wrap;
-    gap: 15px;
-  }
-
-  .progress-steps::before {
-    display: none;
-  }
-
-  .step {
-    flex: 0 0 calc(50% - 15px);
-  }
-
-  .step-container {
-    padding: 20px;
-  }
-
-  .form-row {
+  .settings-header {
     flex-direction: column;
-    gap: 0;
+    align-items: flex-start;
   }
 
-  .interests-grid {
-    grid-template-columns: repeat(auto-fill, minmax(100px, 1fr));
+  .header-main {
+    width: 100%;
   }
 
-  .form-actions {
+  .header-actions {
+    align-self: stretch;
+    justify-content: flex-end;
+  }
+
+  .settings-layout {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  .settings-nav {
+    order: 1;
+  }
+
+  .settings-content {
+    order: 2;
+  }
+
+  .save-bar {
     flex-direction: column;
-  }
-
-  .success-modal {
-    padding: 30px 20px;
-    margin: 20px;
+    align-items: flex-start;
   }
 }
 
 @media (max-width: 480px) {
-  .interests-grid {
-    grid-template-columns: repeat(3, 1fr);
+  .header-main {
+    flex-direction: row;
+    align-items: flex-start;
   }
 
-  .info-item {
-    min-width: 100%;
+  .avatar-wrapper {
+    width: 90px;
+    height: 90px;
+  }
+
+  .form-grid {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  .info-grid {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  .interests-grid {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+  }
+
+  .header-actions {
+    flex-wrap: wrap;
+    justify-content: flex-start;
   }
 }
 </style>

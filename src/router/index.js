@@ -112,7 +112,7 @@ const routes = [
           // No component needed as we're just redirecting after logic
           beforeEnter: (to, from, next) => {
               console.log('Logging out...');
-              emitter.emit("refresh-navigation-state")
+              emitter.emit("logout", true)
               emitter.emit("success-message", "با موفقیت خارج شدی. خدانگهدار!")
               // 1. Clear Local Storage
               localStorage.clear();

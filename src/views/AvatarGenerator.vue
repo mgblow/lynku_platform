@@ -671,8 +671,9 @@ const saveAvatar = async () => {
     )
     if (response && response.data.success) {
       emitter.emit('success-message', 'آواتارت با موفقیت ساخته شد')
+      setTimeout(() => emitter.emit('success-message', 'میتونی با رفتن به تنظمیات اطلاعاتت رو تکمیل کنی'), 3000)
       emitter.emit('reload-me', true)
-      router.push({ path: '/settings' })
+      router.push({ path: '/' })
     } else {
       emitter.emit('error-message', response.data.message)
     }

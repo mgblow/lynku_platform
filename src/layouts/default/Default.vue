@@ -143,6 +143,23 @@ export default {
       }
     }
 
+
+    const logout = () => {
+      // 1. Clear Local Storage
+      localStorage.clear();
+      // 2. Clear Session Storage
+      sessionStorage.clear();
+      // 3. Clear Cookies (You may need a utility function for all cookies)
+      // Example of clearing a single cookie named 'auth_token':
+      // document.cookie = "auth_token=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;";
+      // To clear all path-dependent cookies, you might need a more comprehensive solution
+      // or iterate over known cookie names. For a basic setup, you can clear all:
+      document.cookie.split(";").forEach((c) => {
+        document.cookie = c.replace(/^ +/, "").replace(/=.*/, `=;expires=${new Date().toUTCString()};path=/`);
+      });
+
+      emitter.emit('refresh-navigation-state');
+    }
     onMounted(() => {
       if (getCookie('app-token') && mqttClient === null) {
         handleBrokerConnection()
@@ -159,6 +176,7 @@ export default {
         emitter.on('brokerCredentials', () => handleBrokerConnection())
         emitter.on('mqtt:notification', (msg) => showMessage(msg))
         emitter.on('reload-me', () => getMe())
+        emitter.on('logout', () => logout())
       }
     })
 
