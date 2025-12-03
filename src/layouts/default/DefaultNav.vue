@@ -148,6 +148,7 @@ import { ref, reactive, onMounted, onUnmounted } from 'vue'
 import { useRouter } from 'vue-router'
 import { emitter } from '@/utils/event-bus'
 import { getCookie } from '@/cookie'
+import { post } from '@/api'
 
 const router = useRouter()
 
@@ -458,7 +459,7 @@ const performSearch = () => {
   console.log('Searching for:', searchQuery.value)
 }
 
-const resolveActionPath = (action) => {
+const resolveActionPath = async (action) => {
   if (action.linkTemplate) {
     if (action.requireMe) {
       if (!me.value || !me.value._id) {
@@ -472,8 +473,8 @@ const resolveActionPath = (action) => {
   return action.link
 }
 
-const navigateTo = (action) => {
-  const path = resolveActionPath(action)
+const navigateTo = async (action) => {
+  const path = await resolveActionPath(action)
   orbActive.value = false
   router.push(path)
 }
@@ -517,6 +518,35 @@ const handleRefreshNavigationState = () => {
   loadMeFromStorage()
   buildQuickActions()
 }
+const getMe = async () => {
+  try {
+    const response = await post(
+      '/api/v1',
+      {
+        topic: 'getMe',
+        data: {}
+      },
+      {
+        token: getCookie('app-token')
+      }
+    )
+    if (response && response.data.success) {
+      const person = {
+        ...response.data.body, // existing fields from API
+        type: 'person'
+      }
+      localStorage.setItem('me', JSON.stringify(person))
+      localStorage.setItem('userAvatarConfig', JSON.stringify(response.data.body.avatarConfig))
+    } else {
+      emitter.emit('error-message', response.data)
+    }
+  } catch (error) {
+    console.error('Error posting tweet:', error)
+    // this.showError('خطا در ارسال توییت. لطفاً دوباره تلاش کنید.')
+  } finally {
+  }
+}
+
 
 const handleLoading = (l) => {
   loading.value = l
@@ -527,6 +557,7 @@ onMounted(() => {
   buildQuickActions()
 
   emitter.on('refresh-navigation-state', handleRefreshNavigationState)
+  emitter.on('reload-me', () => getMe())
   emitter.on('loading', handleLoading)
 })
 
