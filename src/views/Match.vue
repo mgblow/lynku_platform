@@ -425,7 +425,7 @@ const resetAdventure = () => {
 .globe-wrapper {
   position: relative;
   width: 100%;
-  height: 90vh;
+  height: 100vh;
   background: radial-gradient(circle at center, #02010a 0%, #000 90%);
   overflow: hidden;
   transform-origin: center;

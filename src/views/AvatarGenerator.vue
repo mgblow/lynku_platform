@@ -68,7 +68,7 @@
             {{ m.label }}
           </button>
         </div>
-
+        <br>
         <button class="random-avatar-generator-btn" @click="randomizeAvatar">
           <svg
             width="48"
