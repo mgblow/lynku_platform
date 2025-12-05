@@ -107,6 +107,15 @@ const routes = [
       }
     },
     {
+      path: '/maker',
+      name: 'maker',
+      component: () => import('../views/GlobeMaker.vue'),
+      props: true,
+      meta: {
+        layout: 'default'
+      }
+    },
+    {
           path: '/logout',
           name: 'Logout',
           // No component needed as we're just redirecting after logic

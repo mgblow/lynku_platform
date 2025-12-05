@@ -590,7 +590,6 @@ onMounted(() => {
   border-radius: 18px;
   height: 100vh;
   box-sizing: border-box;
-  font-family: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
   animation: slideUp 0.3s ease-out;
 }
 
@@ -860,8 +859,9 @@ onMounted(() => {
 }
 
 .nav-subtitle {
-  font-size: 0.7rem;
+  font-size: 0.6rem;
   color: #9ca3af;
+  margin: 0 10px;
 }
 
 /* CONTENT */
@@ -1125,11 +1125,6 @@ textarea::placeholder {
 .info-value {
   font-size: 0.88rem;
   color: #e5e7eb;
-}
-
-.info-value.mono {
-  font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, 'Liberation Mono', 'Courier New',
-  monospace;
 }
 
 .account-actions {

@@ -208,27 +208,56 @@ const quickActionsConfig = [
   {
     id: 1,
     name: 'خانه',
-    svg: `
-<svg width="50" height="50" viewBox="0 0 50 50" xmlns="http://www.w3.org/2000/svg">
+    svg: `<svg width="50" height="50" viewBox="0 0 50 50" xmlns="http://www.w3.org/2000/svg">
   <defs>
-    <filter id="neonGlowHome" x="-50%" y="-50%" width="200%" height="200%">
-      <feGaussianBlur stdDeviation="1.2" result="blur"/>
-      <feMerge><feMergeNode in="blur"/><feMergeNode in="SourceGraphic"/></feMerge>
+    <filter id="neonGlowHome1" x="-50%" y="-50%" width="200%" height="200%">
+      <feGaussianBlur stdDeviation="1.6" result="blur"/>
+      <feMerge>
+        <feMergeNode in="blur"/>
+        <feMergeNode in="SourceGraphic"/>
+      </feMerge>
     </filter>
+
+    <radialGradient id="homeGradient1" cx="50%" cy="50%" r="50%">
+      <stop offset="0%" stop-color="#fff7e6"/>
+      <stop offset="55%" stop-color="#ffb432"/>
+      <stop offset="100%" stop-color="#ff33cc"/>
+    </radialGradient>
   </defs>
-  <circle cx="25" cy="25" r="6" fill="#00f0ff" filter="url(#neonGlowHome)">
-    <animate attributeName="r" values="6;7;6" dur="1.6s" repeatCount="indefinite"/>
+
+  <!-- Outer portal ring -->
+  <circle cx="25" cy="25" r="18"
+          stroke="url(#homeGradient1)"
+          stroke-width="1.5" fill="none" opacity="0.8"
+          filter="url(#neonGlowHome1)">
+    <animate attributeName="opacity" values="0.6;0.9;0.6" dur="2.4s" repeatCount="indefinite"/>
   </circle>
-  <circle cx="25" cy="25" r="16" stroke="#00f0ff" stroke-width="0.7" fill="none" opacity="0.25">
-    <animateTransform attributeName="transform" type="rotate"
-                      from="0 25 25" to="360 25 25" dur="10s" repeatCount="indefinite"/>
-  </circle>
-  <polyline points="19,29 25,23 31,29" fill="none" stroke="#afffff" stroke-width="1.6"
-            stroke-linecap="round" stroke-linejoin="round" filter="url(#neonGlowHome)">
-    <animate attributeName="stroke-width" values="1.6;2.2;1.6" dur="1.8s" repeatCount="indefinite"/>
-  </polyline>
-  <line x1="22" y1="29" x2="28" y2="29" stroke="#cfffff" stroke-width="1.2"
-        filter="url(#neonGlowHome)" opacity="0.85"/>
+
+  <!-- House body -->
+  <rect x="18" y="23" width="14" height="11"
+        rx="2" ry="2"
+        fill="none"
+        stroke="#ffe2aa"
+        stroke-width="1.6"
+        filter="url(#neonGlowHome1)"/>
+
+  <!-- Roof -->
+  <polyline points="16,24 25,17 34,24"
+            fill="none"
+            stroke="#ffcc66"
+            stroke-width="1.8"
+            stroke-linejoin="round"
+            filter="url(#neonGlowHome1)"/>
+
+  <!-- Door -->
+  <rect x="23" y="26" width="4" height="8"
+        rx="1" ry="1"
+        fill="none"
+        stroke="#ffffff"
+        stroke-width="1.3"
+        filter="url(#neonGlowHome1)">
+    <animate attributeName="y" values="26;25.5;26" dur="1.8s" repeatCount="indefinite"/>
+  </rect>
 </svg>
     `,
     link: '/',
@@ -237,7 +266,7 @@ const quickActionsConfig = [
   // RELATION / LYNKS
   {
     id: 10,
-    name: 'ارتباط',
+    name: 'لینک',
     svg: `
 <svg width="50" height="50" viewBox="0 0 50 50" xmlns="http://www.w3.org/2000/svg">
   <defs>
@@ -320,48 +349,60 @@ const quickActionsConfig = [
   {
     id: 5,
     name: 'تنظیمات',
-    svg: `
-<svg width="50" height="50" viewBox="0 0 50 50" xmlns="http://www.w3.org/2000/svg">
+    svg: `<svg width="50" height="50" viewBox="0 0 50 50" xmlns="http://www.w3.org/2000/svg">
   <defs>
-    <filter id="neonGlowSet" x="-50%" y="-50%" width="200%" height="200%">
-      <feGaussianBlur stdDeviation="1.2" result="blur"/>
+    <filter id="neonGlowGear3" x="-50%" y="-50%" width="200%" height="200%">
+      <feGaussianBlur stdDeviation="1.5" result="blur"/>
       <feMerge><feMergeNode in="blur"/><feMergeNode in="SourceGraphic"/></feMerge>
     </filter>
+
+    <radialGradient id="gearGradient3" cx="50%" cy="50%" r="50%">
+      <stop offset="0%" stop-color="#fff7e6"/>
+      <stop offset="55%" stop-color="#ffb432"/>
+      <stop offset="100%" stop-color="#ff33cc"/>
+    </radialGradient>
   </defs>
-  <circle cx="25" cy="25" r="3" fill="#cfff6b" filter="url(#neonGlowSet)">
-    <animate attributeName="r" values="3;4;3" dur="1.7s" repeatCount="indefinite"/>
+
+  <!-- Outer orbit ring -->
+  <circle cx="25" cy="25" r="17"
+          stroke="url(#gearGradient3)" stroke-width="1.4"
+          fill="none" opacity="0.7"
+          filter="url(#neonGlowGear3)">
+    <animateTransform attributeName="transform"
+                      type="rotate" from="0 25 25" to="360 25 25"
+                      dur="10s" repeatCount="indefinite"/>
   </circle>
-  <rect x="12" y="12" width="8" height="8" rx="2"
-        stroke="#cfff6b" stroke-width="1.2" fill="none"
-        filter="url(#neonGlowSet)"/>
-  <rect x="30" y="12" width="8" height="8" rx="2"
-        stroke="#cfff6b" stroke-width="1.2" fill="none"
-        filter="url(#neonGlowSet)"/>
-  <rect x="12" y="30" width="8" height="8" rx="2"
-        stroke="#cfff6b" stroke-width="1.2" fill="none"
-        filter="url(#neonGlowSet)"/>
-  <rect x="30" y="30" width="8" height="8" rx="2"
-        stroke="#cfff6b" stroke-width="1.2" fill="none"
-        filter="url(#neonGlowSet)"/>
-  <g stroke="#e9ffad" stroke-width="1.2" filter="url(#neonGlowSet)">
-    <g>
-      <line x1="25" y1="5" x2="25" y2="9"/>
-      <line x1="25" y1="41" x2="25" y2="45"/>
-      <line x1="5" y1="25" x2="9" y2="25"/>
-      <line x1="41" y1="25" x2="45" y2="25"/>
+
+  <!-- Central gear -->
+  <g filter="url(#neonGlowGear3)">
+    <circle cx="25" cy="25" r="8"
+            stroke="url(#gearGradient3)" stroke-width="1.8"
+            fill="none"/>
+
+    <g stroke="#ffcc66" stroke-width="1.8" stroke-linecap="round">
+      <line x1="25" y1="15" x2="25" y2="11"/>
+      <line x1="25" y1="35" x2="25" y2="39"/>
+      <line x1="15" y1="25" x2="11" y2="25"/>
+      <line x1="35" y1="25" x2="39" y2="25"/>
     </g>
-    <g transform="rotate(45 25 25)">
-      <line x1="25" y1="5" x2="25" y2="9"/>
-      <line x1="25" y1="41" x2="25" y2="45"/>
-      <line x1="5" y1="25" x2="9" y2="25"/>
-      <line x1="41" y1="25" x2="45" y2="25"/>
-    </g>
-    <animateTransform attributeName="transform" type="rotate"
+
+    <circle cx="25" cy="25" r="3" fill="#ffcc66"/>
+    <animateTransform attributeName="transform"
+                      type="rotate"
                       from="0 25 25" to="360 25 25"
-                      dur="6s" repeatCount="indefinite"/>
+                      dur="5s" repeatCount="indefinite"/>
   </g>
+
+  <!-- Floating orb -->
+  <circle cx="25" cy="8" r="1.8"
+          fill="#ffeaa7" filter="url(#neonGlowGear3)">
+    <animateTransform attributeName="transform"
+                      type="rotate"
+                      from="0 25 25" to="360 25 25"
+                      dur="4s" repeatCount="indefinite"/>
+  </circle>
 </svg>
-    `,
+`,
     link: '/settings',
     requireAuth: true
   },
@@ -369,39 +410,58 @@ const quickActionsConfig = [
   {
     id: 7,
     name: 'ورود',
-    svg: `
-<svg width="50" height="50" viewBox="0 0 50 50" xmlns="http://www.w3.org/2000/svg">
-  <defs>
-    <filter id="neonGlowLogin" x="-50%" y="-50%" width="200%" height="200%">
-      <feGaussianBlur stdDeviation="1.2" result="blur"/>
-      <feMerge><feMergeNode in="blur"/><feMergeNode in="SourceGraphic"/></feMerge>
-    </filter>
-  </defs>
-  <line x1="18" y1="10" x2="18" y2="40"
-        stroke="#ffb432" stroke-width="1.8"
-        filter="url(#neonGlowLogin)"/>
-  <line x1="32" y1="10" x2="32" y2="40"
-        stroke="#ffb432" stroke-width="1.8"
-        filter="url(#neonGlowLogin)"/>
-  <ellipse cx="25" cy="25" rx="6" ry="14"
-           stroke="#ffd98a" stroke-width="1.2"
-           fill="none" opacity="0.7">
-    <animate attributeName="rx" values="6;7;6" dur="2.2s" repeatCount="indefinite"/>
-  </ellipse>
-  <line x1="18" y1="25" x2="32" y2="25"
-        stroke="#fff2cc" stroke-width="1.4"
-        filter="url(#neonGlowLogin)">
-    <animate attributeName="stroke-width" values="1.4;2.2;1.4"
-             dur="1.8s" repeatCount="indefinite"/>
-  </line>
-  <polyline points="22,21 28,25 22,29"
-            fill="none" stroke="#ffcc66"
-            stroke-width="1.8" filter="url(#neonGlowLogin)">
-    <animateTransform attributeName="transform" type="translate"
-                      values="0 0; 1 0; 0 0"
-                      dur="1.8s" repeatCount="indefinite"/>
-  </polyline>
-</svg>
+    svg: `<svg width="64" height="64" viewBox="0 0 64 64" xmlns="http://www.w3.org/2000/svg">
+            <defs>
+              <!-- Neon glow -->
+              <filter id="neonGlowLynku" x="-50%" y="-50%" width="200%" height="200%">
+                <feGaussianBlur stdDeviation="2.2" result="blur"/>
+                <feMerge>
+                  <feMergeNode in="blur"/>
+                  <feMergeNode in="SourceGraphic"/>
+                </feMerge>
+              </filter>
+
+              <!-- Gradient glow -->
+              <radialGradient id="lynkuGradient" cx="50%" cy="50%" r="50%">
+                <stop offset="0%" stop-color="#ffe8b5"/>
+                <stop offset="60%" stop-color="#ffb432"/>
+                <stop offset="100%" stop-color="#ff33cc"/>
+              </radialGradient>
+            </defs>
+
+            <!-- Outer glow pulse ring -->
+            <circle cx="32" cy="32" r="26"
+                    stroke="url(#lynkuGradient)" stroke-width="1.6"
+                    fill="none" opacity="0.4" filter="url(#neonGlowLynku)">
+              <animate attributeName="r" values="25;27;25" dur="2.8s" repeatCount="indefinite"/>
+              <animate attributeName="opacity" values="0.4;0.7;0.4" dur="2.8s" repeatCount="indefinite"/>
+            </circle>
+
+            <!-- Inner ring -->
+            <circle cx="32" cy="32" r="20"
+                    stroke="url(#lynkuGradient)" stroke-width="1.2"
+                    fill="none" opacity="0.8" filter="url(#neonGlowLynku)">
+              <animateTransform attributeName="transform" attributeType="XML"
+                                type="rotate" from="0 32 32" to="360 32 32"
+                                dur="5s" repeatCount="indefinite"/>
+            </circle>
+
+            <!-- Play triangle -->
+            <polygon points="27,22 27,42 43,32"
+                     fill="url(#lynkuGradient)"
+                     stroke="#fff7e6" stroke-width="1.5"
+                     filter="url(#neonGlowLynku)">
+              <animate attributeName="opacity" values="1;0.6;1" dur="2.2s" repeatCount="indefinite"/>
+              <animateTransform attributeName="transform" type="scale"
+                                values="1;1.05;1" dur="2s" repeatCount="indefinite"/>
+            </polygon>
+
+            <!-- Spark pulse -->
+            <circle cx="44" cy="32" r="2.2" fill="#ffd98a" filter="url(#neonGlowLynku)">
+              <animate attributeName="r" values="2.2;3.2;2.2" dur="1.6s" repeatCount="indefinite"/>
+              <animate attributeName="opacity" values="0.7;1;0.7" dur="1.6s" repeatCount="indefinite"/>
+            </circle>
+          </svg>
     `,
     link: '/login',
     requireAuth: false
@@ -460,15 +520,11 @@ const performSearch = () => {
 }
 
 const resolveActionPath = async (action) => {
-  if (action.linkTemplate) {
-    if (action.requireMe) {
-      if (!me.value || !me.value._id) {
-        // if user is not fully loaded, fall back to login
-        return '/login'
-      }
-      return action.linkTemplate.replace('{me}', me.value._id)
+  if (action.requireMe) {
+    if (!me.value || !me.value._id) {
+      return '/login'
     }
-    return action.linkTemplate
+    return action.linkTemplate.replace('{me}', me.value._id)
   }
   return action.link
 }
@@ -537,6 +593,7 @@ const getMe = async () => {
       }
       localStorage.setItem('me', JSON.stringify(person))
       localStorage.setItem('userAvatarConfig', JSON.stringify(response.data.body.avatarConfig))
+      me.value = person
     } else {
       emitter.emit('error-message', response.data)
     }

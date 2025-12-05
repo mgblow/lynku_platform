@@ -1,126 +1,132 @@
 <template>
-  <div class="login-modern-page">
-    <div class="modern-container">
-      <div class="modern-card">
-        <!-- Header -->
-        <div class="modern-header">
-          <div class="logo-container">
-            <span class="brand-text">lynku</span>
+  <div class="login-page">
+    <div class="bg-orbits"></div>
+    <div class="bg-noise"></div>
+
+    <div class="auth-shell">
+      <div class="auth-card">
+        <!-- Header / Brand -->
+        <div class="auth-header">
+          <div class="brand">
+            <span class="brand-main">lynku</span>
+            <span class="brand-sub">metaverse access</span>
           </div>
-          <div class="header-glow"></div>
+
+          <!-- Minimal step pill -->
+          <div class="step-pill">
+            <span class="step-pill-text">
+              {{ nextStep ? '۲ / ۲' : '۱ / ۲' }}
+            </span>
+          </div>
         </div>
 
         <!-- Content -->
-        <div class="modern-content">
-          <!-- Phone Entry Step -->
-          <div class="step-container" v-if="!nextStep">
-            <div class="step-indicator">
-              <div class="step active">1</div>
-              <div class="step-line"></div>
-              <div class="step">2</div>
-            </div>
+        <div class="auth-body">
+          <!-- STEP 1: phone -->
+          <div v-if="!nextStep" class="step fade-in">
+            <h1 class="title">ورود به لینکو</h1>
+            <p class="subtitle">
+              شماره موبایل خود را وارد کنید تا لینک ورود برایتان ارسال شود
+            </p>
 
-            <h2 class="modern-title">ورود به lynku</h2>
-            <p class="modern-subtitle">شماره موبایل خود را وارد کنید</p>
-
-            <div class="input-modern-group">
-              <div class="input-container">
+            <div class="field-group">
+              <label class="field-label" for="phone-input">شماره موبایل</label>
+              <div class="field-shell" :class="{ error: phone && !isPhoneValid }">
                 <input
                   id="phone-input"
                   v-model="phone"
                   type="tel"
                   inputmode="numeric"
                   pattern="[0-9]*"
-                  class="modern-input"
+                  maxlength="11"
+                  class="field-input"
                   placeholder="09123456789"
                   @keyup.enter="login()"
-                  maxlength="11"
                 >
-                <label for="phone-input" class="modern-label">شماره موبایل</label>
-                <div class="input-border"></div>
               </div>
-              <div class="input-hint" v-if="phone && !isPhoneValid">
+              <p v-if="phone && !isPhoneValid" class="field-hint">
                 شماره موبایل باید ۱۱ رقم باشد
-              </div>
+              </p>
             </div>
 
-            <button class="modern-btn primary" @click="login()" :disabled="!isPhoneValid">
-              <span class="btn-content">
+            <button
+              class="btn primary"
+              :disabled="!isPhoneValid"
+              @click="login()"
+            >
+              <span class="btn-inner">
                 ادامه
                 <svg class="btn-icon" viewBox="0 0 24 24" fill="currentColor">
-                  <path d="M10 6L8.59 7.41 13.17 12l-4.58 4.59L10 18l6-6z"/>
+                  <path d="M10 6L8.59 7.41 13.17 12l-4.58 4.59L10 18l6-6z" />
                 </svg>
               </span>
             </button>
+
+            <p class="legal">
+              با ورود، شرایط استفاده و قوانین لینکو را می‌پذیرید.
+            </p>
           </div>
 
-          <!-- Verification Step -->
-          <div class="step-container" v-if="nextStep">
-            <div class="step-indicator">
-              <div class="step completed">1</div>
-              <div class="step-line active"></div>
-              <div class="step active">2</div>
-            </div>
+          <!-- STEP 2: code -->
+          <div v-else class="step fade-in">
+            <h1 class="title">کد تأیید</h1>
+            <p class="subtitle">
+              کد ارسال‌شده به
+              <span class="phone-highlight">{{ formatPhone(phone) }}</span>
+              را وارد کنید
+            </p>
 
-            <h2 class="modern-title">کد تأیید</h2>
-            <p class="modern-subtitle">کد ارسال شده به {{ formatPhone(phone) }} را وارد کنید</p>
-
-            <div class="input-modern-group">
-              <div class="input-container">
+            <div class="field-group">
+              <label class="field-label" for="code-input">کد تأیید</label>
+              <div class="field-shell" :class="{ error: code && !isCodeValid }">
                 <input
                   id="code-input"
                   v-model="code"
                   type="text"
                   inputmode="numeric"
                   pattern="[0-9]*"
-                  class="modern-input code-input"
-                  placeholder="12345"
-                  @keyup.enter="verify()"
                   maxlength="6"
+                  class="field-input code"
+                  placeholder="123456"
+                  @keyup.enter="verify()"
                 >
-                <label for="code-input" class="modern-label">کد تأیید</label>
-                <div class="input-border"></div>
               </div>
-              <div class="input-hint" v-if="code && !isCodeValid">
+              <p v-if="code && !isCodeValid" class="field-hint">
                 کد باید حداقل ۳ رقم باشد
-              </div>
+              </p>
             </div>
 
-            <div class="timer-section" v-if="nextStep">
-              <span class="timer-text">ارسال مجدد کد</span>
-              <span class="timer" :class="{ 'timer-active': canResend }">
-                {{ formatTime(countdown) }}
+            <div class="timer-row">
+              <span class="timer-label">ارسال مجدد کد</span>
+              <button
+                class="timer-btn"
+                :class="{ active: canResend }"
+                :disabled="!canResend"
+                @click="resendCode()"
+              >
+                {{ canResend ? 'ارسال دوباره' : formatTime(countdown) }}
+              </button>
+            </div>
+
+            <button
+              class="btn primary"
+              :disabled="!isCodeValid"
+              @click="verify()"
+            >
+              <span class="btn-inner">
+                تأیید و ورود
+                <svg class="btn-icon" viewBox="0 0 24 24" fill="currentColor">
+                  <path
+                    d="M9 16.17L4.83 12 3.41 13.41 9 19 21 7l-1.41-1.41z"
+                  />
+                </svg>
               </span>
-            </div>
+            </button>
 
-            <div class="action-buttons">
-              <button class="modern-btn primary" @click="verify()" :disabled="!isCodeValid">
-                <span class="btn-content">
-                  تأیید و ورود
-                  <svg class="btn-icon" viewBox="0 0 24 24" fill="currentColor">
-                    <path d="M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41z"/>
-                  </svg>
-                </span>
-              </button>
-
-              <button class="modern-btn secondary" @click="resendCode()" :disabled="!canResend">
-                <span class="btn-content">
-                  ارسال مجدد کد
-                </span>
-              </button>
-
-              <button class="modern-btn text" @click="nextStep = false">
-                <span class="btn-content">
-                  تغییر شماره موبایل
-                </span>
-              </button>
-            </div>
+            <button class="btn ghost" @click="nextStep = false">
+              تغییر شماره موبایل
+            </button>
           </div>
-        </div>
-
-        <!-- Footer -->
-        <div class="modern-footer">
-          <p>با ورود، شرایط و قوانین را می‌پذیرید</p>
         </div>
       </div>
     </div>
@@ -134,7 +140,7 @@ import { post } from '@/api'
 import { setCookie, getCookie } from '@/cookie'
 import { emitter } from './../utils/event-bus'
 
-const emit = defineEmits(["loading"])
+const emit = defineEmits(['loading'])
 const router = useRouter()
 
 const nextStep = ref(false)
@@ -151,8 +157,9 @@ const isCodeValid = computed(() => {
   return code.value.length >= 3
 })
 
-const formatPhone = (phone) => {
-  return phone.replace(/(\d{4})(\d{3})(\d{4})/, '$1 $2 $3')
+const formatPhone = (value) => {
+  if (!value) return ''
+  return value.replace(/(\d{4})(\d{3})(\d{4})/, '$1 $2 $3')
 }
 
 const formatTime = (seconds) => {
@@ -177,19 +184,22 @@ const startCountdown = () => {
 const verify = async () => {
   if (!isCodeValid.value) return
 
-  emit("loading", true)
+  emit('loading', true)
   try {
-    const response = await post('/auth/verify', { phone: phone.value, code: code.value })
-    emit("loading", false)
+    const response = await post('/auth/verify', {
+      phone: phone.value,
+      code: code.value
+    })
+    emit('loading', false)
 
     if (response.success) {
-      setCookie("app-token", response.token, 7)
-      setCookie("app-id", response._id, 7)
-      setCookie("app-channel", response.channel, 7)
+      setCookie('app-token', response.token, 7)
+      setCookie('app-id', response._id, 7)
+      setCookie('app-channel', response.channel, 7)
       emitter.emit('brokerCredentials')
 
       if (response.firstLogin) {
-        emitter.emit('refresh-navigation-state');
+        emitter.emit('refresh-navigation-state')
         router.push('/avatar')
       } else {
         router.push('/')
@@ -198,7 +208,7 @@ const verify = async () => {
       alert('کد تأیید اشتباه است.')
     }
   } catch (error) {
-    emit("loading-ended", "true")
+    emit('loading', false)
     console.error(error)
     alert('خطا در احراز هویت. لطفا دوباره تلاش کنید.')
   }
@@ -207,10 +217,10 @@ const verify = async () => {
 const login = async () => {
   if (!isPhoneValid.value) return
 
-  emit("loading", true)
+  emit('loading', true)
   try {
     const response = await post('/auth/entry', { phone: phone.value })
-    emit("loading", false)
+    emit('loading', false)
 
     if (response.success) {
       nextStep.value = true
@@ -219,7 +229,7 @@ const login = async () => {
       alert('خطا در ارسال کد تأیید. لطفا شماره را بررسی کنید.')
     }
   } catch (error) {
-    emit("loading", false)
+    emit('loading', false)
     console.error(error)
     alert('خطای شبکه. لطفا اتصال خود را بررسی کنید.')
   }
@@ -236,356 +246,278 @@ onMounted(() => {
   }
 })
 </script>
+
 <style scoped>
-/* Base Styles */
-.login-modern-page {
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  min-height: 100vh;
-  padding: 20px;
-  background: #0a0a0a;
-  background-image:
-    radial-gradient(circle at 20% 80%, rgba(41, 98, 255, 0.1) 0%, transparent 50%),
-    radial-gradient(circle at 80% 20%, rgba(0, 230, 118, 0.1) 0%, transparent 50%);
-  font-family: 'Inter', 'Segoe UI', system-ui, sans-serif;
-}
-
-.modern-container {
-  width: 100%;
-  max-width: 400px;
-}
-
-/* Card */
-.modern-card {
-  background: rgba(18, 18, 18, 0.95);
-  backdrop-filter: blur(20px);
-  border: 1px solid rgba(255, 255, 255, 0.08);
-  border-radius: 24px;
-  padding: 40px 32px;
-  box-shadow:
-    0 25px 50px -12px rgba(0, 0, 0, 0.5),
-    inset 0 1px 0 rgba(255, 255, 255, 0.05);
+/* ===== Page background ===== */
+.login-page {
   position: relative;
+  min-height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: radial-gradient(circle at top, #050816 0%, #02010a 40%, #010005 100%);
+  color: #f9fafb;
   overflow: hidden;
 }
 
-.modern-card::before {
-  content: '';
+/* soft moving blobs */
+.bg-orbits {
   position: absolute;
-  top: 0;
-  left: 0;
-  right: 0;
-  height: 1px;
-  background: linear-gradient(90deg, transparent, rgba(41, 98, 255, 0.5), transparent);
+  inset: -40%;
+  background:
+    radial-gradient(circle at 0% 0%, rgba(56, 189, 248, 0.18), transparent 60%),
+    radial-gradient(circle at 100% 0%, rgba(244, 114, 182, 0.15), transparent 60%),
+    radial-gradient(circle at 50% 100%, rgba(129, 140, 248, 0.18), transparent 65%);
+  filter: blur(40px);
+  opacity: 0.85;
+  pointer-events: none;
 }
 
-/* Header */
-.modern-header {
-  text-align: center;
-  margin-bottom: 40px;
+/* subtle grain */
+.bg-noise {
+  position: absolute;
+  inset: -20%;
+  background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 120 120' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n' x='0' y='0'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.7' numOctaves='2' stitchTiles='noStitch'/%3E%3CfeColorMatrix type='saturate' values='0'%3E%3C/feColorMatrix%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.16'/%3E%3C/svg%3E");
+  mix-blend-mode: soft-light;
+  pointer-events: none;
+}
+
+/* ===== Layout ===== */
+.auth-shell {
   position: relative;
+  z-index: 1;
+  width: 100%;
+  max-width: 420px;
+  padding: 16px;
 }
 
-.logo-container {
-  display: inline-flex;
-  align-items: center;
-  gap: 12px;
-  margin-bottom: 8px;
+.auth-card {
+  position: relative;
+  border-radius: 26px;
+  padding: 26px 22px 24px;
+  background: radial-gradient(circle at top left, rgba(15, 23, 42, 0.92), rgba(5, 7, 15, 0.96));
+  border: 1px solid rgba(148, 163, 184, 0.4);
+  box-shadow:
+    0 20px 60px rgba(0, 0, 0, 0.85),
+    0 0 60px rgba(59, 130, 246, 0.3);
+  backdrop-filter: blur(22px);
 }
 
-.logo-icon {
-  width: 32px;
-  height: 32px;
-  background: linear-gradient(135deg, #2962ff, #00e676);
-  border-radius: 8px;
+/* glow ring */
+.auth-card::before {
+  content: "";
+  position: absolute;
+  inset: -1px;
+  border-radius: inherit;
+  border: 1px solid transparent;
+  background: linear-gradient(135deg, rgba(56, 189, 248, 0.7), rgba(244, 114, 182, 0.7)) border-box;
+  mask: linear-gradient(#000 0 0) padding-box, linear-gradient(#000 0 0);
+  mask-composite: exclude;
+  opacity: 0.35;
+  pointer-events: none;
+}
+
+/* ===== Header / Brand ===== */
+.auth-header {
   display: flex;
-  align-items: center;
-  justify-content: center;
-  color: white;
+  align-items: flex-start;
+  justify-content: space-between;
+  margin-bottom: 26px;
 }
 
-.logo-icon svg {
-  width: 20px;
-  height: 20px;
+.brand {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
 }
 
-.brand-text {
-  font-size: 48px;
+.brand-main {
   font-family: "Honk", system-ui;
-  font-optical-sizing: auto;
-  font-weight: 400;
-  font-style: normal;
-  font-variation-settings:
-    "MORF" 15,
-    "SHLN" 50;
-  letter-spacing: -0.5px;
+  font-size: 40px;
+  line-height: 1;
+
 }
 
-.header-glow {
-  width: 120px;
-  height: 2px;
-  background: linear-gradient(90deg, transparent, #2962ff, transparent);
-  margin: 0 auto;
-  opacity: 0.6;
+.brand-sub {
+  font-size: 11px;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  color: #9ca3af;
 }
 
-/* Content */
-.modern-content {
-  margin-bottom: 32px;
+/* step pill */
+.step-pill {
+  padding: 6px 12px;
+  border-radius: 999px;
+  border: 1px solid rgba(148, 163, 184, 0.7);
+  background: radial-gradient(circle at top left, rgba(15, 23, 42, 0.85), rgba(15, 23, 42, 0.7));
+  font-size: 11px;
+  color: #e5e7eb;
 }
 
-.step-container {
-  animation: slideUp 0.4s ease-out;
+.step-pill-text {
+  font-variant-numeric: tabular-nums;
 }
 
-@keyframes slideUp {
-  from {
-    opacity: 0;
-    transform: translateY(20px);
-  }
-  to {
-    opacity: 1;
-    transform: translateY(0);
-  }
-}
-
-/* Step Indicator */
-.step-indicator {
+/* ===== Body ===== */
+.auth-body {
   display: flex;
-  align-items: center;
-  justify-content: center;
-  gap: 12px;
-  margin-bottom: 32px;
+  flex-direction: column;
+  gap: 18px;
 }
 
 .step {
-  width: 32px;
-  height: 32px;
-  border-radius: 50%;
+  display: flex;
+  flex-direction: column;
+  gap: 18px;
+}
+
+/* Title / subtitle */
+.title {
+  font-size: 22px;
+  font-weight: 700;
+  color: #f9fafb;
+  text-align: right;
+}
+
+.subtitle {
+  font-size: 13px;
+  color: #9ca3af;
+  text-align: right;
+  line-height: 1.7;
+}
+
+.phone-highlight {
+  color: #e5e7eb;
+  font-weight: 600;
+}
+
+/* ===== Fields ===== */
+.field-group {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.field-label {
+  font-size: 12px;
+  color: #9ca3af;
+  text-align: right;
+}
+
+.field-shell {
+  position: relative;
+  border-radius: 14px;
+  padding: 10px 12px;
+  background: radial-gradient(circle at top left, rgba(15, 23, 42, 0.95), rgba(15, 23, 42, 0.9));
+  border: 1px solid rgba(55, 65, 81, 0.9);
   display: flex;
   align-items: center;
-  justify-content: center;
-  font-size: 14px;
-  font-weight: 600;
-  background: rgba(255, 255, 255, 0.08);
-  color: rgba(255, 255, 255, 0.4);
-  border: 2px solid transparent;
-  transition: all 0.3s ease;
+  transition: border-color 0.2s ease, box-shadow 0.2s ease, background 0.2s ease;
 }
 
-.step.active {
-  background: #2962ff;
-  color: white;
-  border-color: #2962ff;
+.field-shell:focus-within {
+  border-color: rgba(129, 140, 248, 0.9);
+  box-shadow:
+    0 0 0 1px rgba(129, 140, 248, 0.5),
+    0 0 20px rgba(59, 130, 246, 0.4);
+  background: radial-gradient(circle at top left, rgba(17, 24, 39, 0.98), rgba(15, 23, 42, 0.98));
 }
 
-.step.completed {
-  background: #00e676;
-  color: #0a0a0a;
-  border-color: #00e676;
+.field-shell.error {
+  border-color: rgba(248, 113, 113, 0.9);
+  box-shadow: 0 0 0 1px rgba(248, 113, 113, 0.4);
 }
 
-.step-line {
-  width: 60px;
-  height: 2px;
-  background: rgba(255, 255, 255, 0.1);
-  position: relative;
-  transition: all 0.3s ease;
-}
-
-.step-line.active {
-  background: #2962ff;
-}
-
-.step-line.active::after {
-  content: '';
-  position: absolute;
-  top: 0;
-  left: 0;
-  height: 100%;
+.field-input {
   width: 100%;
-  background: #2962ff;
-  animation: lineProgress 60s linear;
-}
-
-@keyframes lineProgress {
-  from { width: 100%; }
-  to { width: 0%; }
-}
-
-/* Titles */
-.modern-title {
-  font-size: 24px;
-  font-weight: 700;
-  color: white;
-  text-align: center;
-  margin-bottom: 8px;
-  letter-spacing: -0.5px;
-}
-
-.modern-subtitle {
-  font-size: 14px;
-  color: rgba(255, 255, 255, 0.6);
-  text-align: center;
-  margin-bottom: 32px;
-  line-height: 1.5;
-}
-
-/* Inputs */
-.input-modern-group {
-  margin-bottom: 24px;
-}
-
-.input-container {
-  position: relative;
-}
-
-.modern-input {
-  width: 100%;
-  background: rgba(255, 255, 255, 0.05);
+  background: transparent;
   border: none;
-  border-radius: 12px;
-  padding: 20px 16px 8px;
-  padding-top: 35px;
-  color: white;
-  font-size: 16px;
-  font-weight: 500;
   outline: none;
-  transition: all 0.3s ease;
-  backdrop-filter: blur(10px);
+  color: #f9fafb;
+  font-size: 15px;
+  font-weight: 500;
   text-align: right;
   direction: ltr;
 }
 
-.modern-input.code-input {
+.field-input::placeholder {
+  color: rgba(148, 163, 184, 0.6);
+}
+
+.field-input.code {
   text-align: center;
-  letter-spacing: 8px;
-  font-size: 18px;
-  font-weight: 600;
+  letter-spacing: 0.3em;
 }
 
-.modern-input:focus {
-  background: rgba(255, 255, 255, 0.08);
-  box-shadow: 0 0 0 2px rgba(41, 98, 255, 0.3);
-}
-
-.modern-input::placeholder {
-  color: rgba(255, 255, 255, 0.3);
-}
-
-/* Hide number input spinners */
-.modern-input::-webkit-outer-spin-button,
-.modern-input::-webkit-inner-spin-button {
+/* numeric tweaks */
+.field-input::-webkit-outer-spin-button,
+.field-input::-webkit-inner-spin-button {
   -webkit-appearance: none;
   margin: 0;
 }
 
-.modern-input[type=number] {
-  -moz-appearance: textfield;
-}
-
-.modern-label {
-  position: absolute;
-  top: 12px;
-  right: 16px;
-  font-size: 12px;
-  color: rgba(255, 255, 255, 0.5);
-  font-weight: 500;
-  transition: all 0.3s ease;
-  pointer-events: none;
-}
-
-.modern-input:focus + .modern-label,
-.modern-input:not(:placeholder-shown) + .modern-label {
-  top: 6px;
-  font-size: 10px;
-  color: #2962ff;
-}
-
-.input-border {
-  position: absolute;
-  bottom: 0;
-  left: 0;
-  right: 0;
-  height: 2px;
-  background: linear-gradient(90deg, #2962ff, #00e676);
-  transform: scaleX(0);
-  transition: transform 0.3s ease;
-  border-radius: 0 0 12px 12px;
-}
-
-.modern-input:focus ~ .input-border {
-  transform: scaleX(1);
-}
-
-.input-hint {
-  font-size: 12px;
-  color: #ff4444;
-  margin-top: 8px;
+/* hint */
+.field-hint {
+  font-size: 11px;
+  color: #f97373;
   text-align: right;
 }
 
-/* Timer */
-.timer-section {
+/* ===== Timer row ===== */
+.timer-row {
   display: flex;
-  justify-content: space-between;
   align-items: center;
-  margin-bottom: 24px;
-  padding: 12px 16px;
-  background: rgba(255, 255, 255, 0.03);
-  border-radius: 8px;
-  border: 1px solid rgba(255, 255, 255, 0.05);
-}
-
-.timer-text {
-  font-size: 14px;
-  color: rgba(255, 255, 255, 0.6);
-}
-
-.timer {
-  font-size: 14px;
-  font-weight: 600;
-  color: rgba(255, 255, 255, 0.4);
-  font-variant-numeric: tabular-nums;
-}
-
-.timer-active {
-  color: #00e676;
-}
-
-/* Buttons */
-.action-buttons {
-  display: flex;
-  flex-direction: column;
-  gap: 12px;
-}
-
-.modern-btn {
-  padding: 16px 24px;
-  border: none;
+  justify-content: space-between;
+  padding: 8px 10px;
   border-radius: 12px;
-  font-size: 15px;
+  background: radial-gradient(circle at top left, rgba(15, 23, 42, 0.9), rgba(15, 23, 42, 0.85));
+  border: 1px solid rgba(55, 65, 81, 0.9);
+}
+
+.timer-label {
+  font-size: 12px;
+  color: #9ca3af;
+}
+
+.timer-btn {
+  border: none;
+  background: transparent;
+  font-size: 12px;
+  font-weight: 600;
+  color: #6b7280;
+  cursor: default;
+  font-variant-numeric: tabular-nums;
+  transition: color 0.2s ease;
+}
+
+.timer-btn.active {
+  cursor: pointer;
+  color: #4ade80;
+}
+
+.timer-btn.active:hover {
+  color: #bbf7d0;
+}
+
+/* ===== Buttons ===== */
+.btn {
+  border: none;
+  border-radius: 999px;
+  padding: 12px 18px;
+  font-size: 14px;
   font-weight: 600;
   cursor: pointer;
-  transition: all 0.3s ease;
+  transition: all 0.25s ease;
   position: relative;
   overflow: hidden;
 }
 
-.modern-btn:disabled {
-  opacity: 0.5;
-  cursor: not-allowed;
-  transform: none !important;
-}
-
-.btn-content {
-  display: flex;
+.btn-inner {
+  display: inline-flex;
   align-items: center;
   justify-content: center;
   gap: 8px;
-  position: relative;
-  z-index: 2;
 }
 
 .btn-icon {
@@ -593,93 +525,85 @@ onMounted(() => {
   height: 18px;
 }
 
-/* Primary Button */
-.modern-btn.primary {
-  background: linear-gradient(135deg, #2962ff, #00e676);
-  color: white;
-  box-shadow: 0 4px 20px rgba(41, 98, 255, 0.3);
+/* primary */
+.btn.primary {
+  background: linear-gradient(135deg, #6366f1, #22d3ee);
+  color: #f9fafb;
+  box-shadow:
+    0 10px 30px rgba(79, 70, 229, 0.5),
+    0 0 25px rgba(59, 130, 246, 0.7);
 }
 
-.modern-btn.primary:hover:not(:disabled) {
-  transform: translateY(-2px);
-  box-shadow: 0 8px 30px rgba(41, 98, 255, 0.4);
+.btn.primary:hover:not(:disabled) {
+  transform: translateY(-1px);
+  box-shadow:
+    0 14px 40px rgba(79, 70, 229, 0.7),
+    0 0 35px rgba(56, 189, 248, 0.8);
 }
 
-.modern-btn.primary:active:not(:disabled) {
+.btn.primary:active:not(:disabled) {
   transform: translateY(0);
+  box-shadow:
+    0 6px 20px rgba(79, 70, 229, 0.5),
+    0 0 20px rgba(56, 189, 248, 0.6);
 }
 
-/* Secondary Button */
-.modern-btn.secondary {
-  background: rgba(255, 255, 255, 0.08);
-  color: rgba(255, 255, 255, 0.9);
-  border: 1px solid rgba(255, 255, 255, 0.1);
-}
-
-.modern-btn.secondary:hover:not(:disabled) {
-  background: rgba(255, 255, 255, 0.12);
-  border-color: rgba(255, 255, 255, 0.2);
-}
-
-/* Text Button */
-.modern-btn.text {
+/* ghost */
+.btn.ghost {
   background: transparent;
-  color: rgba(255, 255, 255, 0.6);
-  padding: 12px;
+  color: #9ca3af;
+  border-radius: 10px;
 }
 
-.modern-btn.text:hover:not(:disabled) {
-  color: rgba(255, 255, 255, 0.9);
-  background: rgba(255, 255, 255, 0.05);
+.btn.ghost:hover {
+  background: rgba(15, 23, 42, 0.9);
+  color: #e5e7eb;
 }
 
-/* Footer */
-.modern-footer {
+/* disabled */
+.btn:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+  box-shadow: none;
+  transform: none;
+}
+
+/* ===== Legal ===== */
+.legal {
+  font-size: 11px;
+  color: #6b7280;
   text-align: center;
-  padding-top: 24px;
-  border-top: 1px solid rgba(255, 255, 255, 0.08);
 }
 
-.modern-footer p {
-  font-size: 12px;
-  color: rgba(255, 255, 255, 0.4);
-  margin: 0;
+/* ===== Animations ===== */
+.fade-in {
+  animation: fadeInUp 0.35s ease-out;
 }
 
-/* Responsive */
+@keyframes fadeInUp {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* ===== Responsive ===== */
 @media (max-width: 480px) {
-  .modern-container {
-    max-width: 100%;
+  .auth-card {
+    padding: 22px 18px 20px;
+    border-radius: 22px;
   }
 
-  .modern-card {
-    padding: 32px 24px;
-    border-radius: 20px;
+  .brand-main {
+    font-size: 34px;
   }
 
-  .modern-title {
-    font-size: 22px;
+  .title {
+    font-size: 20px;
   }
-
-  .step-line {
-    width: 40px;
-  }
-}
-
-/* Loading state */
-.modern-btn:disabled .btn-content::after {
-  content: '';
-  width: 16px;
-  height: 16px;
-  border: 2px solid transparent;
-  border-top: 2px solid currentColor;
-  border-radius: 50%;
-  animation: spin 1s linear infinite;
-  margin-right: 8px;
-}
-
-@keyframes spin {
-  0% { transform: rotate(0deg); }
-  100% { transform: rotate(360deg); }
 }
 </style>

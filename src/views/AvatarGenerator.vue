@@ -43,19 +43,6 @@
 
     <!-- Main Content -->
     <div class="generator-content">
-      <!-- Category Navigation -->
-      <div class="category-nav" style="text-align: center !important">
-        <button
-          v-for="category in categories"
-          :key="category.id"
-          class="category-btn"
-          :class="{ active: activeCategory === category.id }"
-          @click="activeCategory = category.id"
-        >
-          <div>{{ category.name }}</div>
-        </button>
-      </div>
-
       <!-- Mood / Gender / Random -->
       <div class="mood-gender-bar">
         <div class="pill-group">
@@ -82,8 +69,156 @@
           </button>
         </div>
 
-        <button class="action-btn primary random-btn" @click="randomizeAvatar">
-          🎲 آواتار تصادفی
+        <button class="random-avatar-generator-btn" @click="randomizeAvatar">
+          <svg
+            width="48"
+            height="48"
+            viewBox="0 0 48 48"
+            xmlns="http://www.w3.org/2000/svg"
+            aria-hidden="true"
+          >
+            <defs>
+              <!-- پس‌زمینه هاله نئونی -->
+              <radialGradient id="raBgGrad1" cx="50%" cy="20%" r="60%">
+                <stop offset="0%" stop-color="#ffffff22" />
+                <stop offset="50%" stop-color="#5c13ff11" />
+                <stop offset="100%" stop-color="#00000000" />
+              </radialGradient>
+
+              <!-- گرادیان خود دایس -->
+              <linearGradient id="raDiceGradient1" x1="0%" y1="0%" x2="100%" y2="100%">
+                <stop offset="0%" stop-color="#ff00ff" />
+                <stop offset="50%" stop-color="#00f5ff" />
+                <stop offset="100%" stop-color="#7cff00" />
+              </linearGradient>
+
+              <!-- درخشش بیرونی -->
+              <filter id="raGlow1" x="-80%" y="-80%" width="260%" height="260%">
+                <feGaussianBlur stdDeviation="3" result="blur" />
+                <feMerge>
+                  <feMergeNode in="blur" />
+                  <feMergeNode in="SourceGraphic" />
+                </feMerge>
+              </filter>
+
+              <!-- شاین اسلایدی روی دایس -->
+              <linearGradient id="raShineGrad1" x1="0%" y1="0%" x2="100%" y2="0%">
+                <stop offset="0%" stop-color="rgba(255,255,255,0)" />
+                <stop offset="50%" stop-color="rgba(255,255,255,0.9)" />
+                <stop offset="100%" stop-color="rgba(255,255,255,0)" />
+              </linearGradient>
+
+              <clipPath id="raDiceClip1">
+                <rect x="10" y="10" width="28" height="28" rx="8" ry="8" />
+              </clipPath>
+            </defs>
+
+            <!-- هاله‌ی نرم پشت آیکن -->
+            <circle cx="24" cy="24" r="20" fill="url(#raBgGrad1)" />
+
+            <!-- دایس + نقطه‌ها -->
+            <g filter="url(#raGlow1)">
+              <rect
+                x="10"
+                y="10"
+                width="28"
+                height="28"
+                rx="8"
+                ry="8"
+                fill="url(#raDiceGradient1)"
+                stroke="#ffffff"
+                stroke-width="1.2"
+              >
+                <animateTransform
+                  attributeName="transform"
+                  type="rotate"
+                  dur="2.4s"
+                  repeatCount="indefinite"
+                  values="-4 24 24;4 24 24;-4 24 24"
+                  keyTimes="0;0.5;1"
+                />
+              </rect>
+
+              <!-- پیت‌های تاس -->
+              <circle cx="18" cy="18" r="2.2" fill="#050816" />
+              <circle cx="30" cy="30" r="2.2" fill="#050816" />
+              <circle cx="18" cy="30" r="2.2" fill="#050816" />
+              <circle cx="30" cy="18" r="2.2" fill="#050816" />
+              <circle cx="24" cy="24" r="2.4" fill="#050816" />
+            </g>
+
+            <!-- شاین روی سطح دایس -->
+            <g clip-path="url(#raDiceClip1)">
+              <rect
+                x="-30"
+                y="10"
+                width="30"
+                height="28"
+                fill="url(#raShineGrad1)"
+                opacity="0"
+              >
+                <animate
+                  attributeName="x"
+                  from="-30"
+                  to="40"
+                  dur="1.6s"
+                  repeatCount="indefinite"
+                />
+                <animate
+                  attributeName="opacity"
+                  values="0;0.9;0"
+                  keyTimes="0;0.5;1"
+                  dur="1.6s"
+                  repeatCount="indefinite"
+                />
+              </rect>
+            </g>
+
+            <!-- ستاره‌های نئونی اطراف -->
+            <g>
+              <circle cx="10" cy="15" r="1.2" fill="#00f5ff">
+                <animate attributeName="r" values="1.2;2;1.2" dur="1.8s" repeatCount="indefinite" />
+                <animate attributeName="opacity" values="0.4;1;0.4" dur="1.8s" repeatCount="indefinite" />
+              </circle>
+              <circle cx="37" cy="13" r="1.4" fill="#ff00ff">
+                <animate attributeName="r" values="1.4;2.4;1.4" dur="2.1s" repeatCount="indefinite" />
+                <animate attributeName="opacity" values="0.3;1;0.3" dur="2.1s" repeatCount="indefinite" />
+              </circle>
+              <circle cx="38" cy="32" r="1.2" fill="#7cff00">
+                <animate attributeName="r" values="1.2;2;1.2" dur="2s" repeatCount="indefinite" />
+                <animate attributeName="opacity" values="0.3;1;0.3" dur="2s" repeatCount="indefinite" />
+              </circle>
+            </g>
+          </svg>
+
+        </button>
+      </div>
+
+      <!-- Category Navigation -->
+      <!-- Category Navigation -->
+      <div class="category-nav">
+        <button
+          v-for="category in categories"
+          :key="category.id"
+          class="category-btn"
+          :class="{ active: activeCategory === category.id }"
+          @click="activeCategory = category.id"
+        >
+    <span class="category-icon-wrap">
+      <svg viewBox="0 0 24 24" class="category-icon" aria-hidden="true">
+        <path
+          :d="category.iconPath"
+          fill="none"
+          stroke="currentColor"
+          stroke-width="1.6"
+          stroke-linecap="round"
+          stroke-linejoin="round"
+        />
+      </svg>
+    </span>
+          <span class="category-label">
+      {{ category.name }}
+    </span>
         </button>
       </div>
 
@@ -368,19 +503,93 @@ const avatarConfig = ref({
 
 // Categories
 const categories = ref([
-  { id: 'style', name: 'سبک' },
-  { id: 'top', name: 'مو' },
-  { id: 'accessories', name: 'اکسسوری' },
-  { id: 'hairColor', name: 'رنگ مو' },
-  { id: 'facialHair', name: 'ریش' },
-  { id: 'facialHairColor', name: 'رنگ ریش' },
-  { id: 'clothes', name: 'لباس' },
-  { id: 'clotheColor', name: 'رنگ لباس' },
-  { id: 'eyes', name: 'چشم‌ها' },
-  { id: 'eyebrow', name: 'ابرو' },
-  { id: 'mouth', name: 'دهان' },
-  { id: 'skin', name: 'پوست' }
+  {
+    id: 'style',
+    name: 'سبک',
+    // ✨ Spark / Style – ستاره + دو اسپارک کوچک
+    iconPath:
+      'M12 3l1.3 3.4L17 7.7l-3.2 1.3L12 12l-1.8-3-3.2-1.3 3.7-1.3L12 3zM5.5 11L7 11.8 8.5 11l-.5 1.9 1 1.9-1.9-.8-1.9.8 1-1.9-.5-1.9zM18.5 11L20 11.8 21.5 11l-.5 1.9 1 1.9-1.9-.8-1.9.8 1-1.9-.5-1.9z'
+  },
+  {
+    id: 'top',
+    name: 'مو',
+    // 💇 مو + فرم سر
+    iconPath:
+      'M7 16c0-3.7 2.1-6.5 5-6.5s5 2.8 5 6.5v1H7v-1zM7.4 11c.5-3 2.4-5 4.6-5 2.2 0 4.1 2 4.6 5 .1-2.4-.6-4.3-1.8-5.6C13.6 4.1 12.5 3.5 12 3.5s-1.6.6-2.8 1.9C7.9 6.7 7.3 8.6 7.4 11z'
+  },
+  {
+    id: 'accessories',
+    name: 'اکسسوری',
+    // 👓 عینک گرد
+    iconPath:
+      'M5 11c0-1.8 1.4-3.2 3.2-3.2h1.1C11 7.8 12.5 9.2 12.5 11v1.1c0 1.8-1.4 3.2-3.2 3.2H8.2C6.4 15.3 5 13.9 5 12.1V11zm10.5 0c0-1.8 1.4-3.2 3.2-3.2h1.1c1.8 0 3.2 1.4 3.2 3.2v1.1c0 1.8-1.4 3.2-3.2 3.2h-1.1c-1.8 0-3.2-1.4-3.2-3.2V11zM11 12h2'
+  },
+  {
+    id: 'hairColor',
+    name: 'رنگ مو',
+    // 💧 قطره رنگ مو
+    iconPath:
+      'M12 3.2L8.1 8.4a4.9 4.9 0 1 0 7.8 0L12 3.2zm0 10.4a2.5 2.5 0 0 1-2.5-2.5'
+  },
+  {
+    id: 'facialHair',
+    name: 'ریش',
+    // 🧔‍♂️ سبیل نرم و پهن
+    iconPath:
+      'M4 13.2c1.2-1.3 2.6-2 4.2-2 1.5 0 2.9.6 3.8 1.5.9-.9 2.3-1.5 3.8-1.5 1.6 0 3 .7 4.2 2l-1.2 2.1c-.8-.8-1.8-1.3-2.8-1.3-1.1 0-2.2.4-3.1 1.1-.9-.7-2-1.1-3.1-1.1-1 0-2 .5-2.8 1.3L4 13.2z'
+  },
+  {
+    id: 'facialHairColor',
+    name: 'رنگ ریش',
+    // 💧 رنگ + اشاره به ریش
+    iconPath:
+      'M9 5.2L6 9.4A4 4 0 0 0 9 16a4 4 0 0 0 3-6.6L9 5.2zm5.8 7.6c.7.6 1.5.9 2.4.9'
+  },
+  {
+    id: 'clothes',
+    name: 'لباس',
+    // 👕 تیشرت
+    iconPath:
+      'M9 4l-2-1-3 3.5L6 10v9h12v-9l2-3.5L17 3l-2 1-3 1-3-1z'
+  },
+  {
+    id: 'clotheColor',
+    name: 'رنگ لباس',
+    // 👕 + ستاره رنگ
+    iconPath:
+      'M9 4l-2-1-3 3.5L6 10v9h12v-9l2-3.5L17 3l-2 1-3 1-3-1zM17.2 5.3l.7 1.3 1.3.7-1.3.7-.7 1.3-.7-1.3-1.3-.7 1.3-.7.7-1.3z'
+  },
+  {
+    id: 'eyes',
+    name: 'چشم‌ها',
+    // 👁 چشم با عنبیه
+    iconPath:
+      'M12 5C8 5 5 8 3 12c2 4 5 7 9 7s7-3 9-7c-2-4-5-7-9-7zm0 10a3 3 0 1 1 0-6 3 3 0 0 1 0 6z'
+  },
+  {
+    id: 'eyebrow',
+    name: 'ابرو',
+    // قوس ابرو
+    iconPath:
+      'M4 11c2.1-1.5 4.7-2.3 7.3-2.3S16.6 9.5 20 11l-1 2c-2.4-1.4-4.7-2.1-7.7-2.1S6.9 11.6 4 13l1-2z'
+  },
+  {
+    id: 'mouth',
+    name: 'دهان',
+    // 🙂 لبخند
+    iconPath:
+      'M7 14c1.6 2.1 3.2 3.1 5 3.1S15.4 16.1 17 14l-1.6-1.1c-1.1 1.4-2.3 2.1-3.4 2.1s-2.3-.7-3.4-2.1L7 14z'
+  },
+  {
+    id: 'skin',
+    name: 'پوست',
+    // 🙂 صورت / رنگ پوست
+    iconPath:
+      'M12 3a7 7 0 0 0-7 7v1a7 7 0 0 0 14 0v-1a7 7 0 0 0-7-7zm-3 7.5a1 1 0 1 1 0-2 1 1 0 0 1 0 2zm6 0a1 1 0 1 1 0-2 1 1 0 0 1 0 2zm-6.5 3c1.1.9 2.4 1.5 3.5 1.5s2.4-.6 3.5-1.5'
+  }
 ])
+
+
 
 // Mood / Gender options
 const genderOptions = ref([
@@ -390,7 +599,6 @@ const genderOptions = ref([
 ])
 
 const moodOptions = ref([
-  { value: 'any', label: 'هر حالتی' },
   { value: 'happy', label: 'شاد' },
   { value: 'sad', label: 'غمگین' },
   { value: 'angry', label: 'عصبانی' },
@@ -1077,7 +1285,7 @@ onMounted(async () => {
   background: rgba(255, 255, 255, 0.08);
 }
 
-/* ⭐ Selected (Premium Neon Glow) */
+/* Selected (Premium Neon Glow) */
 .option-card.selected {
   background: rgba(214, 0, 255, 0.08);
   box-shadow:
@@ -1207,9 +1415,21 @@ onMounted(async () => {
 }
 
 /* Random button inside mood bar */
-.random-btn {
-  font-size: 0.8rem;
-  padding-inline: 18px;
+
+.random-avatar-generator-btn{
+  position: relative;
+  padding: 0;
+  font-size: 16px;
+  font-weight: 600;
+  color: #fff;
+  border: none;
+  cursor: pointer;
+  border-radius: 10px;
+  background: #0d0d0d;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  transition: 0.3s ease;
+  box-shadow: 0 0 8px #6a5af9, 0 0 16px #6a5af9 inset;
 }
 
 /* Quick actions */
@@ -1416,6 +1636,122 @@ onMounted(async () => {
     transform: scale(1);
   }
 }
+
+.category-nav {
+  display: flex;
+  gap: 10px;
+  margin-bottom: 30px;
+  padding: 12px 6px 4px;
+  overflow-x: auto;
+  justify-content: center;
+}
+
+.category-nav::-webkit-scrollbar {
+  height: 4px;
+}
+.category-nav::-webkit-scrollbar-track {
+  background: transparent;
+}
+.category-nav::-webkit-scrollbar-thumb {
+  background: rgba(75, 85, 99, 0.8);
+  border-radius: 999px;
+}
+
+/* pill button */
+.category-btn {
+  position: relative;
+  min-width: 84px;
+  padding: 8px 10px 10px;
+  border-radius: 999px;
+  border: 1px solid rgba(148, 163, 184, 0.5);
+  background: radial-gradient(circle at top, rgba(15, 23, 42, 0.95), rgba(15, 23, 42, 0.9));
+  color: #e5e7eb;
+  cursor: pointer;
+  display: inline-flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 4px;
+  font-size: 0.8rem;
+  transition:
+    transform 0.18s ease,
+    box-shadow 0.18s ease,
+    border-color 0.18s ease,
+    background 0.18s ease;
+  flex-shrink: 0;
+}
+
+.category-btn:hover {
+  transform: translateY(-2px);
+  box-shadow:
+    0 0 14px rgba(129, 140, 248, 0.6),
+    0 0 24px rgba(56, 189, 248, 0.4);
+  border-color: rgba(129, 140, 248, 0.9);
+}
+
+/* active state – neon */
+.category-btn.active {
+  background:
+    radial-gradient(circle at top left, rgba(59, 130, 246, 0.35), transparent 65%),
+    radial-gradient(circle at bottom right, rgba(236, 72, 153, 0.35), transparent 65%),
+    rgba(15, 23, 42, 0.98);
+  border-color: rgba(236, 72, 153, 0.9);
+  box-shadow:
+    0 0 10px rgba(236, 72, 153, 0.7),
+    0 0 26px rgba(56, 189, 248, 0.6);
+}
+
+/* icon circle */
+.category-icon-wrap {
+  width: 30px;
+  height: 30px;
+  border-radius: 999px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: radial-gradient(circle at 30% 0%, rgba(248, 250, 252, 0.18), transparent 60%);
+  box-shadow:
+    0 0 10px rgba(129, 140, 248, 0.7),
+    inset 0 0 4px rgba(15, 23, 42, 0.9);
+}
+
+/* tiny glow pulse for active icon */
+.category-btn.active .category-icon-wrap {
+  animation: iconPulse 1.8s ease-in-out infinite;
+}
+
+.category-icon {
+  width: 18px;
+  height: 18px;
+}
+
+/* label */
+.category-label {
+  white-space: nowrap;
+  font-weight: 500;
+}
+
+/* pulse animation */
+@keyframes iconPulse {
+  0% {
+    box-shadow:
+      0 0 8px rgba(236, 72, 153, 0.7),
+      0 0 16px rgba(59, 130, 246, 0.4),
+      inset 0 0 4px rgba(15, 23, 42, 0.9);
+  }
+  50% {
+    box-shadow:
+      0 0 14px rgba(236, 72, 153, 0.95),
+      0 0 26px rgba(59, 130, 246, 0.7),
+      inset 0 0 6px rgba(15, 23, 42, 1);
+  }
+  100% {
+    box-shadow:
+      0 0 8px rgba(236, 72, 153, 0.7),
+      0 0 16px rgba(59, 130, 246, 0.4),
+      inset 0 0 4px rgba(15, 23, 42, 0.9);
+  }
+}
+
 
 /* Responsive Design */
 @media (max-width: 768px) {
