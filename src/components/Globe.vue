@@ -374,17 +374,6 @@ function pinData(newData = []) {
         el.appendChild(name)
         el.appendChild(uid)
 
-        if (data.type === 'person' && data.status) {
-          const status = document.createElement('div')
-          status.textContent = data.status
-          status.style.cssText = `
-            color: #a5f3fc;
-            font-size: 9px;
-            margin-top: 2px;
-            opacity: 0.95;
-          `
-          el.appendChild(status)
-        }
 
         if (data.type === 'tex') {
           const wrapper = document.createElement('div')
