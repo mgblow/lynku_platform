@@ -9,6 +9,7 @@
       :autoRotateSpeed="rotateSpeed"
       :data="people"
       :hexed="true"
+      :wired="true"
       :palette="globePlatte"
     />
 
@@ -123,7 +124,7 @@ const globeRef = ref(null)
 const rotateSpeed = ref(0.0)
 const people = ref([])
 const started = ref(false)
-const globePlatte = ref('futuristic')
+const globePlatte = ref('whiteHollow')
 
 // warp FX state
 const warpActive = ref(false)
