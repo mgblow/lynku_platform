@@ -18,10 +18,9 @@ const rarityClass = computed(
 </script>
 
 <template>
-  <div class="gem-popup" :style="popupStyle" v-if="selectedData">
-    <div class="header">
+  <div class="gem-popup mt-4" :style="popupStyle" v-if="selectedData">
+    <div class="header mb-2">
       <span class="badge" :class="rarityClass">{{ selectedData.rarity }}</span>
-      <button class="close" @click="emit('close')">✕</button>
     </div>
 
     <h3>{{ selectedData.name }}</h3>

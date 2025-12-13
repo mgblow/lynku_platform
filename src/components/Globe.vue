@@ -180,7 +180,7 @@ function getPointColor(d) {
 function getPointAltitude(d) {
   switch (d.type) {
     case 'gem':
-      return 0.9
+      return 0.6
     case 'person':
       return 0.7
     case 'tex':
@@ -273,8 +273,8 @@ function pinData(newData = []) {
       if (data.type === 'gem') {
         const wrapper = document.createElement('div')
         wrapper.style.cssText = `
-    width: 34px;
-    height: 34px;
+    width: 64px;
+    height: 64px;
     margin: 0 auto;
     pointer-events: none;
     display: grid;
@@ -288,8 +288,8 @@ function pinData(newData = []) {
         // Normalize SVG size
         const svg = wrapper.querySelector('svg')
         if (svg) {
-          svg.style.width = '34px'
-          svg.style.height = '34px'
+          svg.style.width = '64px'
+          svg.style.height = '64px'
           svg.style.display = 'block'
         }
 
