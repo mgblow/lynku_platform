@@ -2,13 +2,12 @@
 import { onMounted, ref, onBeforeUnmount } from 'vue'
 import { emitter } from '@/utils/event-bus'
 
-import Gift from '@/components/Gift.vue'
+import Gem from '@/components/Gem.vue'
 import Tex from '@/views/Tex.vue'
 import Person from '@/components/Person.vue'
 import TexBox from '@/components/TexBox.vue'
 import AvatarGenerator from '@/views/AvatarGenerator.vue'
 import Settings from '@/views/Settings.vue'
-import Gem from '@/components/Gem.vue'
 
 const props = defineProps({
   selectedData: { type: Object, default: null }
@@ -100,7 +99,7 @@ onBeforeUnmount(() => {
       <Settings v-else-if="drawerData.type === 'settings'" />
       <TexBox v-else-if="drawerData.type === 'tex'" :selectedData="drawerData"/>
       <Person v-else-if="drawerData.type === 'person'" :selectedData="drawerData" />
-      <Gift v-else-if="drawerData.type === 'gift'" :selectedData="drawerData" />
+      <Gem v-else-if="drawerData.type === 'gem'" :selectedData="drawerData" />
       <Gem v-else-if="drawerData.type === 'gem'" :selectedData="drawerData" />
       <Tex v-else-if="drawerData.type === 'publish'" :location="drawerData" />
     </div>

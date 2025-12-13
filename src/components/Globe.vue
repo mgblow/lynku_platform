@@ -31,38 +31,34 @@ import PingCard from '@/components/globe/PingCard.vue'
 const GLOBE_IMAGES_BASE = `${window.location.origin}/globe/images`
 
 const MAJOR_CITIES = [
-  { lat: 35.6892, lng: 51.389, name: 'Tehran',  color: '#ffcc00' },
+  { lat: 35.6892, lng: 51.389, name: 'Tehran', color: '#ffcc00' },
   { lat: 40.7128, lng: -74.006, name: 'NewYork', color: '#00aaff' },
-  { lat: 51.5074, lng: -0.1278, name: 'London',  color: '#ff6699' },
-  { lat: 48.8566, lng: 2.3522, name: 'Paris',   color: '#66ff66' },
-  { lat: 35.6762, lng: 139.6503, name: 'Tokyo',  color: '#ff6600' },
+  { lat: 51.5074, lng: -0.1278, name: 'London', color: '#ff6699' },
+  { lat: 48.8566, lng: 2.3522, name: 'Paris', color: '#66ff66' },
+  { lat: 35.6762, lng: 139.6503, name: 'Tokyo', color: '#ff6600' },
   { lat: 55.7558, lng: 37.6173, name: 'Mosscow', color: '#00ffff' },
-  { lat: 24.7136, lng: 46.6753, name: 'Riaz',    color: '#ffaa00' },
-  { lat: 30.0444, lng: 31.2357, name: 'Qahere',  color: '#ff3300' }
+  { lat: 24.7136, lng: 46.6753, name: 'Riaz', color: '#ffaa00' },
+  { lat: 30.0444, lng: 31.2357, name: 'Qahere', color: '#ff3300' }
 ]
 
 const PALETTES = {
-  futuristic: [
-    'hsl(200, 100%, 55%)',
-    'hsl(330, 100%, 60%)',
-    'hsl(50, 100%, 60%)',
-    'hsl(160, 100%, 55%)',
-    'hsl(280, 95%, 60%)'
+  futuristic: ['hsl(200, 100%, 55%)', 'hsl(330, 100%, 60%)', 'hsl(50, 100%, 60%)', 'hsl(160, 100%, 55%)', 'hsl(280, 95%, 60%)'],
+  simpleDark: ['hsl(0, 0%, 10%)', 'hsl(0, 0%, 20%)', 'hsl(0, 0%, 30%)', 'hsl(0, 0%, 40%)', 'hsl(0, 0%, 50%)'],
+  golden: [
+    'hsl(45, 100%, 45%)', // deep gold
+    'hsl(42, 100%, 55%)', // rich gold
+    'hsl(48, 95%, 62%)', // warm highlight
+    'hsl(38, 80%, 70%)', // soft champagne
+    'hsl(52, 90%, 85%)' // pale gold glow
   ],
-  simpleDark: [
-    'hsl(0, 0%, 10%)',
-    'hsl(0, 0%, 20%)',
-    'hsl(0, 0%, 30%)',
-    'hsl(0, 0%, 40%)',
-    'hsl(0, 0%, 50%)'
+  goldenHollow: [
+    'rgba(255, 193, 7, 0.06)', // amber-gold hollow
+    'rgba(255, 215, 0, 0.10)', // classic gold
+    'rgba(255, 236, 179, 0.14)', // champagne tint
+    'rgba(255, 200, 60, 0.18)', // warm gold
+    'rgba(255, 244, 214, 0.22)' // near-white gold
   ],
-  gray: [
-    'hsl(0, 0%, 20%)',
-    'hsl(0, 0%, 40%)',
-    'hsl(0, 0%, 60%)',
-    'hsl(0, 0%, 80%)',
-    'hsl(0, 0%, 90%)'
-  ],
+  gray: ['hsl(0, 0%, 20%)', 'hsl(0, 0%, 40%)', 'hsl(0, 0%, 60%)', 'hsl(0, 0%, 80%)', 'hsl(0, 0%, 90%)'],
   whiteHollow: [
     'rgba(255, 255, 255, 0.05)',
     'rgba(255, 255, 255, 0.1)',
@@ -70,13 +66,7 @@ const PALETTES = {
     'rgba(255, 255, 255, 0.2)',
     'rgba(255, 255, 255, 0.25)'
   ],
-  blue: [
-    'hsl(210, 90%, 50%)',
-    'hsl(210, 80%, 60%)',
-    'hsl(210, 70%, 70%)',
-    'hsl(210, 60%, 80%)',
-    'hsl(210, 50%, 90%)'
-  ]
+  blue: ['hsl(210, 90%, 50%)', 'hsl(210, 80%, 60%)', 'hsl(210, 70%, 70%)', 'hsl(210, 60%, 80%)', 'hsl(210, 50%, 90%)']
 }
 
 // ---------------------------------------------------------------------
@@ -241,17 +231,8 @@ function pinData(newData = []) {
       const id = getUidFromData(d)
 
       const likes = safeNumber(d.likes, d.stats?.likes)
-      const lynks = safeNumber(
-        d.retex,
-        d.reping,
-        d.stats?.retex,
-        d.stats?.lynks
-      )
-      const comments = safeNumber(
-        d.comments,
-        d.stats?.replies,
-        d.stats?.comments
-      )
+      const lynks = safeNumber(d.retex, d.reping, d.stats?.retex, d.stats?.lynks)
+      const comments = safeNumber(d.comments, d.stats?.replies, d.stats?.comments)
 
       const base = `
         <div style="background: rgba(0,0,0,0.9); padding: 8px 12px; border-radius: 8px; color: white; max-width: 220px;">
@@ -260,21 +241,16 @@ function pinData(newData = []) {
           <span style="color: #6b7280; font-size: 11px;">_id: ${id}</span><br/>
       `
       if (d.type === 'tex') {
-        return (
-          base +
-          `<span style="color:#f973ff;font-size:11px;">❤ ${likes} · 🔁 ${lynks} · 💬 ${comments}</span></div>`
-        )
+        return base + `<span style="color:#f973ff;font-size:11px;">❤ ${likes} · 🔁 ${lynks} · 💬 ${comments}</span></div>`
       }
       if (d.type === 'person') {
         return (
-          base +
-          `<span style="color:#00f5ff;font-size:11px;">${d.status || 'online'} · 💎 ${d.gemsCollected ?? 0}</span></div>`
+          base + `<span style="color:#00f5ff;font-size:11px;">${d.status || 'online'} · 💎 ${d.gemsCollected ?? 0}</span></div>`
         )
       }
       if (d.type === 'gem') {
         return (
-          base +
-          `<span style="color:#ffe45e;font-size:11px;">💎 ${d.rarity || 'common'} · ${d.value ?? 0} pts</span></div>`
+          base + `<span style="color:#ffe45e;font-size:11px;">💎 ${d.rarity || 'common'} · ${d.value ?? 0} pts</span></div>`
         )
       }
       return base + `<span style="color:#9ca3af;font-size:11px;">${d.type || ''}</span></div>`
@@ -295,38 +271,50 @@ function pinData(newData = []) {
       `
 
       if (data.type === 'gem') {
-        // GEM MARKER
-        const gem = document.createElement('div')
-        gem.style.cssText = `
-          width: 22px;
-          height: 22px;
-          margin: 0 auto;
-          transform: rotate(45deg);
-          background: radial-gradient(circle at 30% 30%, #ffffff, #ffe45e, #f59e0b);
-          box-shadow: 0 0 18px rgba(251, 191, 36, 0.85);
-          border-radius: 4px;
-        `
-        el.appendChild(gem)
+        const wrapper = document.createElement('div')
+        wrapper.style.cssText = `
+    width: 34px;
+    height: 34px;
+    margin: 0 auto;
+    pointer-events: none;
+    display: grid;
+    place-items: center;
+    filter: drop-shadow(0 0 10px rgba(255, 215, 0, 0.8));
+  `
+
+        // Inject animated SVG from schema
+        wrapper.innerHTML = data.svg || ''
+
+        // Normalize SVG size
+        const svg = wrapper.querySelector('svg')
+        if (svg) {
+          svg.style.width = '34px'
+          svg.style.height = '34px'
+          svg.style.display = 'block'
+        }
+
+        el.appendChild(wrapper)
 
         const name = document.createElement('div')
         name.textContent = data.name || 'Gem'
         name.style.cssText = `
-          color: #e5e7eb;
-          font-size: 10px;
-          margin-top: 4px;
-          font-weight: 600;
-        `
+    color: #fde68a;
+    font-size: 10px;
+    margin-top: 4px;
+    font-weight: 600;
+    text-shadow: 0 0 6px rgba(0,0,0,0.8);
+  `
         el.appendChild(name)
 
         const rarity = document.createElement('div')
         rarity.textContent = `◆ ${data.rarity || 'common'}`
         rarity.style.cssText = `
-          color: #fde68a;
-          font-size: 9px;
-          margin-top: 2px;
-          text-transform: uppercase;
-          letter-spacing: 0.05em;
-        `
+    color: #fbbf24;
+    font-size: 9px;
+    margin-top: 2px;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+  `
         el.appendChild(rarity)
       } else {
         // PERSON / TEX – AVATAR MARKER
@@ -342,12 +330,12 @@ function pinData(newData = []) {
           margin: 0 auto;
           transition: all 0.3s ease;
           box-shadow: ${
-          data.type === 'person'
-            ? '0 0 14px rgba(0,230,255,0.8)'
-            : data.type === 'tex'
+            data.type === 'person'
+              ? '0 0 14px rgba(0,230,255,0.8)'
+              : data.type === 'tex'
               ? '0 0 12px rgba(255,45,149,0.8)'
               : '0 0 12px rgba(0,255,180,0.5)'
-        };
+          };
         `
 
         const name = document.createElement('div')
@@ -374,24 +362,14 @@ function pinData(newData = []) {
         el.appendChild(name)
         el.appendChild(uid)
 
-
         if (data.type === 'tex') {
           const wrapper = document.createElement('div')
           const mountPoint = document.createElement('div')
           wrapper.appendChild(mountPoint)
 
           const likes = safeNumber(data.likes, data.stats?.likes)
-          const reping = safeNumber(
-            data.retex,
-            data.reping,
-            data.stats?.retex,
-            data.stats?.lynks
-          )
-          const comments = safeNumber(
-            data.comments,
-            data.stats?.replies,
-            data.stats?.comments
-          )
+          const reping = safeNumber(data.retex, data.reping, data.stats?.retex, data.stats?.lynks)
+          const comments = safeNumber(data.comments, data.stats?.replies, data.stats?.comments)
 
           const app = createApp(PingCard, {
             text: data.text,
@@ -434,12 +412,8 @@ function pinData(newData = []) {
           emitter.emit('drawer:settings', data)
         }
 
-        globe.value?.pointOfView(
-          { lat: data.lat, lng: data.lng, altitude: 1.5 },
-          1500
-        )
+        globe.value?.pointOfView({ lat: data.lat, lng: data.lng, altitude: 1.5 }, 1500)
       }
-
 
       return el
     })
@@ -528,9 +502,7 @@ onMounted(async () => {
         .hexPolygonResolution(3)
         .hexPolygonMargin(0.3)
         .hexPolygonUseDots(true)
-        .hexPolygonColor(
-          () => selectedPalette[Math.floor(Math.random() * selectedPalette.length)]
-        )
+        .hexPolygonColor(() => selectedPalette[Math.floor(Math.random() * selectedPalette.length)])
     }
 
     // Wired paths
@@ -577,10 +549,7 @@ onMounted(async () => {
 
     emitter.on('globe:pointOfView', (viewport) => {
       if (!globe.value) return
-      globe.value.pointOfView(
-        { lat: viewport.lat, lng: viewport.lng, altitude: viewport.altitude },
-        viewport.transition
-      )
+      globe.value.pointOfView({ lat: viewport.lat, lng: viewport.lng, altitude: viewport.altitude }, viewport.transition)
     })
   } catch (err) {
     console.error('Globe init error:', err)
@@ -690,16 +659,23 @@ onBeforeUnmount(() => {
 }
 
 @keyframes spin {
-  from { transform: rotate(0deg); }
-  to   { transform: rotate(360deg); }
+  from {
+    transform: rotate(0deg);
+  }
+  to {
+    transform: rotate(360deg);
+  }
 }
 
 @keyframes draw {
-  to { stroke-dashoffset: 0; }
+  to {
+    stroke-dashoffset: 0;
+  }
 }
 
 @keyframes globePulse {
-  0%, 100% {
+  0%,
+  100% {
     box-shadow: 0 0 25px rgba(0, 255, 230, 0.15), inset 0 0 20px rgba(0, 255, 230, 0.05);
   }
   50% {
