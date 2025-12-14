@@ -272,7 +272,7 @@ async function postPublish() {
     const response = await post(
       '/api/v1',
       {
-        topic: 'createPublish',
+        topic: 'createTex',
         data: {
           text: publishText.value,
           location: {
